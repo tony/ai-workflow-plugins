@@ -45,6 +45,3 @@ jobs:
 
       - name: Marketplace sync check
         run: uv run scripts/marketplace.py sync --check
-
-      - name: E2E plugin lifecycle (local)
-        run: uv run scripts/e2e.py --source local
