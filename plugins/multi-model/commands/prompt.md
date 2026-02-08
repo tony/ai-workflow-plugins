@@ -145,7 +145,7 @@ cd ../<repo-name>-mm-gpt && timeout 600 agent -p -f --model gpt-5.2 "<implementa
 ### Execution Strategy
 
 - Launch all models in parallel.
-- Use 10-minute timeout (`timeout 600`) since models are writing code. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
+- Use 10-minute timeout (`timeout 600`) since models are writing code. If `timeout` is not available and `gtimeout` is not installed, time limits will not be enforced. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 - If a model fails, note the failure and continue with remaining models.
 
 ---

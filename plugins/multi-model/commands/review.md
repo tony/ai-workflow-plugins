@@ -158,7 +158,7 @@ timeout 900 agent -p -f --model gpt-5.2 "<review prompt>"
 - Launch the Claude Task agent and the Gemini/GPT Bash commands in parallel where possible.
 - Use whichever backend was resolved in Phase 2 for each slot.
 - If a reviewer fails (timeout, crash, API error), note the failure and continue with the remaining reviewers.
-- Set a 15-minute timeout for external CLI commands (`timeout 900`). If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
+- Set a 15-minute timeout for external CLI commands (`timeout 900`). If `timeout` is not available and `gtimeout` is not installed, time limits will not be enforced. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 
 ---
 

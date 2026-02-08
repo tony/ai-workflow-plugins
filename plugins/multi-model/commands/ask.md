@@ -126,7 +126,7 @@ timeout 450 agent -p -f --model gpt-5.2 "<question prompt>"
 
 - Launch the Claude Task agent and external CLI commands in parallel.
 - If a model fails (timeout, crash, API error), note the failure and continue with remaining models.
-- Set a 7.5-minute timeout for external CLI commands (`timeout 450`). If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
+- Set a 7.5-minute timeout for external CLI commands (`timeout 450`). If `timeout` is not available and `gtimeout` is not installed, time limits will not be enforced. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 
 ---
 
