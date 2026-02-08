@@ -112,23 +112,53 @@ EOF
 
 ### Plugin Directory Structure
 
-Every plugin directory under `plugins/` must contain:
+Every plugin directory under `plugins/` must contain `.claude-plugin/plugin.json` and
+`README.md`. Beyond that, include any combination of component directories:
 
 ```
 plugins/<name>/
 ├── .claude-plugin/
 │   └── plugin.json      # name, description, author (required)
-├── README.md            # usage docs, prerequisites, command reference
-└── commands/
-    └── *.md             # one or more command files with YAML frontmatter
+├── README.md            # usage docs, prerequisites, component reference
+├── commands/            # slash commands (*.md with YAML frontmatter)
+├── agents/              # sub-agents (*.md with name, description, tools)
+├── skills/              # skills (skill-name/SKILL.md)
+├── hooks/               # hooks (hooks.json)
+├── .mcp.json            # MCP server configuration
+└── .lsp.json            # LSP server configuration
 ```
+
+At least one component directory (`commands/`, `agents/`, `skills/`, or `hooks/`) or
+configuration file (`.mcp.json`, `.lsp.json`) is expected.
+
+### Component Frontmatter Schemas
+
+Each component type has specific frontmatter requirements:
+
+**Commands** (`commands/*.md`):
+- `description` (required) — shown in `/` menu
+- `allowed-tools` (optional) — tool access list (bare names, e.g. `Bash`)
+- `argument-hint` (optional) — placeholder text for command argument
+- `model` (optional) — model override for this command
+
+**Agents** (`agents/*.md`):
+- `name` (required) — display name for the agent
+- `description` (required) — must include `<example>` blocks showing when to trigger
+- `tools` (optional) — tool access list
+- `model` (optional) — model override for this agent
+
+**Skills** (`skills/*/SKILL.md`):
+- `name` (required) — skill display name
+- `description` (required) — describes when and how to invoke the skill
+- `version` (optional) — skill version
 
 ### Marketplace Manifest
 
 - Located at `.claude-plugin/marketplace.json`
 - Must reference every plugin under `plugins/` with a valid `source` path
 - Each entry requires: `name`, `description`, `version`, `author`, `source`, `category`
-- Valid categories: `development`, `productivity`, `testing`
+- Valid categories: `development`, `productivity`, `testing`, `security`, `design`,
+  `database`, `deployment`, `monitoring`, `learning`
 
 ### Language-Agnostic Design
 
