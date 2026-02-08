@@ -141,7 +141,7 @@ timeout 600 agent -p -f --model gpt-5.2 "<planning prompt>"
 
 - Launch all models in parallel.
 - If a model fails, note the failure and continue with remaining models.
-- Set a 10-minute timeout for external CLI commands (`timeout 600`). If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
+- Set a 10-minute timeout for external CLI commands (`timeout 600`). If `timeout` is not available and `gtimeout` is not installed, time limits will not be enforced. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 
 ---
 
