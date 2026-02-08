@@ -85,3 +85,42 @@ what:
 EOF
 )"
 ```
+
+## Plugin Quality Standards
+
+### Command Files
+
+- Every command `.md` file **must** have YAML frontmatter with at least a `description` field
+- Commands **must not** hardcode language-specific tool commands (e.g., `uv run pytest`,
+  `npm test`, `cargo test`). Instead, reference "the project's test suite / quality checks
+  as defined in AGENTS.md/CLAUDE.md"
+- Frontmatter `allowed-tools` should use bare tool names (e.g., `Bash`) rather than
+  language-specific patterns (e.g., `Bash(uv run:*)`) so commands work across any project
+
+### Plugin Directory Structure
+
+Every plugin directory under `plugins/` must contain:
+
+```
+plugins/<name>/
+├── .claude-plugin/
+│   └── plugin.json      # name, description, author (required)
+├── README.md            # usage docs, prerequisites, command reference
+└── commands/
+    └── *.md             # one or more command files with YAML frontmatter
+```
+
+### Marketplace Manifest
+
+- Located at `.claude-plugin/marketplace.json`
+- Must reference every plugin under `plugins/` with a valid `source` path
+- Each entry requires: `name`, `description`, `version`, `author`, `source`, `category`
+- Valid categories: `development`, `productivity`, `testing`
+
+### Language-Agnostic Design
+
+Plugins in this repository are designed to work with **any** programming language or
+framework. Commands discover project-specific tooling by reading AGENTS.md / CLAUDE.md
+at runtime rather than assuming a particular ecosystem. When listing examples of tools
+or frameworks, present them as illustrative examples (e.g., in tables or lists), never
+as hardcoded instructions.
