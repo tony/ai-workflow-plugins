@@ -31,6 +31,8 @@ True
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import typing as t
 from pathlib import Path
 
@@ -622,6 +624,59 @@ def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     return errors
 
 
+def _run_claude_validate(path: Path) -> tuple[list[str], list[str]]:
+    """Run ``claude plugin validate`` and return (errors, warnings).
+
+    Returns empty lists if the CLI is not available.
+
+    Parameters
+    ----------
+    path : Path
+        Path to validate (marketplace root or plugin directory).
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        (errors, warnings) extracted from validate output.
+    """
+    if shutil.which("claude") is None:
+        return [], []
+    result = subprocess.run(  # noqa: S603
+        ["claude", "plugin", "validate", str(path)],  # noqa: S607
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    marker = "\u276f"
+    findings = [
+        line.strip().removeprefix(marker).strip()
+        for line in result.stdout.splitlines()
+        if marker in line
+    ]
+    if result.returncode != 0:
+        return [f"claude validate: {f}" for f in findings], []
+    return [], [f"claude validate: {f}" for f in findings]
+
+
+def _lint_claude_validate() -> tuple[list[str], list[str]]:
+    """Run ``claude plugin validate`` on the repo and each plugin, printing status."""
+    if shutil.which("claude") is None:
+        console.print("\n[dim]Skipping claude plugin validate (CLI not found)[/dim]")
+        return [], []
+
+    console.print("\n[bold]Running claude plugin validate...[/bold]")
+    all_errors: list[str] = []
+    all_warnings: list[str] = []
+    for path in [REPO_ROOT, *discover_plugins()]:
+        ve, vw = _run_claude_validate(path)
+        all_errors.extend(ve)
+        all_warnings.extend(vw)
+    if not all_errors:
+        console.print("  [green]OK[/green]")
+    return all_errors, all_warnings
+
+
 @app.command()
 def lint() -> None:
     """Validate the marketplace manifest and all plugin directories."""
@@ -678,6 +733,11 @@ def lint() -> None:
             f"Plugin '{name}' exists in plugins/ but is not listed in marketplace.json"
             for name in sorted(undiscovered)
         )
+
+    # Run claude plugin validate if CLI is available
+    cli_errors, cli_warnings = _lint_claude_validate()
+    errors.extend(cli_errors)
+    warnings.extend(cli_warnings)
 
     # Report results
     console.print()
