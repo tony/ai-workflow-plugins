@@ -103,12 +103,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to implement in the 
 
 **Native (`gemini` CLI)** — run in the worktree directory:
 ```bash
-cd ../<repo-name>-mm-gemini && timeout 600 gemini -p "<implementation prompt>"
+cd ../<repo-name>-mm-gemini && timeout 1200 gemini -p "<implementation prompt>"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../<repo-name>-mm-gemini && timeout 600 agent -p -f --model gemini-3-pro "<implementation prompt>"
+cd ../<repo-name>-mm-gemini && timeout 1200 agent -p -f --model gemini-3-pro "<implementation prompt>"
 ```
 
 ### GPT Implementation (worktree)
@@ -120,7 +120,7 @@ cd ../<repo-name>-mm-gemini && timeout 600 agent -p -f --model gemini-3-pro "<im
 
 **Native (`codex` CLI)** — run in the worktree directory:
 ```bash
-cd ../<repo-name>-mm-gpt && timeout 600 codex \
+cd ../<repo-name>-mm-gpt && timeout 1200 codex \
     --sandbox danger-full-access \
     --ask-for-approval never \
     -c model_reasoning_effort=medium \
@@ -129,13 +129,13 @@ cd ../<repo-name>-mm-gpt && timeout 600 codex \
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../<repo-name>-mm-gpt && timeout 600 agent -p -f --model gpt-5.2 "<implementation prompt>"
+cd ../<repo-name>-mm-gpt && timeout 1200 agent -p -f --model gpt-5.2 "<implementation prompt>"
 ```
 
 ### Execution Strategy
 
 - Launch all models in parallel.
-- Use 10-minute timeout (`timeout 600`) since models are writing code.
+- Use 20-minute timeout (`timeout 1200`) since models are writing code. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 - If a model fails, note the failure and continue with remaining models.
 
 ---
@@ -304,7 +304,8 @@ The changes are now in the working tree, unstaged. The user can review and commi
 - Always clean up worktrees and branches after synthesis
 - The synthesis must pass all quality gates before being considered complete
 - If only Claude is available, skip worktree creation and just implement directly
-- Use `timeout 600` for external CLI commands
+- Use `timeout 1200` for external CLI commands — adjust higher or lower based on observed completion times
 - If a model fails, clearly report why and continue with remaining models
 - Branch names use `mm/<model>/<YYYYMMDD-HHMMSS>` format
 - Never commit the synthesized result — leave it unstaged for user review
+- If an external model times out persistently, ask the user whether to retry with a higher timeout. Warn that retrying spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).

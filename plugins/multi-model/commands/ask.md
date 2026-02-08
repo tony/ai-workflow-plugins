@@ -81,12 +81,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 
 **Native (`gemini` CLI)**:
 ```bash
-timeout 300 gemini -p "<question prompt>"
+timeout 450 gemini -p "<question prompt>"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-timeout 300 agent -p -f --model gemini-3-pro "<question prompt>"
+timeout 450 agent -p -f --model gemini-3-pro "<question prompt>"
 ```
 
 ### GPT Answer (if available)
@@ -100,7 +100,7 @@ timeout 300 agent -p -f --model gemini-3-pro "<question prompt>"
 
 **Native (`codex` CLI)**:
 ```bash
-timeout 300 codex \
+timeout 450 codex \
     --sandbox danger-full-access \
     --ask-for-approval never \
     -c model_reasoning_effort=medium \
@@ -109,14 +109,14 @@ timeout 300 codex \
 
 **Fallback (`agent` CLI)**:
 ```bash
-timeout 300 agent -p -f --model gpt-5.2 "<question prompt>"
+timeout 450 agent -p -f --model gpt-5.2 "<question prompt>"
 ```
 
 ### Execution Strategy
 
 - Launch the Claude Task agent and external CLI commands in parallel.
 - If a model fails (timeout, crash, API error), note the failure and continue with remaining models.
-- Set a 5-minute timeout for external CLI commands (`timeout 300`).
+- Set a 7.5-minute timeout for external CLI commands (`timeout 450`). If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 
 ---
 
@@ -174,5 +174,6 @@ Combine the best elements from all responses:
 - Always cite specific files and line numbers when possible
 - If models contradict each other, check the code and state which is correct
 - If only Claude is available, still provide a thorough answer and note the limitation
-- Use `timeout 300` for external CLI commands
+- Use `timeout 450` for external CLI commands — adjust higher or lower based on observed completion times
 - Capture stderr from external tools to report failures clearly
+- If an external model times out persistently, ask the user whether to retry with a higher timeout. Warn that retrying spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).
