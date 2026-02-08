@@ -72,6 +72,32 @@ class Author(pydantic.BaseModel):
     url: str | None = None
 
 
+VALID_CATEGORIES = (
+    "database",
+    "deployment",
+    "design",
+    "development",
+    "learning",
+    "monitoring",
+    "productivity",
+    "security",
+    "testing",
+)
+"""Valid plugin marketplace categories (alphabetical)."""
+
+Category = t.Literal[
+    "database",
+    "deployment",
+    "design",
+    "development",
+    "learning",
+    "monitoring",
+    "productivity",
+    "security",
+    "testing",
+]
+
+
 class PluginEntry(pydantic.BaseModel):
     """A plugin entry in the marketplace manifest.
 
@@ -87,6 +113,21 @@ class PluginEntry(pydantic.BaseModel):
     ... )
     >>> entry.name
     'test'
+
+    Invalid categories are rejected:
+
+    >>> try:
+    ...     PluginEntry(
+    ...         name="bad",
+    ...         description="Bad",
+    ...         version="1.0.0",
+    ...         author=Author(name="Test"),
+    ...         source="./plugins/bad",
+    ...         category="invalid-category",
+    ...     )
+    ... except pydantic.ValidationError:
+    ...     print("rejected")
+    rejected
     """
 
     name: str
@@ -94,9 +135,13 @@ class PluginEntry(pydantic.BaseModel):
     version: str
     author: Author
     source: str
-    category: str
+    category: Category
     tags: list[str] | None = None
     homepage: str | None = None
+    repository: str | None = None
+    license: str | None = None
+    keywords: list[str] | None = None
+    strict: bool | None = None
 
 
 class MarketplaceManifest(pydantic.BaseModel):
@@ -323,6 +368,13 @@ def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     skills_dir = plugin_dir / "skills"
     if skills_dir.exists():
         errors.extend(_validate_skills_dir(name, skills_dir))
+
+    # Validate hooks/hooks.json exists when hooks/ is present
+    hooks_dir = plugin_dir / "hooks"
+    if hooks_dir.exists():
+        hooks_json = hooks_dir / "hooks.json"
+        if not hooks_json.exists():
+            errors.append(f"[{name}] hooks/ exists but missing hooks.json")
 
     return errors
 
