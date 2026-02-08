@@ -95,6 +95,8 @@ class PluginEntry(pydantic.BaseModel):
     author: Author
     source: str
     category: str
+    tags: list[str] | None = None
+    homepage: str | None = None
 
 
 class MarketplaceManifest(pydantic.BaseModel):
@@ -216,6 +218,45 @@ def parse_frontmatter(path: Path) -> dict[str, t.Any] | None:
     return None
 
 
+def _validate_agents_dir(plugin_name: str, agents_dir: Path) -> list[str]:
+    """Validate agents/*.md frontmatter in a plugin directory."""
+    errors: list[str] = []
+    for md_file in sorted(agents_dir.glob("*.md")):
+        fm = parse_frontmatter(md_file)
+        if fm is None:
+            errors.append(f"[{plugin_name}] agents/{md_file.name}: Missing YAML frontmatter")
+        else:
+            errors.extend(
+                f"[{plugin_name}] agents/{md_file.name}: Frontmatter missing '{field}'"
+                for field in ("name", "description")
+                if field not in fm
+            )
+    return errors
+
+
+def _validate_skills_dir(plugin_name: str, skills_dir: Path) -> list[str]:
+    """Validate skills/*/SKILL.md frontmatter in a plugin directory."""
+    errors: list[str] = []
+    for skill_subdir in sorted(d for d in skills_dir.iterdir() if d.is_dir()):
+        skill_md = skill_subdir / "SKILL.md"
+        if not skill_md.exists():
+            errors.append(f"[{plugin_name}] skills/{skill_subdir.name}/: Missing SKILL.md")
+            continue
+        fm = parse_frontmatter(skill_md)
+        if fm is None:
+            errors.append(
+                f"[{plugin_name}] skills/{skill_subdir.name}/SKILL.md: Missing YAML frontmatter"
+            )
+        else:
+            prefix = f"[{plugin_name}] skills/{skill_subdir.name}/SKILL.md"
+            errors.extend(
+                f"{prefix}: Frontmatter missing '{field}'"
+                for field in ("name", "description")
+                if field not in fm
+            )
+    return errors
+
+
 def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     """Validate a single plugin directory structure.
 
@@ -249,19 +290,39 @@ def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     if not readme_path.exists():
         errors.append(f"[{name}] Missing README.md")
 
+    # Check for at least one component directory or config file
+    component_dirs = ["commands", "agents", "skills", "hooks"]
+    config_files = [".mcp.json", ".lsp.json"]
+    has_component = any((plugin_dir / d).exists() for d in component_dirs) or any(
+        (plugin_dir / f).exists() for f in config_files
+    )
+    if not has_component:
+        msg = f"[{name}] No component directory or config file found"
+        errors.append(msg)
+
+    # Validate commands/*.md frontmatter
     commands_dir = plugin_dir / "commands"
-    if not commands_dir.exists():
-        errors.append(f"[{name}] Missing commands/ directory")
-    else:
+    if commands_dir.exists():
         md_files = sorted(commands_dir.glob("*.md"))
         if not md_files:
             errors.append(f"[{name}] No .md files in commands/")
         for md_file in md_files:
             fm = parse_frontmatter(md_file)
             if fm is None:
-                errors.append(f"[{name}] {md_file.name}: Missing YAML frontmatter")
+                errors.append(f"[{name}] commands/{md_file.name}: Missing YAML frontmatter")
             elif "description" not in fm:
-                errors.append(f"[{name}] {md_file.name}: Frontmatter missing 'description'")
+                errors.append(
+                    f"[{name}] commands/{md_file.name}: Frontmatter missing 'description'"
+                )
+
+    # Validate agents/*.md and skills/*/SKILL.md frontmatter
+    agents_dir = plugin_dir / "agents"
+    if agents_dir.exists():
+        errors.extend(_validate_agents_dir(name, agents_dir))
+
+    skills_dir = plugin_dir / "skills"
+    if skills_dir.exists():
+        errors.extend(_validate_skills_dir(name, skills_dir))
 
     return errors
 
