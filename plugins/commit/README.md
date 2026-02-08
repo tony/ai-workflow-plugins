@@ -2,6 +2,12 @@
 
 Create git commits following project conventions with format enforcement and safety checks.
 
+## Installation
+
+```console
+/plugin install commit@ai-workflow-plugins
+```
+
 ## Command
 
 | Command | Description |
