@@ -15,10 +15,19 @@ Language-agnostic workflow plugins for [Claude Code](https://docs.anthropic.com/
 
 Install a plugin from this marketplace repository:
 
-```
+```console
 /plugin install multi-model@tony/claude-plugins
+```
+
+```console
 /plugin install rebase@tony/claude-plugins
+```
+
+```console
 /plugin install changelog@tony/claude-plugins
+```
+
+```console
 /plugin install tdd@tony/claude-plugins
 ```
 
@@ -40,31 +49,67 @@ or any other language.
 
 ## Development
 
+Scripts use [uv](https://docs.astral.sh/uv/) to manage Python dependencies.
+
+Install uv:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+or:
+
+```bash
+wget -qO- https://astral.sh/uv/install.sh | sh
+```
+
+See [uv installation docs](https://docs.astral.sh/uv/getting-started/installation/) for
+other methods.
+
 ### Lint and validate
 
 ```bash
-uv run scripts/marketplace.py lint
+uv run ./scripts/marketplace.py lint
 ```
 
 ### Sync marketplace manifest with plugin directories
 
+Dry-run:
+
 ```bash
-uv run scripts/marketplace.py sync          # dry-run
-uv run scripts/marketplace.py sync --write  # update marketplace.json
+uv run ./scripts/marketplace.py sync
+```
+
+Write changes to marketplace.json:
+
+```bash
+uv run ./scripts/marketplace.py sync --write
 ```
 
 ### Check for outdated entries
 
 ```bash
-uv run scripts/marketplace.py check-outdated
+uv run ./scripts/marketplace.py check-outdated
 ```
 
 ### Code quality for scripts
 
+Lint:
+
 ```bash
-ruff check scripts/
-ruff format --check scripts/
-basedpyright scripts/
+uv run ruff check ./scripts/
+```
+
+Format check:
+
+```bash
+uv run ruff format --check ./scripts/
+```
+
+Type check:
+
+```bash
+uv run basedpyright ./scripts/
 ```
 
 ## License
