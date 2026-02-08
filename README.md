@@ -2,6 +2,11 @@
 
 Language-agnostic workflow plugins for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
+> **Warning:** Review plugins before installing. Anthropic does not control plugin
+> contents and cannot verify they work as intended.
+
+**Repository:** [tony/ai-workflow-plugins](https://github.com/tony/ai-workflow-plugins)
+
 ## Plugins
 
 | Plugin | Category | Description |
@@ -18,6 +23,8 @@ Add the marketplace:
 ```console
 /plugin marketplace add tony/ai-workflow-plugins
 ```
+
+You can also browse available plugins with `/plugin > Discover`.
 
 Then install any plugin:
 
@@ -117,6 +124,11 @@ Type check:
 ```bash
 uv run basedpyright ./scripts/
 ```
+
+## Documentation
+
+See the [official Claude Code plugin docs](https://docs.anthropic.com/en/docs/claude-code/plugins) for
+authoring guides, component schemas, and marketplace publishing.
 
 ## License
 
