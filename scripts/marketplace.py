@@ -44,8 +44,18 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_PATH = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 PLUGINS_DIR = REPO_ROOT / "plugins"
 
-app = typer.Typer(help="Marketplace management CLI for claude-plugins.")
+app = typer.Typer(
+    help="Marketplace management CLI for claude-plugins.",
+    invoke_without_command=True,
+)
 console = rich.console.Console()
+
+
+@app.callback()
+def _main(ctx: typer.Context) -> None:  # pyright: ignore[reportUnusedFunction]
+    """Marketplace management CLI for claude-plugins."""
+    if ctx.invoked_subcommand is None:
+        console.print(ctx.get_help())
 
 
 class Author(pydantic.BaseModel):
