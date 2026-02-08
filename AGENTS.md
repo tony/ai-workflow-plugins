@@ -118,7 +118,7 @@ Every plugin directory under `plugins/` must contain `.claude-plugin/plugin.json
 ```
 plugins/<name>/
 ├── .claude-plugin/
-│   └── plugin.json      # name, description, author (required)
+│   └── plugin.json      # name, description (required)
 ├── README.md            # usage docs, prerequisites, component reference
 ├── commands/            # slash commands (*.md with YAML frontmatter)
 ├── agents/              # sub-agents (*.md with name, description, tools)
@@ -164,6 +164,7 @@ Each component type has specific frontmatter requirements:
 - `disallowedTools` (optional) — comma-separated tools to deny
 - `context` (optional) — agent context mode
 - `disable-model-invocation` (optional) — if true, runs without model invocation
+- Content can reference `$ARGUMENTS` to access arguments passed to the skill
 
 **Hooks** (`hooks/hooks.json`):
 ```json
@@ -175,18 +176,59 @@ Each component type has specific frontmatter requirements:
   }
 }
 ```
-- Events: `PreToolUse`, `PostToolUse`, `Stop`, `SubagentStop`, `UserPromptSubmit`,
-  `SessionStart`, `SessionEnd`, `PreCompact`, `Notification`
+- Events: `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `Stop`,
+  `SubagentStart`, `SubagentStop`, `UserPromptSubmit`, `PermissionRequest`,
+  `SessionStart`, `SessionEnd`, `PreCompact`, `Notification`,
+  `TeammateIdle`, `TaskCompleted`
 - Hook types: `command` (shell script), `prompt` (LLM evaluation), `agent` (agentic verifier)
 - Use `${CLAUDE_PLUGIN_ROOT}` for portable paths in command hooks
+
+**MCP Servers** (`.mcp.json`):
+```json
+{
+  "server-name": {
+    "type": "http",
+    "url": "https://api.example.com/mcp",
+    "headers": { "Authorization": "Bearer ${API_KEY}" }
+  }
+}
+```
+- Server types: `http` (remote REST), `stdio` (local subprocess), `sse` (server-sent events)
+- `stdio` servers use `command` and `args` instead of `url`
+- Environment variables expanded with `${VAR_NAME}` syntax
+- Use `${CLAUDE_PLUGIN_ROOT}` for portable paths to local server binaries
+
+**LSP Servers** (`.lsp.json`):
+```json
+{
+  "server-name": {
+    "command": "pyright-langserver",
+    "args": ["--stdio"],
+    "extensionToLanguage": { ".py": "python", ".pyi": "python" }
+  }
+}
+```
+- Required: `command`, `extensionToLanguage`
+- Optional: `args`, `transport` (`stdio`/`socket`), `env`, `initializationOptions`,
+  `settings`, `startupTimeout`, `shutdownTimeout`, `restartOnCrash`, `maxRestarts`
+- Users must install the language server binary separately
 
 ### Marketplace Manifest
 
 - Located at `.claude-plugin/marketplace.json`
 - Must reference every plugin under `plugins/` with a valid `source` path
-- Each entry requires: `name`, `description`, `version`, `author`, `source`, `category`
+- Official spec requires only `name` and `source` per entry; this marketplace also
+  requires `description`, `version`, `author`, and `category` for quality
 - Valid categories: `development`, `productivity`, `testing`, `security`, `design`,
   `database`, `deployment`, `monitoring`, `learning`
+- Source types for plugin entries:
+  - Relative path: `"./plugins/my-plugin"` (for git-based marketplaces)
+  - GitHub: `{ "source": "github", "repo": "owner/repo" }` (optional `ref`, `sha`)
+  - Git URL: `{ "source": "url", "url": "https://.../.git" }` (optional `ref`, `sha`)
+- Reserved marketplace names: `claude-code-marketplace`, `claude-code-plugins`,
+  `claude-plugins-official`, `anthropic-marketplace`, `anthropic-plugins`,
+  `agent-skills`, `life-sciences`. Names impersonating official Anthropic
+  marketplaces are also blocked.
 
 ### Language-Agnostic Design
 
