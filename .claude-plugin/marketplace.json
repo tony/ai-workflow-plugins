@@ -16,7 +16,9 @@
         "email": "tony@git-pull.com"
       },
       "source": "./plugins/multi-model",
-      "category": "development"
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/multi-model",
+      "license": "MIT"
     },
     {
       "name": "rebase",
@@ -27,7 +29,9 @@
         "email": "tony@git-pull.com"
       },
       "source": "./plugins/rebase",
-      "category": "development"
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/rebase",
+      "license": "MIT"
     },
     {
       "name": "changelog",
@@ -38,7 +42,9 @@
         "email": "tony@git-pull.com"
       },
       "source": "./plugins/changelog",
-      "category": "productivity"
+      "category": "productivity",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/changelog",
+      "license": "MIT"
     },
     {
       "name": "tdd",
@@ -49,7 +55,9 @@
         "email": "tony@git-pull.com"
       },
       "source": "./plugins/tdd",
-      "category": "testing"
+      "category": "testing",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/tdd",
+      "license": "MIT"
     }
   ]
 }
