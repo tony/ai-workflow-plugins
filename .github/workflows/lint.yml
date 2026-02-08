@@ -3,17 +3,7 @@ name: Lint
 on:
   push:
     branches: [main]
-    paths:
-      - "plugins/**"
-      - ".claude-plugin/**"
-      - "scripts/**"
-      - "pyproject.toml"
   pull_request:
-    paths:
-      - "plugins/**"
-      - ".claude-plugin/**"
-      - "scripts/**"
-      - "pyproject.toml"
 
 jobs:
   lint:
