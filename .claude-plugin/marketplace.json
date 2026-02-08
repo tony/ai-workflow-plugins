@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "claude-plugins",
+  "name": "ai-workflow-plugins",
   "description": "Language-agnostic workflow plugins for Claude Code — multi-model AI collaboration, rebase automation, changelog generation, and TDD workflows",
   "owner": {
     "name": "Tony Narlock",
