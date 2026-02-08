@@ -61,6 +61,19 @@
       "category": "testing",
       "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/tdd",
       "license": "MIT"
+    },
+    {
+      "name": "commit",
+      "description": "Create git commits following project conventions with format enforcement and safety checks",
+      "version": "0.0.1",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/commit",
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/commit",
+      "license": "MIT"
     }
   ]
 }
