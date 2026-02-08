@@ -2,6 +2,16 @@
 
 Project conventions and standards for AI-assisted development.
 
+## Official Documentation References
+
+These docs define the Claude Code plugin system and should be consulted for spec details:
+
+- [Plugins overview](https://code.claude.com/docs/en/plugins.md) — plugin lifecycle, installation, discovery
+- [Plugin reference](https://code.claude.com/docs/en/plugins-reference.md) — component types, frontmatter schemas, directory structure
+- [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces.md) — marketplace.json schema, source types, publishing
+- [Sub-agents](https://code.claude.com/docs/en/sub-agents.md) — agent frontmatter, delegation patterns, tool restrictions
+- [Agent teams](https://code.claude.com/docs/en/agent-teams.md) — multi-agent coordination (experimental)
+
 ## Git Commit Standards
 
 Format commit messages as:
