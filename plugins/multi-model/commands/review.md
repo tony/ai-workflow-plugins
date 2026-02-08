@@ -107,13 +107,13 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 **Native (`gemini` CLI)**:
 
 ```bash
-timeout 300 gemini -p "<review prompt>"
+timeout 900 gemini -p "<review prompt>"
 ```
 
 **Fallback (`agent` CLI)**:
 
 ```bash
-timeout 300 agent -p -f --model gemini-3-pro "<review prompt>"
+timeout 900 agent -p -f --model gemini-3-pro "<review prompt>"
 ```
 
 ### GPT Review (if available)
@@ -130,7 +130,7 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 **Native (`codex` CLI)**:
 
 ```bash
-timeout 300 codex \
+timeout 900 codex \
     --sandbox danger-full-access \
     --ask-for-approval never \
     -c model_reasoning_effort=medium \
@@ -140,7 +140,7 @@ timeout 300 codex \
 **Fallback (`agent` CLI)**:
 
 ```bash
-timeout 300 agent -p -f --model gpt-5.2 "<review prompt>"
+timeout 900 agent -p -f --model gpt-5.2 "<review prompt>"
 ```
 
 ### Execution Strategy
@@ -148,7 +148,7 @@ timeout 300 agent -p -f --model gpt-5.2 "<review prompt>"
 - Launch the Claude Task agent and the Gemini/GPT Bash commands in parallel where possible.
 - Use whichever backend was resolved in Phase 2 for each slot.
 - If a reviewer fails (timeout, crash, API error), note the failure and continue with the remaining reviewers.
-- Set a 5-minute timeout for external CLI commands (`timeout 300`).
+- Set a 15-minute timeout for external CLI commands (`timeout 900`). If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 
 ---
 
@@ -247,5 +247,6 @@ After presenting the report:
 - Always clearly attribute which reviewer(s) found each issue
 - Consensus issues take priority over single-reviewer issues
 - If no external reviewers are available, fall back to Claude-only review and note the limitation
-- Use `timeout 300` for external CLI commands to prevent hangs
+- Use `timeout 900` for external CLI commands — adjust higher or lower based on observed completion times
 - Capture stderr from external tools to report failures clearly
+- If an external model times out persistently, ask the user whether to retry with a higher timeout. Warn that retrying spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).

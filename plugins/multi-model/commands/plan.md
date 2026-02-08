@@ -96,12 +96,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to create Claude's p
 
 **Native (`gemini` CLI)**:
 ```bash
-timeout 300 gemini -p "<planning prompt>"
+timeout 600 gemini -p "<planning prompt>"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-timeout 300 agent -p -f --model gemini-3-pro "<planning prompt>"
+timeout 600 agent -p -f --model gemini-3-pro "<planning prompt>"
 ```
 
 ### GPT Plan (if available)
@@ -115,7 +115,7 @@ timeout 300 agent -p -f --model gemini-3-pro "<planning prompt>"
 
 **Native (`codex` CLI)**:
 ```bash
-timeout 300 codex \
+timeout 600 codex \
     --sandbox danger-full-access \
     --ask-for-approval never \
     -c model_reasoning_effort=medium \
@@ -124,14 +124,14 @@ timeout 300 codex \
 
 **Fallback (`agent` CLI)**:
 ```bash
-timeout 300 agent -p -f --model gpt-5.2 "<planning prompt>"
+timeout 600 agent -p -f --model gpt-5.2 "<planning prompt>"
 ```
 
 ### Execution Strategy
 
 - Launch all models in parallel.
 - If a model fails, note the failure and continue with remaining models.
-- Set a 5-minute timeout for external CLI commands (`timeout 300`).
+- Set a 10-minute timeout for external CLI commands (`timeout 600`). If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 
 ---
 
@@ -224,6 +224,7 @@ For each plan's claims about the codebase:
 - Always resolve conflicts by checking what the code actually does
 - The final plan must follow project conventions from CLAUDE.md/AGENTS.md
 - If only Claude is available, still produce a thorough plan and note the limitation
-- Use `timeout 300` for external CLI commands
+- Use `timeout 600` for external CLI commands — adjust higher or lower based on observed completion times
 - Capture stderr from external tools to report failures clearly
 - The output should be a concrete, actionable plan — not vague suggestions
+- If an external model times out persistently, ask the user whether to retry with a higher timeout. Warn that retrying spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).

@@ -135,7 +135,7 @@ cd ../<repo-name>-mm-gpt && timeout 600 agent -p -f --model gpt-5.2 "<implementa
 ### Execution Strategy
 
 - Launch all models in parallel.
-- Use 10-minute timeout (`timeout 600`) since models are writing code.
+- Use 10-minute timeout (`timeout 600`) since models are writing code. If models time out, increase the value. If they finish quickly, lower it to reduce wait time on failures.
 - If a model fails, note the failure and continue with remaining models.
 
 ---
@@ -249,6 +249,7 @@ git branch -D mm/gpt/<timestamp> 2>/dev/null
 - Always present the comparison to the user and let them choose (or accept recommendation)
 - Always clean up worktrees and branches after adoption
 - If only Claude is available, skip worktree creation and just implement directly
-- Use `timeout 600` for external CLI commands (longer timeout since models are coding)
+- Use `timeout 600` for external CLI commands — adjust higher or lower based on observed completion times
 - If a model fails, clearly report why and continue with remaining models
 - Branch names use `mm/<model>/<YYYYMMDD-HHMMSS>` format
+- If an external model times out persistently, ask the user whether to retry with a higher timeout. Warn that retrying spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).
