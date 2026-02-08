@@ -1,0 +1,8 @@
+{
+  "name": "changelog",
+  "description": "Generate categorized changelog entries from branch commits and PR context",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}
