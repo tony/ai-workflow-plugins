@@ -1,0 +1,55 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-plugins",
+  "description": "Language-agnostic workflow plugins for Claude Code — multi-model AI collaboration, rebase automation, changelog generation, and TDD workflows",
+  "owner": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  },
+  "plugins": [
+    {
+      "name": "multi-model",
+      "description": "Run prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models",
+      "version": "1.0.0",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/multi-model",
+      "category": "development"
+    },
+    {
+      "name": "rebase",
+      "description": "Automated rebase onto trunk with conflict prediction, resolution, and quality gate verification",
+      "version": "1.0.0",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/rebase",
+      "category": "development"
+    },
+    {
+      "name": "changelog",
+      "description": "Generate categorized changelog entries from branch commits and PR context",
+      "version": "1.0.0",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/changelog",
+      "category": "productivity"
+    },
+    {
+      "name": "tdd",
+      "description": "TDD bug-fix workflow — reproduce bugs as failing tests, find root cause, fix, and verify",
+      "version": "1.0.0",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/tdd",
+      "category": "testing"
+    }
+  ]
+}
