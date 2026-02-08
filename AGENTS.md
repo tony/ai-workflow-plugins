@@ -249,3 +249,10 @@ framework. Commands discover project-specific tooling by reading AGENTS.md / CLA
 at runtime rather than assuming a particular ecosystem. When listing examples of tools
 or frameworks, present them as illustrative examples (e.g., in tables or lists), never
 as hardcoded instructions.
+
+### Accessible Code Blocks
+
+- **One command per code block** — never combine multiple commands in a single
+  fenced block; use separate blocks with explanatory text between them
+- **No comments inside code blocks** — explanatory text goes outside as
+  regular markdown, not as `#` comments inside the fence
