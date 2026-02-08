@@ -41,7 +41,7 @@ At minimum, Claude (this agent) is always available. For multi-model functionali
 |-----|-------|---------|
 | `gemini` | Gemini | [Gemini CLI](https://github.com/google-gemini/gemini-cli) |
 | `codex` | GPT | [Codex CLI](https://github.com/openai/codex) |
-| `agent` | Any (fallback) | [Agent CLI](https://github.com/anthropics/agent) |
+| `agent` | Any (fallback) | [Agent CLI](https://cursor.com/cli) |
 
 If no external CLIs are available, commands fall back to Claude-only mode with a note about the limitation.
 
