@@ -4,11 +4,16 @@ Project conventions and standards for AI-assisted development.
 
 ## Official Documentation References
 
-These docs define the Claude Code plugin system and should be consulted for spec details:
+These docs are the canonical references for the Claude Code plugin system.
+Consult them when authoring or reviewing plugin components:
 
 - [Plugins overview](https://code.claude.com/docs/en/plugins.md) — plugin lifecycle, installation, discovery
 - [Plugin reference](https://code.claude.com/docs/en/plugins-reference.md) — component types, frontmatter schemas, directory structure
 - [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces.md) — marketplace.json schema, source types, publishing
+- [Skills](https://code.claude.com/docs/en/skills.md) — skill authoring, SKILL.md format, `$ARGUMENTS`
+- [Hooks](https://code.claude.com/docs/en/hooks.md) — hook events, types (command/prompt/agent), hooks.json
+- [MCP servers](https://code.claude.com/docs/en/mcp.md) — MCP server configuration, .mcp.json, server types
+- [Settings](https://code.claude.com/docs/en/settings.md) — plugin settings, permissions, scopes
 - [Sub-agents](https://code.claude.com/docs/en/sub-agents.md) — agent frontmatter, delegation patterns, tool restrictions
 - [Agent teams](https://code.claude.com/docs/en/agent-teams.md) — multi-agent coordination (experimental)
 
