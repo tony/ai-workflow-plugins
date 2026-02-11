@@ -138,7 +138,7 @@ uv run basedpyright ./scripts/
 
 ## Documentation
 
-See the [official Claude Code plugin docs](https://docs.anthropic.com/en/docs/claude-code/plugins) for
+See the [official Claude Code plugin docs](https://code.claude.com/docs/en/plugins) for
 authoring guides, component schemas, and marketplace publishing.
 
 ## License
