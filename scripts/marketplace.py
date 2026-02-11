@@ -367,7 +367,10 @@ def parse_frontmatter(path: Path) -> dict[str, t.Any] | None:
     if end == -1:
         return None
     fm_text = text[3:end].strip()
-    loaded = t.cast("object", yaml.safe_load(fm_text))
+    try:
+        loaded = t.cast("object", yaml.safe_load(fm_text))
+    except yaml.YAMLError:
+        return None
     if isinstance(loaded, dict):
         return t.cast("dict[str, t.Any]", loaded)
     return None
