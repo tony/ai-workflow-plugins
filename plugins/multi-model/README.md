@@ -84,6 +84,86 @@ Commands always prompt via `AskUserQuestion` for pass count, with trigger hints 
 
 In headless mode (`claude -p`), pass count uses the trigger hint value if present, otherwise defaults to 1. Timeout uses the parsed value if provided, otherwise the per-command default.
 
+## Session Artifacts
+
+All commands persist model outputs, prompts, and synthesis results to a structured directory under `/tmp/ai-aip/`. This enables post-session inspection, selective reference to prior pass artifacts during multi-pass refinement, and lightweight resume tracking.
+
+### Directory Hierarchy
+
+```
+/tmp/ai-aip/
+├── ask-sessions/
+│   └── <repo_name>/
+│       ├── index.json
+│       └── <YYYYMMDD-HHMMSS>/
+│           ├── pass-1/
+│           │   ├── prompt.md
+│           │   ├── claude.md
+│           │   ├── gemini.md
+│           │   ├── gpt.md
+│           │   ├── stderr-gemini.txt
+│           │   ├── stderr-gpt.txt
+│           │   └── synthesis.md
+│           ├── pass-2/
+│           │   └── ...
+│           └── metadata.md
+├── plan-sessions/
+│   └── <repo_name>/ ...
+├── review-sessions/
+│   └── <repo_name>/ ...
+├── execute-sessions/
+│   └── <repo_name>/ ...
+└── prompt-sessions/
+    └── <repo_name>/ ...
+```
+
+Write commands (execute, prompt) add per-pass diff and quality gate artifacts:
+
+```
+pass-N/
+├── ...
+├── claude.diff
+├── gemini.diff
+├── gpt.diff
+└── quality-gates.md
+```
+
+The repo name is determined via `basename "$(git rev-parse --show-toplevel)"`. Directories are created with `mkdir -p -m 700` and are preserved after the session for user inspection.
+
+### Index Manifest (`index.json`)
+
+Each `<command>-sessions/<repo_name>/` directory contains an `index.json` that tracks all sessions for that repo and command type:
+
+```json
+{
+  "sessions": [
+    {
+      "timestamp": "20260210-143022",
+      "branch": "feature/add-auth",
+      "ref": "abc1234",
+      "status": "completed",
+      "pass_count": 2,
+      "completed_passes": 2,
+      "models": ["claude", "gemini", "gpt"],
+      "prompt_summary": "How does the authentication middleware work?"
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `timestamp` | Session directory name (`YYYYMMDD-HHMMSS`) |
+| `branch` | Git branch at session start |
+| `ref` | Git commit ref (short SHA) at session start |
+| `status` | `in_progress` or `completed` |
+| `pass_count` | Configured total passes |
+| `completed_passes` | How many passes finished |
+| `models` | Which models participated |
+| `prompt_summary` | First 120 chars of the user's prompt |
+
+The index is updated at session start (`in_progress`), after each pass (`completed_passes` incremented), and at session end (`completed`).
+
 ## Prerequisites
 
 At minimum, Claude (this agent) is always available. For multi-model functionality, install one or more external CLIs:
@@ -109,7 +189,7 @@ If no external CLIs are available, commands fall back to Claude-only mode with a
 
 ## Shell Resilience
 
-All commands use `command -v` (POSIX-portable) instead of `which` for CLI detection. Prompts are written to temporary files (`/tmp/mm-prompt-XXXXXX.txt`) to avoid shell metacharacter injection. stderr is captured to separate files (`/tmp/mm-stderr-<model>.txt`) for failure diagnostics. A structured retry protocol classifies failures (timeout, rate-limit, crash, empty output) and retries retryable failures once before marking a model unavailable.
+All commands use `command -v` (POSIX-portable) instead of `which` for CLI detection. Prompts are written to the session directory (`$SESSION_DIR/pass-N/prompt.md`) to avoid shell metacharacter injection while also persisting artifacts. stderr is captured per-pass (`$SESSION_DIR/pass-N/stderr-<model>.txt`) for failure diagnostics. A structured retry protocol classifies failures (timeout, rate-limit, crash, empty output) and retries retryable failures once before marking a model unavailable.
 
 ## Language-Agnostic Design
 
