@@ -63,11 +63,14 @@ Values above 5 are capped at 5 with a note to the user.
 
 ### Step 2: Interactive Configuration
 
-Run this step ONLY if both `has_pass_config` and `has_timeout_config` are false. If either is true, skip and use parsed/default values.
+Skip individual questions whose config was already provided via triggers:
+- If `has_pass_config` is true, omit Question 1 and use the parsed pass count.
+- If `has_timeout_config` is true, omit Question 2 and use the parsed/default timeout.
+- If both are true, skip this step entirely.
 
 If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use defaults silently (1 pass, 900s timeout).
 
-Use `AskUserQuestion` with two questions:
+Use `AskUserQuestion` with the remaining questions (one or both):
 
 **Question 1 — Passes**:
 - question: "How many synthesis passes? Multi-pass re-runs all models with prior results for deeper refinement."
