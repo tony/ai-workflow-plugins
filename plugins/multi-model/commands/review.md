@@ -252,7 +252,7 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 
 ```bash
 <timeout_cmd> <timeout_seconds> codex exec \
-    --dangerously-bypass-approvals-and-sandbox \
+    --yolo \
     -c model_reasoning_effort=medium \
     "$(cat $SESSION_DIR/pass-1/prompt.md)" 2>$SESSION_DIR/pass-1/stderr-gpt.txt
 ```

@@ -38,7 +38,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 **Resolution** (priority order):
 
-1. `codex` found → use `codex exec --dangerously-bypass-approvals-and-sandbox -c model_reasoning_effort=medium`
+1. `codex` found → use `codex exec --yolo -c model_reasoning_effort=medium`
 2. Else `agent` found → use `agent -p -f --model gpt-5.2`
 3. Else → report both CLIs unavailable and stop
 
@@ -63,7 +63,7 @@ Write the prompt content to the temp file using `printf '%s'`.
 **Native (`codex` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> codex exec --dangerously-bypass-approvals-and-sandbox -c model_reasoning_effort=medium "$(cat /tmp/mc-prompt-XXXXXX.txt)" 2>/tmp/mc-stderr-codex.txt
+<timeout_cmd> <timeout_seconds> codex exec --yolo -c model_reasoning_effort=medium "$(cat /tmp/mc-prompt-XXXXXX.txt)" 2>/tmp/mc-stderr-codex.txt
 ```
 
 **Fallback (`agent` CLI)**:
