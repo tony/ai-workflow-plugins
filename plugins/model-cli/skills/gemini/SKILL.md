@@ -38,7 +38,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 **Resolution** (priority order):
 
-1. `gemini` found → use `gemini -p`
+1. `gemini` found → use `gemini -m pro -y -p`
 2. Else `agent` found → use `agent -p -f --model gemini-3-pro`
 3. Else → report both CLIs unavailable and stop
 
@@ -63,7 +63,7 @@ Write the prompt content to the temp file using `printf '%s'`.
 **Native (`gemini` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -p "$(cat /tmp/mc-prompt-XXXXXX.txt)" 2>/tmp/mc-stderr-gemini.txt
+<timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat /tmp/mc-prompt-XXXXXX.txt)" 2>/tmp/mc-stderr-gemini.txt
 ```
 
 **Fallback (`agent` CLI)**:
