@@ -229,7 +229,7 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 **Native (`gemini` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -p "$(cat $SESSION_DIR/pass-1/prompt.md)" 2>$SESSION_DIR/pass-1/stderr-gemini.txt
+<timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat $SESSION_DIR/pass-1/prompt.md)" 2>$SESSION_DIR/pass-1/stderr-gemini.txt
 ```
 
 **Fallback (`agent` CLI)**:
