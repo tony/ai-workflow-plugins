@@ -241,7 +241,7 @@ Launch a Task agent with `subagent_type: "general-purpose"` to create Claude's p
 **Native (`codex` CLI)**:
 ```bash
 <timeout_cmd> <timeout_seconds> codex exec \
-    --dangerously-bypass-approvals-and-sandbox \
+    --yolo \
     -c model_reasoning_effort=medium \
     "$(cat $SESSION_DIR/pass-1/prompt.md)" 2>$SESSION_DIR/pass-1/stderr-gpt.txt
 ```

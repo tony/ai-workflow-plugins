@@ -260,7 +260,7 @@ cd ../<repo-name>-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --mod
 **Native (`codex` CLI)** — run in the worktree directory:
 ```bash
 cd ../<repo-name>-mm-gpt && <timeout_cmd> <timeout_seconds> codex exec \
-    --dangerously-bypass-approvals-and-sandbox \
+    --yolo \
     -c model_reasoning_effort=medium \
     "$(cat $SESSION_DIR/pass-1/prompt.md)" 2>$SESSION_DIR/pass-1/stderr-gpt.txt
 ```
