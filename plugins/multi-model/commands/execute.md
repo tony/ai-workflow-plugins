@@ -168,18 +168,33 @@ ln -sfn "$AIP_ROOT" /tmp/ai-aip 2>/dev/null || true
 
 ```bash
 REPO_TOPLEVEL="$(git rev-parse --show-toplevel)"
+```
+
+```bash
 REPO_SLUG="$(basename "$REPO_TOPLEVEL" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g')"
+```
+
+```bash
 REPO_ORIGIN="$(git remote get-url origin 2>/dev/null || true)"
+```
+
+```bash
 if [ -n "$REPO_ORIGIN" ]; then
   REPO_KEY="${REPO_ORIGIN}|${REPO_SLUG}"
 else
   REPO_KEY="$REPO_TOPLEVEL"
 fi
+```
+
+```bash
 if command -v sha256sum >/dev/null 2>&1; then
   REPO_ID="$(printf '%s' "$REPO_KEY" | sha256sum | cut -c1-12)"
 else
   REPO_ID="$(printf '%s' "$REPO_KEY" | shasum -a 256 | cut -c1-12)"
 fi
+```
+
+```bash
 REPO_DIR="${REPO_SLUG}--${REPO_ID}"
 ```
 
