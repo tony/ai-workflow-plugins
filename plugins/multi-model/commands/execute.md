@@ -618,10 +618,10 @@ All project quality gates passed.
 
 ### Step 6: Restore Stashed Changes
 
-If user changes were stashed in Phase 7 Step 1, restore them:
+If user changes were stashed in Phase 2b Step 4b, restore them. Only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake.
 
 ```bash
-git stash pop
+git stash list | grep -q "mm-execute: user-changes stash" && git stash pop || true
 ```
 
 If the pop fails due to merge conflicts with the synthesized changes, notify the user: "Pre-existing uncommitted changes conflicted with the synthesis. Resolve conflicts, then run `git stash drop` to remove the stash entry."
