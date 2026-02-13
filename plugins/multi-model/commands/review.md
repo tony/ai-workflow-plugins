@@ -292,13 +292,13 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 **Native (`gemini` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gemini.txt
+<timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gemini.txt
+<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Review (if available)
@@ -317,13 +317,13 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 <timeout_cmd> <timeout_seconds> codex exec \
     --yolo \
     -c model_reasoning_effort=medium \
-    "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gpt.txt
+    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gpt.txt
+<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 ### Artifact Capture

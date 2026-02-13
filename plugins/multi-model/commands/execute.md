@@ -304,12 +304,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to implement in the 
 
 **Native (`gemini` CLI)** — run in the worktree directory:
 ```bash
-cd ../<repo-name>-mm-gemini && <timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gemini.txt
+cd ../<repo-name>-mm-gemini && <timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../<repo-name>-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gemini.txt
+cd ../<repo-name>-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Implementation (worktree)
@@ -325,12 +325,12 @@ cd ../<repo-name>-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --mod
 cd ../<repo-name>-mm-gpt && <timeout_cmd> <timeout_seconds> codex exec \
     --yolo \
     -c model_reasoning_effort=medium \
-    "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gpt.txt
+    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../<repo-name>-mm-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat $SESSION_DIR/pass-0001/prompt.md)" 2>$SESSION_DIR/pass-0001/stderr/gpt.txt
+cd ../<repo-name>-mm-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 ### Artifact Capture
