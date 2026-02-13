@@ -203,6 +203,14 @@ SESSION_DIR="$AIP_ROOT/repos/$REPO_DIR/sessions/architecture/$SESSION_ID"
 mkdir -p -m 700 "$SESSION_DIR/pass-0001/outputs" "$SESSION_DIR/pass-0001/stderr" "$SESSION_DIR/pass-0001/diffs" "$SESSION_DIR/pass-0001/files"
 ```
 
+### Step 4b: Stash user changes
+
+If the working tree has uncommitted changes, stash them before any model runs. This protects user changes from Phase 6 multi-pass resets.
+
+```bash
+git stash --include-untracked -m "mm-architecture: user-changes stash"
+```
+
 ### Step 5: Write `repo.json` (if missing)
 
 If `$AIP_ROOT/repos/$REPO_DIR/repo.json` does not exist, write it with these contents:
@@ -560,11 +568,7 @@ Present the final-pass analysis and wait for user confirmation before synthesizi
 
 ### Step 1: Start Fresh
 
-Stash any uncommitted user changes, then discard Claude's modifications to start from a clean state:
-
-```bash
-git stash --include-untracked -m "mm-architecture: pre-synthesis stash"
-```
+Discard Claude's modifications to start from a clean state (user changes were already stashed in Phase 2b Step 4b):
 
 ```bash
 git checkout -- .
