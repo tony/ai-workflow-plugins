@@ -531,7 +531,12 @@ Present the final-pass analysis and wait for user confirmation before synthesizi
 
 ### Step 1: Start Fresh
 
-Discard Claude's changes to start from a clean state:
+Stash any uncommitted user changes, then discard Claude's modifications to start from a clean state:
+
+```bash
+git stash --include-untracked -m "mm-execute: pre-synthesis stash"
+```
+
 ```bash
 git checkout -- .
 ```

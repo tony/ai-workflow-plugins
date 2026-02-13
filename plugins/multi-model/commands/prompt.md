@@ -523,7 +523,10 @@ Present the final-pass comparison and wait for user to pick the winner.
 - Clean up external worktrees (see cleanup below).
 
 ### If an external model's implementation was chosen:
-1. **Discard Claude's changes** in the main tree:
+1. **Stash uncommitted user changes** and **discard Claude's modifications**:
+   ```bash
+   git stash --include-untracked -m "mm-prompt: pre-synthesis stash"
+   ```
    ```bash
    git checkout -- .
    ```
