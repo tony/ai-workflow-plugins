@@ -24,6 +24,7 @@ Install the plugin:
 | `/multi-model:plan` | Get implementation plans from all models, synthesize the best plan |
 | `/multi-model:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
 | `/multi-model:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
+| `/multi-model:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
 | `/multi-model:review` | Run code review with all models, produce consensus-weighted report |
 | `/multi-model:fix-review` | Fix review findings as atomic commits with test coverage |
 
@@ -43,9 +44,10 @@ Each command follows a consistent multi-phase workflow:
 
 ### Write Commands
 
-**prompt** and **execute** create isolated git worktrees for each external model, so implementations never interfere with each other. After comparison:
+**prompt**, **execute**, and **architecture** create isolated git worktrees for each external model, so implementations never interfere with each other. After comparison:
 - **prompt** picks one winner
 - **execute** cherry-picks the best parts from each model
+- **architecture** cherry-picks the best conventions, skills, agents, and scaffolding per file
 
 **fix-review** processes findings from a review, applying each as an atomic commit with test coverage. Multi-pass does not apply to fix-review since it is already iterative.
 
@@ -73,7 +75,7 @@ Override the default timeout per command:
 | `timeout:<seconds>` | Set custom timeout | `/multi-model:ask question timeout:300` |
 | `timeout:none` | Disable timeout | `/multi-model:execute task timeout:none` |
 
-Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s).
+Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s), architecture (1200s).
 
 ### Interactive Configuration
 
@@ -148,21 +150,32 @@ $AI_AIP_ROOT/
             │   └── ...
             ├── execute/
             │   └── ...
-            └── prompt/
+            ├── prompt/
+            │   └── ...
+            └── architecture/
                 └── ...
 ```
 
-Write commands (execute, prompt) add per-pass diff and quality gate artifacts:
+Write commands (execute, prompt, architecture) add per-pass diff, quality gate, and file snapshot artifacts:
 
 ```
 pass-0001/
 ├── ...
 ├── quality-gates.md
-└── diffs/
-    ├── claude.diff
-    ├── gemini.diff
-    └── gpt.diff
+├── diffs/
+│   ├── claude.diff
+│   ├── gemini.diff
+│   └── gpt.diff
+└── files/
+    ├── claude/
+    │   └── <repo-relative paths of changed files>
+    ├── gemini/
+    │   └── ...
+    └── gpt/
+        └── ...
 ```
+
+Only files that differ from HEAD are snapshotted into `files/<model>/`. The directory structure mirrors the repository layout. Deleted files appear in the diff only, not as snapshots. This enables post-session inspection and multi-pass file-level cross-referencing without depending on worktree persistence.
 
 Pass directories use zero-padded 4-digit numbering (`pass-0001`, `pass-0002`, ...) for correct lexicographic sorting. Directories are created with `mkdir -p -m 700` and are preserved after the session for user inspection.
 

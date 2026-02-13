@@ -183,7 +183,7 @@ SESSION_ID="$(date -u '+%Y%m%d-%H%M%SZ')-$$-$(head -c2 /dev/urandom | od -An -tx
 
 ```bash
 SESSION_DIR="$AIP_ROOT/repos/$REPO_DIR/sessions/execute/$SESSION_ID"
-mkdir -p -m 700 "$SESSION_DIR/pass-0001/outputs" "$SESSION_DIR/pass-0001/stderr" "$SESSION_DIR/pass-0001/diffs"
+mkdir -p -m 700 "$SESSION_DIR/pass-0001/outputs" "$SESSION_DIR/pass-0001/stderr" "$SESSION_DIR/pass-0001/diffs" "$SESSION_DIR/pass-0001/files"
 ```
 
 ### Step 5: Write `repo.json` (if missing)
@@ -373,6 +373,26 @@ After capturing each diff, write it to the session directory:
 - `$SESSION_DIR/pass-0001/diffs/gemini.diff`
 - `$SESSION_DIR/pass-0001/diffs/gpt.diff`
 
+### Step 1b: Snapshot Changed Files
+
+For each model that completed, snapshot its changed files into `$SESSION_DIR/pass-0001/files/<model>/` preserving repo-relative paths. Only new and modified files are snapshotted — deleted files appear in the diff only.
+
+For each changed file (from `git diff --name-only HEAD`):
+
+**Claude** (main worktree):
+```bash
+git diff --name-only HEAD
+```
+
+For each file in the list, copy it to `$SESSION_DIR/pass-0001/files/claude/<filepath>` using `mkdir -p` to create intermediate directories.
+
+**External models** (worktrees):
+```bash
+git -C ../<repo-name>-mm-<model> diff --name-only HEAD
+```
+
+For each file in the list, copy it from the worktree (`../<repo-name>-mm-<model>/<filepath>`) to `$SESSION_DIR/pass-0001/files/<model>/<filepath>` using `mkdir -p` to create intermediate directories.
+
 ### Step 2: Run Quality Gates on Each
 
 For each implementation, run the project's quality gates in its worktree. Discover the specific commands from AGENTS.md/CLAUDE.md. Common gates include:
@@ -390,7 +410,7 @@ Record pass/fail status for each gate and model. Write the results to `$SESSION_
 
 For each file that was modified by any model:
 
-1. **Read all versions** — the original plus each model's version
+1. **Read all versions** — the original from `git show HEAD:<filepath>`, plus each model's version from `$SESSION_DIR/pass-NNNN/files/<model>/<filepath>`
 2. **Compare approaches** — how did each model solve this part?
 3. **Rate each approach** on:
    - Correctness (does it work?)
@@ -452,7 +472,7 @@ For each pass from 2 to `pass_count`:
 2. **Create the pass directory** (N is the pass number, zero-padded to 4 digits):
 
    ```bash
-   mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr" "$SESSION_DIR/pass-$(printf '%04d' $N)/diffs"
+   mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr" "$SESSION_DIR/pass-$(printf '%04d' $N)/diffs" "$SESSION_DIR/pass-$(printf '%04d' $N)/files"
    ```
 
 3. **Clean up old worktrees**:
@@ -493,7 +513,7 @@ For each pass from 2 to `pass_count`:
 
 8. **Capture outputs**: Write each model's response to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
-9. **Re-analyze** following the same procedure as Phase 5. Write diffs to `$SESSION_DIR/pass-{N}/diffs/<model>.diff`, quality gate results to `$SESSION_DIR/pass-{N}/quality-gates.md`, and the synthesis to `$SESSION_DIR/pass-{N}/synthesis.md`.
+9. **Re-analyze** following the same procedure as Phase 5 (including Step 1b — snapshot changed files to `$SESSION_DIR/pass-{N}/files/<model>/`). Write diffs to `$SESSION_DIR/pass-{N}/diffs/<model>.diff`, quality gate results to `$SESSION_DIR/pass-{N}/quality-gates.md`, and the synthesis to `$SESSION_DIR/pass-{N}/synthesis.md`.
 
 10. **Update session**: Update `session.json` via atomic replace: set `completed_passes` to N, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
 
@@ -514,14 +534,12 @@ git checkout -- .
 
 ### Step 2: Apply Best-of-Breed Changes
 
-For each file, apply the best model's version:
+For each file, apply the best model's version from the file snapshots:
 
-- **If from Claude**: Re-apply Claude's changes (from the diff captured earlier)
-- **If from an external model**: Read the file from the worktree and apply it:
-  ```bash
-  git -C ../<repo-name>-mm-<model> show HEAD:<filepath>
-  ```
-  Then use Edit/Write to apply those changes to the main tree.
+- Read the file from `$SESSION_DIR/pass-NNNN/files/<model>/<filepath>` (where NNNN is the final pass number)
+- Use Edit/Write to apply those changes to the main tree
+
+This reads from snapshots rather than worktrees, so synthesis works even if worktrees have been cleaned up during multi-pass refinement.
 
 ### Step 3: Integrate and Adjust
 
