@@ -133,7 +133,7 @@ Store the resolved timeout command (`timeout`, `gtimeout`, or empty) for use in 
 ### Step 1: Resolve storage root
 
 ```bash
-echo "${AI_AIP_ROOT:-${XDG_STATE_HOME:-$HOME/.local/state}/ai-aip}"
+AIP_ROOT="${AI_AIP_ROOT:-${XDG_STATE_HOME:-$HOME/.local/state}/ai-aip}"
 ```
 
 On macOS (detected via `uname -s` = `Darwin`), if both `$AI_AIP_ROOT` and `$XDG_STATE_HOME` are unset, use `~/Library/Application Support/ai-aip`. Final fallback if none of the above exist: `~/.ai-aip`.
