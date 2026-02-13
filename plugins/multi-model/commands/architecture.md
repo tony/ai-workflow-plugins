@@ -154,10 +154,16 @@ Store the resolved timeout command (`timeout`, `gtimeout`, or empty) for use in 
 ### Step 1: Resolve storage root
 
 ```bash
-AIP_ROOT="${AI_AIP_ROOT:-${XDG_STATE_HOME:-$HOME/.local/state}/ai-aip}"
+if [ -n "$AI_AIP_ROOT" ]; then
+  AIP_ROOT="$AI_AIP_ROOT"
+elif [ -n "$XDG_STATE_HOME" ]; then
+  AIP_ROOT="$XDG_STATE_HOME/ai-aip"
+elif [ "$(uname -s)" = "Darwin" ]; then
+  AIP_ROOT="$HOME/Library/Application Support/ai-aip"
+else
+  AIP_ROOT="$HOME/.local/state/ai-aip"
+fi
 ```
-
-On macOS (detected via `uname -s` = `Darwin`), if both `$AI_AIP_ROOT` and `$XDG_STATE_HOME` are unset, use `~/Library/Application Support/ai-aip`. Final fallback if none of the above exist: `~/.ai-aip`.
 
 Create a `/tmp/ai-aip` symlink to the resolved root for backward compatibility (if `/tmp/ai-aip` doesn't already exist or isn't already correct):
 
