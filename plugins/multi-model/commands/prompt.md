@@ -194,6 +194,14 @@ SESSION_DIR="$AIP_ROOT/repos/$REPO_DIR/sessions/prompt/$SESSION_ID"
 mkdir -p -m 700 "$SESSION_DIR/pass-0001/outputs" "$SESSION_DIR/pass-0001/stderr" "$SESSION_DIR/pass-0001/diffs" "$SESSION_DIR/pass-0001/files"
 ```
 
+### Step 4b: Stash user changes
+
+If the working tree has uncommitted changes, stash them before any model runs. This protects user changes from Phase 6 multi-pass resets.
+
+```bash
+git stash --include-untracked -m "mm-prompt: user-changes stash"
+```
+
 ### Step 5: Write `repo.json` (if missing)
 
 If `$AIP_ROOT/repos/$REPO_DIR/repo.json` does not exist, write it with these contents:
@@ -526,10 +534,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 - Clean up external worktrees (see cleanup below).
 
 ### If an external model's implementation was chosen:
-1. **Stash uncommitted user changes** and **discard Claude's modifications**:
-   ```bash
-   git stash --include-untracked -m "mm-prompt: pre-synthesis stash"
-   ```
+1. **Discard Claude's modifications** (user changes were already stashed in Phase 2b Step 4b):
    ```bash
    git checkout -- .
    ```
