@@ -169,7 +169,11 @@ if [ -n "$REPO_ORIGIN" ]; then
 else
   REPO_KEY="$REPO_TOPLEVEL"
 fi
-REPO_ID="$(printf '%s' "$REPO_KEY" | sha256sum | cut -c1-12)"
+if command -v sha256sum >/dev/null 2>&1; then
+  REPO_ID="$(printf '%s' "$REPO_KEY" | sha256sum | cut -c1-12)"
+else
+  REPO_ID="$(printf '%s' "$REPO_KEY" | shasum -a 256 | cut -c1-12)"
+fi
 REPO_DIR="${REPO_SLUG}--${REPO_ID}"
 ```
 
