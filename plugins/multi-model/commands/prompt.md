@@ -479,11 +479,11 @@ For each pass from 2 to `pass_count`:
    ```
 
    ```bash
-   git for-each-ref --format='%(refname:short)' refs/heads/mm/gemini/ | xargs -r git branch -D 2>/dev/null
+   git for-each-ref --format='%(refname:short)' refs/heads/mm/gemini/ | while read -r b; do git branch -D "$b" 2>/dev/null; done
    ```
 
    ```bash
-   git for-each-ref --format='%(refname:short)' refs/heads/mm/gpt/ | xargs -r git branch -D 2>/dev/null
+   git for-each-ref --format='%(refname:short)' refs/heads/mm/gpt/ | while read -r b; do git branch -D "$b" 2>/dev/null; done
    ```
 
 4. **Discard Claude's changes** in the main tree (tracked and untracked):
