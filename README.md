@@ -56,7 +56,7 @@ npx skills add tony/ai-workflow-plugins --skill commit
 
 Every skill in this repository is **language-agnostic**. Skills do not hardcode
 language-specific tools like `pytest`, `jest`, `cargo test`, or `ruff`. Instead, they
-reference the project's own conventions by reading `AGENTS.md` or `CLAUDE.md` at
+reference the project's own conventions by reading `AGENTS.md` / `CLAUDE.md` at
 runtime to discover:
 
 - How to run the test suite
