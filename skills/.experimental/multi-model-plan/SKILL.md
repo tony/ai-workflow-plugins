@@ -203,6 +203,11 @@ SESSION_ID="$(date -u '+%Y%m%d-%H%M%SZ')-$$-$(head -c2 /dev/urandom | od -An -tx
 
 ```bash
 SESSION_DIR="$AIP_ROOT/repos/$REPO_DIR/sessions/plan/$SESSION_ID"
+```
+
+Create the session directory tree:
+
+```bash
 mkdir -p -m 700 "$SESSION_DIR/pass-0001/outputs" "$SESSION_DIR/pass-0001/stderr"
 ```
 
