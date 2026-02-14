@@ -66,9 +66,9 @@ If conflicts are detected:
 2. For each conflicted file:
    a. Read the file to see the conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
    b. Understand both sides of the conflict by examining what the branch intended vs what trunk changed
-   c. Resolve the conflict by editing the file — preserve the intent of BOTH changes when possible. When in doubt, prefer the branch's changes (our work) but integrate trunk's changes if they're structural (renames, new parameters, etc.)
+   c. Resolve the conflict by editing the file — preserve the intent of BOTH changes when possible. When in doubt, prefer the branch's changes (the current work) but integrate trunk's changes if they're structural (renames, new parameters, etc.)
    d. Run `git add <file>` to mark it resolved
-3. Before continuing the rebase, run the project's quality checks. Look for CLAUDE.md or AGENTS.md in the repo root to discover the project's required checks. Common quality gates by ecosystem:
+3. Before continuing the rebase, run the project's quality checks. Look for AGENTS.md / CLAUDE.md in the repo root to discover the project's required checks. Common quality gates by ecosystem:
 
    | Gate | Example commands |
    |------|-----------------|
