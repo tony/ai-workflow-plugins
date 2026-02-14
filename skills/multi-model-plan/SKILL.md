@@ -57,7 +57,7 @@ Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md`.
 Delegate to a sub-agent (or execute inline if sub-agents are not supported) to create the primary model's plan:
 
 **Prompt for the Claude planning agent**:
-> Create a detailed implementation plan for the following task. Read the codebase to understand the existing architecture, patterns, and conventions. Read CLAUDE.md/AGENTS.md for project standards.
+> Create a detailed implementation plan for the following task. Read the codebase to understand the existing architecture, patterns, and conventions. Read AGENTS.md / CLAUDE.md for project standards.
 >
 > Task: <task description>
 >
@@ -76,7 +76,7 @@ Delegate to a sub-agent (or execute inline if sub-agents are not supported) to c
 > <task description>
 >
 > ---
-> Additional instructions: Read AGENTS.md/CLAUDE.md for project conventions. Reference actual files, functions, and patterns from the codebase. Do NOT modify any files — plan only. Include: files to modify, implementation steps in order, architecture decisions, test strategy, and risks.
+> Additional instructions: Read AGENTS.md / CLAUDE.md for project conventions. Reference actual files, functions, and patterns from the codebase. Do NOT modify any files — plan only. Include: files to modify, implementation steps in order, architecture decisions, test strategy, and risks.
 
 **Native (`gemini` CLI)**:
 ```bash
@@ -94,7 +94,7 @@ Delegate to a sub-agent (or execute inline if sub-agents are not supported) to c
 > <task description>
 >
 > ---
-> Additional instructions: Read AGENTS.md/CLAUDE.md for project conventions. Reference actual files, functions, and patterns from the codebase. Do NOT modify any files — plan only. Include: files to modify, implementation steps in order, architecture decisions, test strategy, and risks.
+> Additional instructions: Read AGENTS.md / CLAUDE.md for project conventions. Reference actual files, functions, and patterns from the codebase. Do NOT modify any files — plan only. Include: files to modify, implementation steps in order, architecture decisions, test strategy, and risks.
 
 **Native (`codex` CLI)**:
 ```bash
@@ -130,7 +130,7 @@ Follow the execution strategy in references/infrastructure.md for retry and fail
 For each model's plan, evaluate:
 - **File coverage**: Which files does it identify for modification? Are any missing?
 - **Sequence correctness**: Are dependencies between steps correct?
-- **Pattern adherence**: Does it follow the project's existing patterns (from AGENTS.md/CLAUDE.md)?
+- **Pattern adherence**: Does it follow the project's existing patterns (from AGENTS.md / CLAUDE.md)?
 - **Test strategy**: Does it extend existing tests or create new ones appropriately?
 - **Risk awareness**: Does it identify realistic edge cases?
 - **Unique approaches**: What novel ideas does this plan have that others don't?
@@ -140,7 +140,7 @@ For each model's plan, evaluate:
 For each plan's claims about the codebase:
 - **Read the referenced files** to confirm they exist and the plan's understanding is correct
 - **Check function signatures** and APIs to verify the proposed integration points
-- **Validate test patterns** — confirm that the test approach matches the project's conventions from AGENTS.md/CLAUDE.md
+- **Validate test patterns** — confirm that the test approach matches the project's conventions from AGENTS.md / CLAUDE.md
 
 ### Step 3: Build the Synthesized Plan
 
@@ -251,7 +251,7 @@ Present the final-pass synthesis as the result, adding a **Plan Evolution** sect
 - Never modify project files — this is read-only planning. Writing to `$AI_AIP_ROOT` for artifact persistence is not a project modification.
 - Always verify each plan's claims by reading the actual codebase
 - Always resolve conflicts by checking what the code actually does
-- The final plan must follow project conventions from CLAUDE.md/AGENTS.md
+- The final plan must follow project conventions from AGENTS.md / CLAUDE.md
 - If only Claude is available, still produce a thorough plan and note the limitation
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from infrastructure. If no timeout command is available, omit the prefix entirely.
 - Capture stderr from external tools to report failures clearly
