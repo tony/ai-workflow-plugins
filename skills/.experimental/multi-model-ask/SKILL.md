@@ -73,7 +73,7 @@ Ask the user:
 - options:
   - "Default (450s)" — Use this skill's built-in default timeout.
   - "Quick — 3 min (180s)" — For fast queries. May timeout on complex tasks.
-  - "Long — 15 min (900s)" — For complex code generation. Higher wait on failures.
+  - "Long — 15 min (900s)" — For complex queries. Higher wait on failures.
   - "None" — No timeout. Wait indefinitely for each model.
 
 ### Step 3: Detect Available Models
