@@ -110,7 +110,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
-| **Claude** | Always available (this agent) | — | — |
+| **Primary** | Always available (the executing agent) | — | — |
 | **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
@@ -166,7 +166,7 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 
 ## Phase 3: Create Isolated Worktrees
 
-For each external model (Gemini, GPT — Claude works in the main tree):
+For each external model (Gemini, GPT — the primary model works in the main tree):
 
 ```bash
 git worktree add ../$REPO_SLUG-mm-<model> -b mm/<model>/<timestamp>
@@ -199,7 +199,7 @@ The architecture prompt should include:
 >
 > Follow existing project conventions. Each artifact should be a separate file in the appropriate location.
 
-### Claude Implementation (main worktree)
+### Primary Model Implementation (main worktree)
 
 Delegate to a sub-agent (or execute inline if sub-agents are not supported).
 
@@ -274,7 +274,7 @@ Persist the synthesis to `$SESSION_DIR/pass-0001/synthesis.md`. Update `session.
 
 If `pass_count` is 1, skip this phase.
 
-For each pass from 2 to `pass_count`: ask for user confirmation, create pass directory, clean up old worktrees, discard Claude's changes, create fresh worktrees, construct refinement prompts, re-run all models, re-analyze, update session.
+For each pass from 2 to `pass_count`: ask for user confirmation, create pass directory, clean up old worktrees, discard the primary model's changes, create fresh worktrees, construct refinement prompts, re-run all models, re-analyze, update session.
 
 ---
 
@@ -330,7 +330,7 @@ At session end: update `session.json` to `"completed"`, append a `session_comple
 - Always present the synthesis plan to the user and wait for confirmation before applying
 - Always clean up worktrees and branches after synthesis
 - The synthesized architecture must have valid frontmatter and consistent cross-references
-- If only Claude is available, skip worktree creation and generate artifacts directly
+- If only the primary model is available, skip worktree creation and generate artifacts directly
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands. If no timeout command is available, omit the prefix entirely.
 - Capture stderr from external tools to report failures clearly
 - Branch names use `mm/<model>/<YYYYMMDD-HHMMSS>` format

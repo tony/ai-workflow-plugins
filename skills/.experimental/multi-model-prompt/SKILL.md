@@ -110,7 +110,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
-| **Claude** | Always available (this agent) | — | — |
+| **Primary** | Always available (the executing agent) | — | — |
 | **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
@@ -269,7 +269,7 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 
 **Goal**: Set up an isolated git worktree for each available external model.
 
-For each external model (Gemini, GPT — Claude works in the main tree):
+For each external model (Gemini, GPT — the primary model works in the main tree):
 
 ```bash
 git worktree add ../$REPO_SLUG-mm-<model> -b mm/<model>/<timestamp>
@@ -299,11 +299,11 @@ Use the format `mm/<model>/<YYYYMMDD-HHMMSS>` for branch names to avoid collisio
 
 Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md`.
 
-### Claude Implementation (main worktree)
+### Primary Model Implementation (main worktree)
 
 Delegate to a sub-agent (or execute inline if sub-agents are not supported) to implement in the main working tree:
 
-**Prompt for the Claude sub-agent**:
+**Prompt for the primary model**:
 > Implement the following task in this codebase. Read CLAUDE.md/AGENTS.md for project conventions and follow them strictly.
 >
 > Task: <user's prompt>
@@ -353,7 +353,7 @@ cd ../$REPO_SLUG-mm-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model g
 
 After each model completes, persist its output to the session directory:
 
-- **Claude**: Write the sub-agent's response to `$SESSION_DIR/pass-0001/outputs/claude.md`
+- **Primary model**: Write the response to `$SESSION_DIR/pass-0001/outputs/claude.md`
 - **Gemini**: Write Gemini's stdout to `$SESSION_DIR/pass-0001/outputs/gemini.md`
 - **GPT**: Write GPT's stdout to `$SESSION_DIR/pass-0001/outputs/gpt.md`
 
@@ -378,7 +378,7 @@ After each model completes, persist its output to the session directory:
 
 For each model that completed, examine the changes:
 
-**Claude** (main worktree):
+**Primary model** (main worktree):
 ```bash
 git diff HEAD
 ```
@@ -490,7 +490,7 @@ For each pass from 2 to `pass_count`:
    git for-each-ref --format='%(refname:short)' refs/heads/mm/gpt/ | while read -r b; do git branch -D "$b" 2>/dev/null; done
    ```
 
-4. **Discard Claude's changes** in the main tree (tracked and untracked):
+4. **Discard the primary model's changes** in the main tree (tracked and untracked):
    ```bash
    git checkout -- .
    ```
@@ -503,7 +503,7 @@ For each pass from 2 to `pass_count`:
 6. **Construct refinement prompts** using the prior pass's artifacts:
 
    - Read `$SESSION_DIR/pass-{prev}/synthesis.md` as the canonical prior comparison.
-   - For the **Claude sub-agent**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly.
+   - For the **primary model**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly.
    - For **external models** (Gemini, GPT): Inline the prior synthesis in their prompt.
 
    > Feedback from the previous pass: [contents of $SESSION_DIR/pass-{prev}/synthesis.md].
@@ -525,7 +525,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 
 **Goal**: Bring the chosen implementation into the main working tree.
 
-### If Claude's implementation was chosen:
+### If the primary model's implementation was chosen:
 - Changes are already in the main tree — nothing to do.
 - Restore stashed user changes (only pop if the named stash exists):
   ```bash
@@ -534,7 +534,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 - Clean up external worktrees (see cleanup below).
 
 ### If an external model's implementation was chosen:
-1. **Discard Claude's modifications** (user changes were already stashed in Phase 2b Step 4b):
+1. **Discard the primary model's modifications** (user changes were already stashed in Phase 2b Step 4b):
    ```bash
    git checkout -- .
    ```
@@ -578,7 +578,7 @@ git branch -D mm/gpt/<timestamp> 2>/dev/null
 - Always run quality gates on each implementation before comparing
 - Always present the comparison to the user and let them choose (or accept recommendation)
 - Always clean up worktrees and branches after adoption
-- If only Claude is available, skip worktree creation and just implement directly
+- If only the primary model is available, skip worktree creation and just implement directly
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from Phase 2 Step 4. If no timeout command is available, omit the prefix entirely. Adjust higher or lower based on observed completion times.
 - Capture stderr from external tools (via `$SESSION_DIR/pass-{N}/stderr/<model>.txt`) to report failures clearly
 - If a model fails, clearly report why and continue with remaining models

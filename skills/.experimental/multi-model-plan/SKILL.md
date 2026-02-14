@@ -110,7 +110,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
-| **Claude** | Always available (this agent) | — | — |
+| **Primary** | Always available (the executing agent) | — | — |
 | **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
@@ -269,11 +269,11 @@ Write the prompt to the session directory for persistence and shell safety:
 
 Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md`.
 
-### Claude Plan (sub-agent)
+### Primary Model Plan (sub-agent)
 
-Delegate to a sub-agent (or execute inline if sub-agents are not supported) to create Claude's plan:
+Delegate to a sub-agent (or execute inline if sub-agents are not supported) to create the primary model's plan:
 
-**Prompt for the Claude planning sub-agent**:
+**Prompt for the primary model**:
 > Create a detailed implementation plan for the following task. Read the codebase to understand the existing architecture, patterns, and conventions. Read CLAUDE.md/AGENTS.md for project standards.
 >
 > Task: <task description>
@@ -330,7 +330,7 @@ Delegate to a sub-agent (or execute inline if sub-agents are not supported) to c
 
 After each model completes, persist its output to the session directory:
 
-- **Claude**: Write the sub-agent's response to `$SESSION_DIR/pass-0001/outputs/claude.md`
+- **Primary model**: Write the response to `$SESSION_DIR/pass-0001/outputs/claude.md`
 - **Gemini**: Write Gemini's stdout to `$SESSION_DIR/pass-0001/outputs/gemini.md`
 - **GPT**: Write GPT's stdout to `$SESSION_DIR/pass-0001/outputs/gpt.md`
 
@@ -450,7 +450,7 @@ For each pass from 2 to `pass_count`:
 2. **Construct refinement prompts** using the prior pass's artifacts:
 
    - Read `$SESSION_DIR/pass-{prev}/synthesis.md` as the canonical prior synthesis (where `{prev}` is the zero-padded previous pass number).
-   - For the **Claude sub-agent**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly (synthesis.md and optionally individual model outputs) instead of inlining the entire prior synthesis in the prompt. This reduces prompt size on later passes.
+   - For the **primary model**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly (synthesis.md and optionally individual model outputs) instead of inlining the entire prior synthesis in the prompt. This reduces prompt size on later passes.
    - For **external models** (Gemini, GPT): Inline the prior synthesis in their prompt (they cannot read local files).
 
    > Prior synthesized plan from the previous pass: [contents of $SESSION_DIR/pass-{prev}/synthesis.md]. For this refinement:
@@ -478,7 +478,7 @@ Present the final-pass synthesis as the result, adding a **Plan Evolution** sect
 - Always verify each plan's claims by reading the actual codebase
 - Always resolve conflicts by checking what the code actually does
 - The final plan must follow project conventions from CLAUDE.md/AGENTS.md
-- If only Claude is available, still produce a thorough plan and note the limitation
+- If only the primary model is available, still produce a thorough plan and note the limitation
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from Phase 2 Step 4. If no timeout command is available, omit the prefix entirely. Adjust higher or lower based on observed completion times.
 - Capture stderr from external tools (via `$SESSION_DIR/pass-{N}/stderr/<model>.txt`) to report failures clearly
 - The output should be a concrete, actionable plan — not vague suggestions

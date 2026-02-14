@@ -94,7 +94,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
-| **Claude** | Always available (this agent) | — | — |
+| **Primary** | Always available (the executing agent) | — | — |
 | **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
@@ -146,11 +146,11 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 
 Write the review prompt to `$SESSION_DIR/pass-0001/prompt.md`.
 
-### Claude Review (sub-agent)
+### Primary Model Review (sub-agent)
 
-Delegate to a sub-agent (or execute inline if sub-agents are not supported) to perform Claude's own code review:
+Delegate to a sub-agent (or execute inline if sub-agents are not supported) to perform the primary model's code review:
 
-**Prompt for the Claude review sub-agent**:
+**Prompt for the primary model**:
 > Perform a thorough code review of the changes on this branch compared to origin/<trunk>.
 >
 > Run `git diff origin/<trunk>...HEAD` to see all changes.
@@ -323,7 +323,7 @@ After presenting the report:
 - Always attempt to run all available reviewers, even if one fails
 - Always clearly attribute which reviewer(s) found each issue
 - Consensus issues take priority over single-reviewer issues
-- If no external reviewers are available, fall back to Claude-only review and note the limitation
+- If no external reviewers are available, fall back to primary-model-only review and note the limitation
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands. If no timeout command is available, omit the prefix entirely.
 - Capture stderr from external tools to report failures clearly
 - If an external model times out persistently, ask the user whether to retry. Warn about external token costs.

@@ -108,7 +108,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
-| **Claude** | Always available (this agent) | — | — |
+| **Primary** | Always available (the executing agent) | — | — |
 | **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
@@ -225,7 +225,7 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 
 ## Phase 3: Create Isolated Worktrees
 
-For each external model (Gemini, GPT — Claude works in the main tree):
+For each external model (Gemini, GPT — the primary model works in the main tree):
 
 ```bash
 git worktree add ../$REPO_SLUG-mm-<model> -b mm/<model>/<timestamp>
@@ -241,7 +241,7 @@ Use the format `mm/<model>/<YYYYMMDD-HHMMSS>` for branch names.
 
 Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md`.
 
-### Claude Implementation (main worktree)
+### Primary Model Implementation (main worktree)
 
 Delegate to a sub-agent (or execute inline if sub-agents are not supported):
 
@@ -352,7 +352,7 @@ For each pass from 2 to `pass_count`:
 1. Ask for user confirmation before starting. Warn about external token costs.
 2. Create the pass directory with subdirectories for outputs, stderr, diffs, files.
 3. Clean up old worktrees and branches.
-4. Discard Claude's changes in the main tree.
+4. Discard the primary model's changes in the main tree.
 5. Create fresh worktrees with new timestamps.
 6. Construct refinement prompts using the prior pass's synthesis.
 7. Re-run all models, capture outputs, re-analyze, update session.
@@ -363,7 +363,7 @@ For each pass from 2 to `pass_count`:
 
 ### Step 1: Start Fresh
 
-Discard Claude's modifications to start from a clean state:
+Discard the primary model's modifications to start from a clean state:
 
 ```bash
 git checkout -- .
@@ -433,7 +433,7 @@ At session end: update `session.json` to `"completed"`, append a `session_comple
 - Always present the synthesis plan to the user and wait for confirmation before applying
 - Always clean up worktrees and branches after synthesis
 - The synthesis must pass all quality gates before being considered complete
-- If only Claude is available, skip worktree creation and just implement directly
+- If only the primary model is available, skip worktree creation and just implement directly
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands. If no timeout command is available, omit the prefix entirely.
 - Capture stderr from external tools to report failures clearly
 - If a model fails, clearly report why and continue with remaining models
