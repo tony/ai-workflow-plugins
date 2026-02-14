@@ -83,11 +83,11 @@ Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md`.
 Delegate to a sub-agent (or execute inline if sub-agents are not supported) to implement in the main working tree:
 
 **Prompt for the Claude agent**:
-> Implement the following task in this codebase. Read CLAUDE.md/AGENTS.md for project conventions and follow them strictly.
+> Implement the following task in this codebase. Read AGENTS.md / CLAUDE.md for project conventions and follow them strictly.
 >
 > Task: <user's task>
 >
-> Follow all project conventions from AGENTS.md/CLAUDE.md. Run the project's quality gates after making changes.
+> Follow all project conventions from AGENTS.md / CLAUDE.md. Run the project's quality gates after making changes.
 
 ### Gemini Implementation (worktree)
 
@@ -95,7 +95,7 @@ Delegate to a sub-agent (or execute inline if sub-agents are not supported) to i
 > <user's task>
 >
 > ---
-> Additional instructions: Follow AGENTS.md/CLAUDE.md conventions. Run quality checks after implementation.
+> Additional instructions: Follow AGENTS.md / CLAUDE.md conventions. Run quality checks after implementation.
 
 **Native (`gemini` CLI)** — run in the worktree directory:
 ```bash
@@ -113,7 +113,7 @@ cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --mode
 > <user's task>
 >
 > ---
-> Additional instructions: Follow AGENTS.md/CLAUDE.md conventions. Run quality checks after implementation.
+> Additional instructions: Follow AGENTS.md / CLAUDE.md conventions. Run quality checks after implementation.
 
 **Native (`codex` CLI)** — run in the worktree directory:
 ```bash
@@ -169,7 +169,7 @@ For each model that completed, snapshot its changed files into `$SESSION_DIR/pas
 
 ### Step 2: Run Quality Gates on Each
 
-For each implementation, run the project's quality gates in its worktree. Discover the specific commands from AGENTS.md/CLAUDE.md. Record pass/fail status for each gate and model. Write the results to `$SESSION_DIR/pass-0001/quality-gates.md`.
+For each implementation, run the project's quality gates in its worktree. Discover the specific commands from AGENTS.md / CLAUDE.md. Record pass/fail status for each gate and model. Write the results to `$SESSION_DIR/pass-0001/quality-gates.md`.
 
 ### Step 3: File-by-File Comparison
 
@@ -264,11 +264,11 @@ For each file, apply the best model's version from the file snapshots:
 After applying best-of-breed changes:
 1. **Read the combined result** — verify all pieces fit together
 2. **Fix integration issues** — imports, function signatures, or API mismatches between files from different models
-3. **Ensure consistency** — naming conventions, docstring style, import style from AGENTS.md/CLAUDE.md
+3. **Ensure consistency** — naming conventions, docstring style, import style from AGENTS.md / CLAUDE.md
 
 ### Step 4: Run Quality Gates
 
-Run the project's quality gates as defined in AGENTS.md/CLAUDE.md. All gates must pass. If they fail, fix the integration issues and re-run.
+Run the project's quality gates as defined in AGENTS.md / CLAUDE.md. All gates must pass. If they fail, fix the integration issues and re-run.
 
 ### Step 5: Cleanup Worktrees
 
