@@ -1,11 +1,7 @@
 ---
-<<<<<<<< HEAD:plugins/loom/commands/fix-review.md
-description: Fix loom review findings — validate, add test coverage, fix, and commit each as atomic changes
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
-========
 name: multi-model-fix-review
 description: Fix multi-model review findings as atomic commits with test coverage. Use when review findings need to be validated, tested, and applied as fixes.
->>>>>>>> 42e7989 (feat(skills) Convert to Vercel Skills repository structure):skills/.experimental/multi-model-fix-review/SKILL.md
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
 ---
 
 # Fix Review Findings
@@ -24,11 +20,7 @@ This skill does not invoke external models and therefore does not require model 
 
 **Actions**:
 
-<<<<<<<< HEAD:plugins/loom/commands/fix-review.md
-1. **Locate the review report** in the conversation context (output from `/loom:review` or similar)
-========
 1. **Locate the review report** in the conversation context (output from multi-model-review or similar)
->>>>>>>> 42e7989 (feat(skills) Convert to Vercel Skills repository structure):skills/.experimental/multi-model-fix-review/SKILL.md
 
 2. **Extract each finding** into a numbered list with:
    - **Consensus level**: how many reviewers flagged it (3, 2, or 1)
@@ -59,7 +51,7 @@ For EACH finding:
 
 1. **Read the relevant code** — the exact lines referenced in the finding
 
-2. **Check project conventions** — read CLAUDE.md/AGENTS.md to verify whether the finding aligns with project standards
+2. **Check project conventions** — read AGENTS.md / CLAUDE.md to verify whether the finding aligns with project standards
 
 3. **Review the project's own APIs** — read the function signatures, return types, and docstrings to understand the intended contract vs what the reviewers flagged
 
@@ -107,7 +99,7 @@ Before writing any code, search for existing tests that can be extended:
 
 ### Step 2: Write/Extend Tests
 
-Follow the project's test conventions from AGENTS.md/CLAUDE.md strictly. Common conventions to check for:
+Follow the project's test conventions from AGENTS.md / CLAUDE.md strictly. Common conventions to check for:
 
 - Test structure (classes vs functions, parameterized vs individual)
 - Fixture patterns (project-specific fixtures, setup/teardown)
@@ -119,11 +111,11 @@ Follow the project's test conventions from AGENTS.md/CLAUDE.md strictly. Common 
 
 - Make the minimal change that addresses the finding
 - Do not bundle unrelated changes
-- Follow project conventions from CLAUDE.md/AGENTS.md
+- Follow project conventions from AGENTS.md / CLAUDE.md
 
 ### Step 4: Run Quality Gates
 
-Run the project's quality gates as defined in AGENTS.md/CLAUDE.md. All gates must pass before committing.
+Run the project's quality gates as defined in AGENTS.md / CLAUDE.md. All gates must pass before committing.
 
 - If any gate fails, fix the issue before proceeding
 - If a test fails due to the change, either:
@@ -139,7 +131,7 @@ Stage only the files changed for this specific finding:
 git add <specific-files>
 ```
 
-Use the project's commit message format from AGENTS.md/CLAUDE.md. Include a reference to the loom review finding.
+Use the project's commit message format from AGENTS.md / CLAUDE.md. Include a reference to the multi-model review finding.
 
 ### Step 6: Verify Clean State
 
@@ -148,11 +140,9 @@ After committing, confirm:
 git status
 ```
 
-<<<<<<<< HEAD:plugins/loom/commands/fix-review.md
 Verify no uncommitted changes remain:
 
-========
->>>>>>>> 42e7989 (feat(skills) Convert to Vercel Skills repository structure):skills/.experimental/multi-model-fix-review/SKILL.md
+
 ```bash
 git diff
 ```
@@ -198,7 +188,7 @@ If quality gates fail after applying a fix:
 - Never bundle multiple findings into one commit
 - Never modify code that isn't related to the finding being addressed
 - Always wait for user confirmation after Phase 2 validation
-- Always use the project's commit message conventions from AGENTS.md/CLAUDE.md
+- Always use the project's commit message conventions from AGENTS.md / CLAUDE.md
 - Always search for existing tests before creating new test functions
 - Always prefer extending existing test fixtures over creating new tests
 - If a finding requires changes in multiple files, that is still ONE commit (one logical change)
