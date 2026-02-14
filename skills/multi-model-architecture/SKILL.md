@@ -174,7 +174,7 @@ If `pass_count` is 1, skip this phase. Otherwise follow the same multi-pass patt
 ### Step 1: Start Fresh
 
 ```bash
-git checkout -- .
+git restore .
 ```
 
 ### Step 2: Apply Best-of-Breed Changes
