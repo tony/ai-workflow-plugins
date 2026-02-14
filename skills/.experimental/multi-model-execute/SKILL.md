@@ -281,7 +281,12 @@ cd ../$REPO_SLUG-mm-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model g
 ### Artifact Capture and Execution Strategy
 
 - Launch all models in parallel. Write outputs to `$SESSION_DIR/pass-0001/outputs/<model>.md`.
-- For each external CLI invocation: record exit code/stderr/elapsed time, classify failures, retry max 1 time, continue on failure.
+- For each external CLI invocation:
+  1. **Record**: exit code, stderr (from `$SESSION_DIR/pass-0001/stderr/<model>.txt`), elapsed time
+  2. **Classify failure**: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
+  3. **Retry**: max 1 retry per model per pass
+  4. **After retry failure**: mark model as unavailable for this pass, include failure details in report
+  5. **Continue**: never block entire workflow on single model failure
 
 ---
 
