@@ -381,7 +381,7 @@ For each pass from 2 to `pass_count`:
 Discard Claude's modifications to start from a clean state:
 
 ```bash
-git checkout -- .
+git restore .
 ```
 
 ### Step 2: Apply Best-of-Breed Changes
