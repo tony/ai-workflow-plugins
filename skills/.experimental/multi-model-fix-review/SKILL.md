@@ -61,7 +61,7 @@ For EACH finding:
    - **Already addressed**: The issue was already fixed in a later commit
    - **Incorrect**: The reviewer misread the code or the suggestion would introduce a bug
    - **Out of scope**: Valid concern but not related to this branch's changes
-   - **Pre-existing**: Valid but existed before this branch (not introduced by our changes)
+   - **Pre-existing**: Valid but existed before this branch (not introduced by the branch's changes)
 
 6. **Document the verdict** for each finding:
    - If valid: note the planned fix AND test coverage strategy
