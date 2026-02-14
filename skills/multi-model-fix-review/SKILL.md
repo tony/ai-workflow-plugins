@@ -10,6 +10,8 @@ Process loom code review findings from the conversation context. Validate each f
 
 Multi-pass (`multipass`, `x2`, etc.) is not applicable to this skill — it is already iterative by nature. Trigger words are ignored if present.
 
+This skill does not invoke external models and therefore does not require model detection, session directory infrastructure, or retry logic.
+
 ---
 
 ## Phase 1: Parse and Prioritize Findings
