@@ -15,7 +15,7 @@ For model detection, session management, and execution infrastructure, see refer
 
 **Goal**: Understand the project and prepare the question.
 
-1. **Read CLAUDE.md / AGENTS.md** if present — project conventions inform better answers.
+1. **Read AGENTS.md / CLAUDE.md** if present — project conventions inform better answers.
 
 2. **Determine trunk branch** (for questions about branch changes):
    ```bash
