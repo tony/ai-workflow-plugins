@@ -3,6 +3,8 @@ name: rebase
 description: Rebase current branch onto trunk with conflict prediction, resolution, and quality gate verification. Use when asked to rebase, update from trunk, or sync with the main branch.
 ---
 
+# Git Rebase
+
 ## Context
 
 Gather the following information before proceeding:
