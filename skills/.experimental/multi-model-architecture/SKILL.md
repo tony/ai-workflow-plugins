@@ -414,7 +414,7 @@ For each pass from 2 to `pass_count`: ask for user confirmation, create pass dir
 ### Step 1: Start Fresh
 
 ```bash
-git checkout -- .
+git restore .
 ```
 
 ### Step 2: Apply Best-of-Breed Changes
