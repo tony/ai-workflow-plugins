@@ -41,7 +41,7 @@ Rebase the current branch onto the remote trunk branch. Follow these steps caref
 
 ### Phase 1: Detect trunk branch
 
-Determine the trunk branch name from the context above (the "Trunk branch" value). Store it mentally as `TRUNK`. It will typically be `master` or `main`. If detection failed, try both `origin/master` and `origin/main` to see which exists.
+Determine the trunk branch name from the context above (the `TRUNK` value). It will typically be `main` or `master`. If detection returned empty, try both `origin/main` and `origin/master` to see which exists.
 
 ### Phase 2: Fetch latest and analyze
 
