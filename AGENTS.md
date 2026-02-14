@@ -113,3 +113,6 @@ as hardcoded instructions.
   `case`/`esac`) and pipelines count as one command per block
 - **No comments inside code blocks** — explanatory text goes outside as
   regular markdown, not as `#` comments inside the fence
+- **Agent-mediated variable substitution** — code blocks use `$VARIABLE`
+  references that the executing agent resolves by capturing prior block output;
+  blocks are not guaranteed to share a shell session
