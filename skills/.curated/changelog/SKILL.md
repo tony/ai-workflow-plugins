@@ -198,7 +198,7 @@ one bug fix entry, not three.
    Before: <next section or release heading>
    ```
 
-4. **Ask the user**: "Insert these entries into <changelog-file>? You can also ask me to modify them first."
+4. **Ask the user**: "Insert these entries into <changelog-file>? The entries can be modified first if needed."
 
 **Wait for user response.** Do not proceed until they confirm.
 
