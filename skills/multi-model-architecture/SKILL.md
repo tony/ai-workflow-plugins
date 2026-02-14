@@ -220,7 +220,7 @@ Present the final result with a table of artifacts produced, their source model,
 - Always clean up worktrees and branches after synthesis
 - The synthesized architecture must have valid frontmatter and consistent cross-references
 - If only Claude is available, skip worktree creation and just generate artifacts directly
-- Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from infrastructure.
+- Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from infrastructure. If no timeout command is available, omit the prefix entirely.
 - Capture stderr from external tools to report failures clearly
 - If a model fails, clearly report why and continue with remaining models
 - Branch names use `mm/<model>/<YYYYMMDD-HHMMSS>` format
