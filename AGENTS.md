@@ -33,10 +33,10 @@ Common commit types:
 
 ### Skill Component Naming
 
-This repo contains OpenSkills SKILL.md files. Use the `ai(skill/*)` pattern:
+This repo contains OpenSkills SKILL.md files. Use the `ai(skill[*])` pattern:
 
-- `ai(skill/commit)` — the `commit` skill specifically
-- `ai(skill/multi-model-ask)` — the `multi-model-ask` skill specifically
+- `ai(skill[commit])` — the `commit` skill specifically
+- `ai(skill[multi-model-ask])` — the `multi-model-ask` skill specifically
 - `ai(skills)` — changes spanning multiple skills
 - `ai(rules)` — AGENTS.md or other AI convention files
 
@@ -47,7 +47,7 @@ When a change targets a specific named component, include it:
 
 Examples:
 ```
-ai(skill/commit) Add heredoc formatting for multi-line messages
+ai(skill[commit]) Add heredoc formatting for multi-line messages
 
 why: Commit messages with body text need preserved newlines
 what:
