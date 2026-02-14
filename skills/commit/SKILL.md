@@ -53,7 +53,7 @@ Match the style of the recent commits shown above — capitalization, tense, lev
 - **If nothing is staged**: auto-stage changed files, but:
   - **Never stage sensitive files**: `.env`, `.env.*`, `*.pem`, `*.key`, `*credentials*`, `*secret*`, `*.p12`, `*.pfx`, `id_rsa*`, `*.keystore`
   - Use `git add <specific-files>` — never `git add -A` or `git add .`
-  - Tell the user which files you are staging
+  - Tell the user which files are being staged
 
 ### 3. Draft Commit Message
 
