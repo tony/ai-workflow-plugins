@@ -130,7 +130,7 @@ Follow the execution strategy in references/infrastructure.md for retry and fail
 For each model's plan, evaluate:
 - **File coverage**: Which files does it identify for modification? Are any missing?
 - **Sequence correctness**: Are dependencies between steps correct?
-- **Pattern adherence**: Does it follow the project's existing patterns (from CLAUDE.md)?
+- **Pattern adherence**: Does it follow the project's existing patterns (from AGENTS.md/CLAUDE.md)?
 - **Test strategy**: Does it extend existing tests or create new ones appropriately?
 - **Risk awareness**: Does it identify realistic edge cases?
 - **Unique approaches**: What novel ideas does this plan have that others don't?
