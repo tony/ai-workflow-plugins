@@ -295,7 +295,7 @@ git branch -D mm/gpt/<timestamp> 2>/dev/null
 If user changes were stashed, restore them. Only pop if the named stash exists:
 
 ```bash
-git stash list | grep -q "mm-execute: user-changes stash" && git stash pop || true
+if git stash list | grep -q "mm-execute: user-changes stash"; then git stash pop; fi
 ```
 
 If the pop fails due to merge conflicts with the synthesized changes, notify the user: "Pre-existing uncommitted changes conflicted with the synthesis. Resolve conflicts, then run `git stash drop` to remove the stash entry."

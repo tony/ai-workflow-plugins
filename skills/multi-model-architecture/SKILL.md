@@ -215,7 +215,7 @@ git branch -D mm/gpt/<timestamp> 2>/dev/null
 ### Step 6: Restore Stashed Changes
 
 ```bash
-git stash list | grep -q "mm-architecture: user-changes stash" && git stash pop || true
+if git stash list | grep -q "mm-architecture: user-changes stash"; then git stash pop; fi
 ```
 
 The changes are now in the working tree, unstaged.
