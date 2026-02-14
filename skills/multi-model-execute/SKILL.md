@@ -249,7 +249,7 @@ Present the final-pass analysis and wait for user confirmation before synthesizi
 Discard Claude's modifications to start from a clean state (user changes were already stashed):
 
 ```bash
-git checkout -- .
+git restore .
 ```
 
 ### Step 2: Apply Best-of-Breed Changes
