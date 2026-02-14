@@ -33,11 +33,11 @@ Common commit types:
 
 ### Skill Component Naming
 
-This repo contains skills organized into categories. Use the `ai(skill/*)` component
+This repo contains skills organized into categories. Use the `ai(skill[*])` component
 pattern for changes:
 
-- `ai(skill/commit)` — the commit skill specifically
-- `ai(skill/rebase)` — the rebase skill specifically
+- `ai(skill[commit])` — the commit skill specifically
+- `ai(skill[rebase])` — the rebase skill specifically
 - `ai(skills)` — changes spanning multiple skills
 - `ai(rules)` — AGENTS.md or other AI convention files
 
@@ -48,7 +48,7 @@ When a change targets a specific named component, include it:
 
 Examples:
 ```
-ai(skill/commit) Add heredoc formatting for multi-line messages
+ai(skill[commit]) Add heredoc formatting for multi-line messages
 
 why: Commit messages with body text need preserved newlines
 what:
