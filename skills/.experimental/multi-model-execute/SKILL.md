@@ -383,7 +383,7 @@ For each file, apply the best model's version from the file snapshots in `$SESSI
 After applying best-of-breed changes:
 1. Read the combined result — verify all pieces fit together
 2. Fix integration issues — imports, function signatures, or API mismatches between files from different models
-3. Ensure consistency — naming conventions, docstring style, import style from CLAUDE.md
+3. Ensure consistency — naming conventions, docstring style, import style from AGENTS.md/CLAUDE.md
 
 ### Step 4: Run Quality Gates
 
