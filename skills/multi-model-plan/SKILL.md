@@ -15,7 +15,7 @@ For model detection, session management, and execution infrastructure, see refer
 
 **Goal**: Understand the project state and the planning request.
 
-1. **Read CLAUDE.md / AGENTS.md** if present — project conventions constrain valid plans.
+1. **Read AGENTS.md / CLAUDE.md** if present — project conventions constrain valid plans.
 
 2. **Determine trunk branch**:
    ```bash
