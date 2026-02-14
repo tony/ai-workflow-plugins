@@ -89,7 +89,7 @@ EOF
 - Frontmatter must contain **only** `name` and `description` — no other fields
 - Skills **must not** hardcode language-specific tool commands (e.g., `uv run pytest`,
   `npm test`, `cargo test`). Instead, reference "the project's test suite / quality checks
-  as defined in AGENTS.md/CLAUDE.md"
+  as defined in AGENTS.md / CLAUDE.md"
 - Descriptions should include "Use when..." trigger context explaining when to invoke
 
 ### Skill Directory Structure
