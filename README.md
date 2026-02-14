@@ -65,7 +65,7 @@ runtime to discover:
 - What commit message format to use
 - What test patterns to follow
 
-This means the same skill works whether your project uses Python, TypeScript, Rust, Go,
+This means the same skill works whether the project uses Python, TypeScript, Rust, Go,
 or any other language.
 
 ## License
