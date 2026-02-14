@@ -35,6 +35,12 @@ For model detection, session management, and execution infrastructure, see refer
 
 ---
 
+## Phase 2: Configuration, Model Detection, and Session Setup
+
+Read `references/infrastructure.md` and complete all steps in Phase 2 (Configuration and Model Detection) and Phase 2b (Initialize Session Directory) before proceeding to Phase 3.
+
+---
+
 ## Phase 3: Launch Reviews in Parallel
 
 **Goal**: Run all available reviewers simultaneously.
