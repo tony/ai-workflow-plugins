@@ -1,4 +1,4 @@
-# AGENTS.md — ai-workflow-skills
+# AGENTS.md — ai-workflow-plugins
 
 Project conventions and standards for AI-assisted development.
 
