@@ -18,15 +18,13 @@ Run `git remote -v 2>/dev/null | head -2` to check available remote refs.
 Run the following to see commits on the current branch not on trunk (substitute the detected trunk branch name):
 
 ```
-TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master")
-git log --oneline "origin/${TRUNK}..HEAD" 2>/dev/null || echo "(could not determine commits ahead)"
+TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"); git log --oneline "origin/${TRUNK}..HEAD" 2>/dev/null || echo "(could not determine commits ahead)"
 ```
 
 Run the following to see a diff summary from trunk:
 
 ```
-TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master")
-git diff --stat "origin/${TRUNK}" 2>/dev/null || echo "(could not diff against trunk)"
+TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"); git diff --stat "origin/${TRUNK}" 2>/dev/null || echo "(could not diff against trunk)"
 ```
 
 ## Your Task
