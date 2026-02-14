@@ -419,7 +419,7 @@ Record pass/fail status for each gate and each model. Write the results to `$SES
 For each implementation, assess:
 - **Quality gate results**: Does it pass the project's quality gates?
 - **Correctness**: Does it actually solve the task?
-- **Pattern adherence**: Does it follow project conventions from CLAUDE.md?
+- **Pattern adherence**: Does it follow project conventions from AGENTS.md/CLAUDE.md?
 - **Code quality**: Readability, naming, structure
 - **Test coverage**: Did it add/extend tests appropriately?
 - **Scope discipline**: Did it make only the requested changes (no unnecessary refactoring)?
