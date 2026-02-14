@@ -274,7 +274,7 @@ For each pass from 2 to `pass_count`:
 
 4. **Discard Claude's changes** in the main tree (tracked and untracked):
    ```bash
-   git checkout -- .
+   git restore .
    ```
 
    Remove untracked files created during the primary model's work:
@@ -321,7 +321,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 ### If an external model's implementation was chosen:
 1. **Discard Claude's modifications** (user changes were already stashed):
    ```bash
-   git checkout -- .
+   git restore .
    ```
 2. **Cherry-pick or merge** the external model's commit(s):
    ```bash
