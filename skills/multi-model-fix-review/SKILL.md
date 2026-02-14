@@ -159,7 +159,7 @@ If quality gates fail after applying a fix:
 2. **Fix** the issue (adjust the change, not bypass the gate)
 3. **Re-run** all gates
 4. If the fix cannot be made to pass all gates after 2 attempts:
-   - Revert the change: `git checkout -- <files>`
+   - Revert only the files modified for this specific finding: `git restore <files-changed-for-this-finding>`
    - Mark the finding as "valid but could not apply cleanly"
    - Move to the next finding
    - Report the issue in the Phase 4 summary
