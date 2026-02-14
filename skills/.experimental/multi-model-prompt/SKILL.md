@@ -497,7 +497,7 @@ For each pass from 2 to `pass_count`:
 
 4. **Discard the primary model's changes** in the main tree (tracked and untracked):
    ```bash
-   git checkout -- .
+   git restore .
    ```
    Remove untracked files created during the primary model's work:
    ```bash
@@ -542,7 +542,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 ### If an external model's implementation was chosen:
 1. **Discard the primary model's modifications** (user changes were already stashed in Phase 2b Step 4b):
    ```bash
-   git checkout -- .
+   git restore .
    ```
 2. **Cherry-pick or merge** the external model's commit(s):
    ```bash
