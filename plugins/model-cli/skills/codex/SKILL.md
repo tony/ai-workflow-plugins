@@ -78,8 +78,9 @@ Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>
 
 1. **Record**: exit code, stderr (from `/tmp/mc-stderr-codex.txt`), elapsed time
 2. **Classify**: timeout → retry with 1.5x timeout; rate-limit → retry after 10s delay; crash → stop; empty output → retry once
-3. **Retry**: max 1 retry
-4. **After retry failure**: report failure with stderr details
+3. **Retry**: max 1 retry with the same backend
+4. **Agent fallback**: if retry fails AND native `codex` was used AND `agent` is available, re-run the command using `agent -p -f --model gpt-5.2` (1 attempt, same timeout). Note the backend switch in the output.
+5. **After all retries exhausted**: report failure with stderr details from both backends
 
 ## Step 6: Clean Up and Return
 
