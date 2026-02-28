@@ -102,7 +102,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
 | **Claude** | Always available (this agent) | — | — |
-| **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
+| **Gemini** | `gemini` binary | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
 **Resolution logic** for each external slot:
@@ -281,12 +281,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 
 **Native (`gemini` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+<timeout_cmd> <timeout_seconds> gemini -m 3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Answer (if available)
