@@ -66,6 +66,11 @@ Lockfile resolved versions are preferred over manifest version constraints.
 
 ## Arguments
 
+| Flag | Effect |
+|------|--------|
+| `--lang <language>` | Override auto-detected language directory |
+| `--no-worktree` | Clone only, skip worktree creation |
+
 ```console
 /research:deps vite
 ```
