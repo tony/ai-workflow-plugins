@@ -73,7 +73,7 @@ Apply the filter from `$ARGUMENTS`:
 Check `~/study/` for existing clones and worktrees:
 
 ```bash
-ls -d ~/study/*/ 2>/dev/null
+ls -d ~/study/*/*/ 2>/dev/null
 ```
 
 Mark each dependency as: **new** (needs clone + worktree), **update** (clone exists, needs worktree), or **exists** (worktree at correct version already present).
