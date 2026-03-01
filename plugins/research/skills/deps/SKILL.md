@@ -173,6 +173,8 @@ The worktree path follows the convention: `~/study/<language>/<repo-name>-<versi
 
 If the worktree path already exists, skip creation and report it as already present.
 
+For monorepo-hosted packages (e.g., `@tanstack/react-query` and `@tanstack/react-table` both in `tanstack/query`), the entire repo is cloned once. The worktree contains all packages — the user can navigate to the specific package subdirectory.
+
 ## Step 9: Report Results
 
 Present a summary of what was done:
