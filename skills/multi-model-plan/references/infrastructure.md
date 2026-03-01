@@ -77,7 +77,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
 | **Claude** | Always available (the current agent) | — | — |
-| **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
+| **Gemini** | `gemini` binary | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
 **Resolution logic** for each external slot:
@@ -233,9 +233,10 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 For each external CLI invocation:
 1. **Record**: exit code, stderr (from `$SESSION_DIR/pass-{N}/stderr/<model>.txt`), elapsed time
 2. **Classify failure**: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
-3. **Retry**: max 1 retry per model per pass
-4. **After retry failure**: mark model as unavailable for this pass, include failure details in report
-5. **Continue**: never block entire workflow on single model failure
+3. **Retry**: max 1 retry per model per pass with the same backend
+4. **Agent fallback**: if retry fails AND native CLI was used (not already using `agent`) AND `agent` is available, re-run using the agent fallback command for that model (1 attempt, same timeout). Capture stderr to the same `$SESSION_DIR/pass-{N}/stderr/<model>.txt` (append, don't overwrite)
+5. **After all retries exhausted**: mark model as unavailable for this pass, include failure details from both backends in report
+6. **Continue**: never block entire workflow on single model failure
 
 ---
 

@@ -80,12 +80,12 @@ Delegate to a sub-agent (or execute inline if sub-agents are not supported) to c
 
 **Native (`gemini` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+<timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Plan (if available)
