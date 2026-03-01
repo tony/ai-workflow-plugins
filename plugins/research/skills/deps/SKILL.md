@@ -88,7 +88,7 @@ For each filtered dependency, find the official source repository URL.
 
 1. **Manifest metadata** — `repository` field in `package.json`, `[package]` `repository` in `Cargo.toml`, `project.urls` in `pyproject.toml`
 2. **Package registry metadata** — `npm view <pkg> repository.url`, `cargo metadata`, `pip show <pkg>`, `go list -m -json <module>`
-3. **WebSearch** — search for `"<package-name>" official github repository` and verify the result
+3. **WebSearch** — search for `"<package-name>" official source repository` and verify the result
 
 Normalize all URLs to `https://<host>/<owner>/<repo>.git` format where possible. Strip `.git` suffix for display, keep it for clone commands.
 
