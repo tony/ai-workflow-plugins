@@ -50,7 +50,7 @@ Search the current project root for manifest files and extract dependencies with
 | Manifest | Language dir | Lockfiles | Extraction method |
 |----------|-------------|-----------|-------------------|
 | `package.json` | `typescript` | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock` | `dependencies`, `devDependencies`, `peerDependencies` fields |
-| `pyproject.toml` | `python` | `uv.lock`, `poetry.lock`, `requirements.txt` | `[project.dependencies]`, `[tool.poetry.dependencies]` |
+| `pyproject.toml` | `python` | `uv.lock`, `poetry.lock`, `requirements.txt` | `[project]` `dependencies`, `[tool.poetry.dependencies]` |
 | `Cargo.toml` | `rust` | `Cargo.lock` | `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]` |
 | `go.mod` | `golang` | `go.sum` | `require` block entries |
 | `Gemfile` | `ruby` | `Gemfile.lock` | `gem` declarations |
