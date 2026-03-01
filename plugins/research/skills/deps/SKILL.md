@@ -112,16 +112,18 @@ Do not proceed past this step without user approval.
 
 ## Step 6: Clone Repositories
 
+Always quote variables and use `--` to separate options from arguments to prevent shell injection from manifest-derived values.
+
 For each approved dependency that needs cloning:
 
 ```bash
-git clone <repo-url> ~/study/<language>/<repo-name>/
+git clone -- "$repo_url" "$HOME/study/<language>/<repo-name>/"
 ```
 
 If the clone directory already exists, fetch latest tags instead:
 
 ```bash
-git -C ~/study/<language>/<repo-name>/ fetch --tags --force
+git -C "$HOME/study/<language>/<repo-name>/" fetch --tags --force
 ```
 
 Clone one repository at a time. Report progress after each clone.
@@ -142,11 +144,11 @@ For each dependency, find the matching git ref. Try these patterns in order (sto
 Use the lockfile resolved version (from Step 2) when available, otherwise use the manifest version constraint stripped of range operators (`^`, `~`, `>=`, etc.).
 
 ```bash
-git -C ~/study/<language>/<repo-name>/ tag -l
+git -C "$HOME/study/<language>/<repo-name>/" tag -l
 ```
 
 ```bash
-git -C ~/study/<language>/<repo-name>/ branch -r -l
+git -C "$HOME/study/<language>/<repo-name>/" branch -r -l
 ```
 
 If no matching ref is found, warn the user and offer to use the default branch instead.
@@ -158,13 +160,13 @@ Skip this step if `--no-worktree` was passed.
 For tag refs (detached HEAD):
 
 ```bash
-git -C ~/study/<language>/<repo-name>/ worktree add --detach ~/study/<language>/<repo-name>-<version>/ <tag>
+git -C "$HOME/study/<language>/<repo-name>/" worktree add --detach "$HOME/study/<language>/<repo-name>-<version>/" <tag>
 ```
 
 For branch refs:
 
 ```bash
-git -C ~/study/<language>/<repo-name>/ worktree add ~/study/<language>/<repo-name>-<version>/ <branch>
+git -C "$HOME/study/<language>/<repo-name>/" worktree add "$HOME/study/<language>/<repo-name>-<version>/" <branch>
 ```
 
 The worktree path follows the convention: `~/study/<language>/<repo-name>-<version>/`.
