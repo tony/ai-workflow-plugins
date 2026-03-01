@@ -109,7 +109,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 | Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|-----------------------------|-------------|
 | **Claude** | Always available (this agent) | — | — |
-| **Gemini** | `gemini` binary | `agent --model gemini-3-pro` | `gemini-3-pro` |
+| **Gemini** | `gemini` binary | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
 
 **Resolution logic** for each external slot:
@@ -265,12 +265,12 @@ Delegate to a sub-agent (or execute inline if sub-agents are not supported):
 
 **Native (`gemini` CLI)**:
 ```bash
-cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> gemini -m pro -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Implementation (worktree)
@@ -292,11 +292,12 @@ cd ../$REPO_SLUG-mm-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model g
 
 - Launch all models in parallel. Write outputs to `$SESSION_DIR/pass-0001/outputs/<model>.md`.
 - For each external CLI invocation:
-  1. **Record**: exit code, stderr (from `$SESSION_DIR/pass-0001/stderr/<model>.txt`), elapsed time
+  1. **Record**: exit code, stderr (from `$SESSION_DIR/pass-{N}/stderr/<model>.txt`), elapsed time
   2. **Classify failure**: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
-  3. **Retry**: max 1 retry per model per pass
-  4. **After retry failure**: mark model as unavailable for this pass, include failure details in report
-  5. **Continue**: never block entire workflow on single model failure
+  3. **Retry**: max 1 retry per model per pass with the same backend
+  4. **Agent fallback**: if retry fails AND native CLI was used (not already using `agent`) AND `agent` is available, re-run using the agent fallback command for that model (1 attempt, same timeout). Capture stderr to the same `$SESSION_DIR/pass-{N}/stderr/<model>.txt` (append, don't overwrite)
+  5. **After all retries exhausted**: mark model as unavailable for this pass, include failure details from both backends in report
+  6. **Continue**: never block entire workflow on single model failure
 
 ---
 
