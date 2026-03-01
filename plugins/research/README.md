@@ -46,7 +46,8 @@ The skill follows a 9-step workflow:
 | `go.mod` | `golang` | `go.sum` |
 | `Gemfile` | `ruby` | `Gemfile.lock` |
 | `mix.exs` | `elixir` | `mix.lock` |
-| `build.gradle` / `pom.xml` | `java` | `gradle.lockfile` |
+| `build.gradle` / `build.gradle.kts` | `java` | `gradle.lockfile` |
+| `pom.xml` | `java` | — |
 
 ## Version Tag Resolution
 
