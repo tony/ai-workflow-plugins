@@ -52,7 +52,7 @@ Search the current project root for manifest files and extract dependencies with
 | `package.json` | `typescript` | `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock` | `dependencies`, `devDependencies`, `peerDependencies` fields |
 | `pyproject.toml` | `python` | `uv.lock`, `poetry.lock`, `requirements.txt` | `[project]` `dependencies`, `[tool.poetry.dependencies]` |
 | `Cargo.toml` | `rust` | `Cargo.lock` | `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]` |
-| `go.mod` | `golang` | `go.sum` | `require` block entries |
+| `go.mod` | `golang` | `go.sum` | `require` entries (block and single-line) |
 | `Gemfile` | `ruby` | `Gemfile.lock` | `gem` declarations |
 | `mix.exs` | `elixir` | `mix.lock` | `deps` function return |
 | `build.gradle` / `build.gradle.kts` | `java` | `gradle.lockfile` | `implementation`, `api`, `testImplementation` |
