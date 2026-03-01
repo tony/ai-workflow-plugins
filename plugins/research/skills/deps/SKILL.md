@@ -86,7 +86,7 @@ For each filtered dependency, find the official source repository URL.
 
 **Resolution order** (stop at first success):
 
-1. **Manifest metadata** — `repository` field in `package.json`, `[package.repository]` in `Cargo.toml`, `project.urls` in `pyproject.toml`
+1. **Manifest metadata** — `repository` field in `package.json`, `[package]` `repository` in `Cargo.toml`, `project.urls` in `pyproject.toml`
 2. **Package registry metadata** — `npm view <pkg> repository.url`, `cargo metadata`, `pip show <pkg>`, `go list -m -json <module>`
 3. **WebSearch** — search for `"<package-name>" official github repository` and verify the result
 
