@@ -34,6 +34,10 @@ command -v rg >/dev/null 2>&1 && echo "rg:available" || echo "rg:missing"
 ```
 
 ```bash
+command -v ag >/dev/null 2>&1 && echo "ag:available" || echo "ag:missing"
+```
+
+```bash
 command -v fd >/dev/null 2>&1 && echo "fd:available" || echo "fd:missing"
 ```
 
@@ -41,7 +45,7 @@ command -v fd >/dev/null 2>&1 && echo "fd:available" || echo "fd:missing"
 command -v jq >/dev/null 2>&1 && echo "jq:available" || echo "jq:missing"
 ```
 
-Use `rg`/`fd`/`jq` when available, fall back to `grep`/`find`/manual parsing otherwise.
+For content search, prefer `rg` over `ag` over `grep`. For file finding, prefer `fd` over `find`. For JSON parsing, use `jq` when available, otherwise parse manually.
 
 ## Step 2: Scan Manifest Files
 
