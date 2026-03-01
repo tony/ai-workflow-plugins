@@ -76,7 +76,7 @@ Check `~/study/` for existing clones and worktrees:
 ls -d ~/study/*/*/ 2>/dev/null
 ```
 
-Mark each dependency as: **new** (needs clone + worktree), **update** (clone exists, needs worktree), or **exists** (worktree at correct version already present).
+Mark each dependency as: **new** (needs clone + worktree), **update** (clone exists, needs worktree), or **exists** (worktree at correct version already present). Plain directories (e.g., `vite/`) are main clones; version-suffixed directories (e.g., `vite-6.2.0/`) are worktrees.
 
 If `--lang` was provided, use that as the language directory instead of auto-detecting from the manifest.
 
