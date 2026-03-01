@@ -18,6 +18,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [changelog](plugins/changelog/) | Productivity | Generate categorized changelog entries from branch commits and PR context |
 | [tdd](plugins/tdd/) | Testing | TDD bug-fix workflow — reproduce bugs as failing tests, find root cause, fix, and verify |
 | [model-cli](plugins/model-cli/) | Development | Run prompts through individual AI CLIs — codex/GPT, gemini, and cursor/agent with fallback support |
+| [research](plugins/research/) | Learning | Clone and study your project's dependencies at the exact versions you use |
 
 ## Installation
 
@@ -53,6 +54,10 @@ Then install any plugin:
 
 ```console
 /plugin install model-cli@ai-workflow-plugins
+```
+
+```console
+/plugin install research@ai-workflow-plugins
 ```
 
 ## Design Philosophy
