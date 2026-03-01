@@ -8,7 +8,7 @@ description: >
   source code, understand how a dependency works, or study a library at the
   exact version their project depends on.
 user-invocable: true
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "WebSearch"]
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "WebSearch", "AskUserQuestion"]
 argument-hint: <package-name|"all"|category> [--lang <language>] [--no-worktree]
 ---
 
