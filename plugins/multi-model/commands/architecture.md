@@ -353,7 +353,7 @@ Launch a Task agent with `subagent_type: "general-purpose"` to generate artifact
 
 **Native (`gemini` CLI)** — run in the worktree directory:
 ```bash
-cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> gemini -m 3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+cd ../$REPO_SLUG-mm-gemini && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
