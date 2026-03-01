@@ -87,6 +87,19 @@
       "category": "development",
       "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/model-cli",
       "license": "MIT"
+    },
+    {
+      "name": "research",
+      "description": "Clone and study your project's dependencies at the exact versions you use — source repos with version-pinned git worktrees",
+      "version": "0.0.1",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/research",
+      "category": "learning",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/research",
+      "license": "MIT"
     }
   ]
 }
