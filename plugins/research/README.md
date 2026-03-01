@@ -87,11 +87,15 @@ Lockfile resolved versions are preferred over manifest version constraints.
 
 ## Study Directory Layout
 
+Each language gets its own directory under `~/study/`. The plain directory (e.g., `vite/`) is the
+bare clone, and the version-suffixed directory (e.g., `vite-6.2.0/`) is the worktree pinned to
+that tag.
+
 ```
 ~/study/
 ├── typescript/
-│   ├── vite/              # bare clone
-│   ├── vite-6.2.0/        # worktree at v6.2.0
+│   ├── vite/
+│   ├── vite-6.2.0/
 │   ├── react/
 │   └── react-19.1.0/
 ├── python/
