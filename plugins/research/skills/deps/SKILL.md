@@ -90,7 +90,7 @@ For each filtered dependency, find the official source repository URL.
 2. **Package registry metadata** — `npm view <pkg> repository.url`, `cargo metadata`, `pip show <pkg>`, `go list -m -json <module>`
 3. **WebSearch** — search for `"<package-name>" official github repository` and verify the result
 
-Normalize all URLs to `https://github.com/<owner>/<repo>.git` format where possible. Strip `.git` suffix for display, keep it for clone commands.
+Normalize all URLs to `https://<host>/<owner>/<repo>.git` format where possible. Strip `.git` suffix for display, keep it for clone commands.
 
 ## Step 5: Present Plan and Confirm
 
