@@ -115,6 +115,8 @@ that tag.
     └── chi-5.2.1/
 ```
 
+For monorepo-hosted packages (e.g., `@tanstack/react-query` in `tanstack/query`), the repo is cloned once and the worktree contains all packages.
+
 ## Prerequisites
 
 - **git** — for cloning and worktree management
