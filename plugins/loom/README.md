@@ -32,11 +32,20 @@ Install the plugin:
 
 Each command follows a consistent multi-phase workflow:
 
-1. **Configure** — Parse trigger words and prompt for settings if none provided.
+1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
 2. **Detect models** — Check for `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available, fall back to the `agent` CLI with `--model` flags.
 3. **Run in parallel** — Execute the task across all available models simultaneously.
 4. **Synthesize** — Compare outputs, verify claims against the codebase, and combine the best elements.
 5. **Refine** (multi-pass) — Optionally re-run all models with the prior synthesis as context for deeper results.
+
+### Protocols
+
+All commands share four quality protocols that decorrelate model outputs and improve synthesis:
+
+- **Context packets** — a structured bundle (conventions, repo state, key snippets) included verbatim in every model prompt so all models work from the same information
+- **Role differentiation** — each model receives a distinct evaluation lens (Maintainer, Skeptic, Builder) to reduce shared blind spots
+- **Blind judging** — model outputs are randomly labeled (A/B/C) during scoring to prevent brand bias
+- **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence
 
 ### Read-Only Commands
 
