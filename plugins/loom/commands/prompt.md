@@ -522,7 +522,9 @@ Before synthesis, strip model identity from responses to prevent brand bias duri
 
 After collecting model outputs and applying blind labels, follow this evidence-backed synthesis protocol.
 
-**Verify Claims**: For each blinded response (A/B/C), check factual claims against the codebase:
+**Step 1: Verify Claims**
+
+For each blinded response (A/B/C), check factual claims against the codebase:
 
 - **File references**: Use `Glob` and `Read` to confirm referenced files exist
 - **Function/API references**: Read the file and verify function signatures, class names, and API contracts match what the response claims
@@ -531,7 +533,9 @@ After collecting model outputs and applying blind labels, follow this evidence-b
 
 Write the verification results to `$SESSION_DIR/pass-NNNN/verification.md`.
 
-**Score with Rubric**: Rate each blinded response 0–10 per dimension using the General Rubric below. Compute a weighted total for each response.
+**Step 2: Score with Rubric**
+
+Rate each blinded response 0–10 per dimension using the General Rubric below. Compute a weighted total for each response.
 
 | Dimension | Weight | Description |
 |-----------|--------|-------------|
@@ -543,15 +547,21 @@ Write the verification results to `$SESSION_DIR/pass-NNNN/verification.md`.
 
 Write scores to `$SESSION_DIR/pass-NNNN/scores.md` in a table showing per-dimension scores and weighted totals for each label (A/B/C).
 
-**Adjudicate Conflicts**: Compare responses to identify:
+**Step 3: Adjudicate Conflicts**
+
+Compare responses to identify:
 
 - **Agreement points** — all responses concur on these → accept as foundation
 - **Conflicts** — responses disagree → verify against the codebase, accept the one supported by evidence
 - **Unresolvable conflicts** — cannot determine which is correct from code alone → note both positions with available evidence
 
-**Converge**: Build the final result using **pick-winner** convergence mode — select the highest-scoring implementation as the winner; do not merge code from different implementations.
+**Step 4: Converge**
 
-**Critic**: Launch an independent Task agent (`subagent_type: "general-purpose"`) to challenge the synthesized result:
+Build the final result using **pick-winner** convergence mode — select the highest-scoring implementation as the winner; do not merge code from different implementations.
+
+**Step 5: Critic**
+
+Launch an independent Task agent (`subagent_type: "general-purpose"`) to challenge the synthesized result:
 
 > Review the following synthesis for errors. Your job is to BREAK it — find problems, not confirm it's good.
 >
