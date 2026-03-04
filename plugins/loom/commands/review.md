@@ -34,6 +34,12 @@ Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, t
 
 ---
 
+## Phase 1b: Build Context Packet
+
+Follow the context packet protocol in [_shared-infrastructure.md](./_shared-infrastructure.md). For `review`, prioritize conventions summary (review should enforce these), changed files (full diff stats), and key snippets of modified code. Known unknowns should note any areas of the diff that are hard to review without more context.
+
+---
+
 ## Phase 2: Configuration and Reviewer Detection
 
 Follow the shared infrastructure protocol in [_shared-infrastructure.md](./_shared-infrastructure.md) for flag parsing, interactive configuration, model detection, and timeout detection with these parameters:

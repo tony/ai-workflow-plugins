@@ -39,6 +39,12 @@ The task description comes from `$ARGUMENTS`. If no arguments are provided, ask 
 
 ---
 
+## Phase 1b: Build Context Packet
+
+Follow the context packet protocol in [_shared-infrastructure.md](./_shared-infrastructure.md). For `plan`, include changed files (branch diff stats), key snippets of code relevant to the task, and known unknowns that the plan should address.
+
+---
+
 ## Phase 2: Configuration and Model Detection
 
 Follow the shared infrastructure protocol in [_shared-infrastructure.md](./_shared-infrastructure.md) for flag parsing, interactive configuration, model detection, and timeout detection with these parameters:
