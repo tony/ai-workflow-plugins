@@ -85,7 +85,7 @@ Legacy trigger words (`multipass`, `x<N>`, `timeout:<seconds>`) are still recogn
 When flags are provided, the corresponding interactive question is skipped. Otherwise, commands prompt via `AskUserQuestion`:
 
 1. **Pass count** (skipped when `--passes` is provided) — choose single pass (1), multipass (2), or triple pass (3).
-2. **Timeout** (skipped when `--timeout` is provided) — choose the default, quick (180s), long (900–1800s, varies by command), or no timeout.
+2. **Timeout** (skipped when `--timeout` is provided) — choose the default, quick (0.5× default), long (1.5× default), or no timeout.
 
 In headless mode (`claude -p`), pass count uses the flag value if provided, otherwise defaults to 1. Timeout uses the flag value if provided, otherwise the per-command default.
 
