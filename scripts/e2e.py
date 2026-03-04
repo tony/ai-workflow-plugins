@@ -252,6 +252,42 @@ def _test_static_agent_skill_frontmatter() -> list[TestCase]:
     return tests
 
 
+def _test_static_marketplace_json() -> list[TestCase]:
+    """Verify marketplace.json entries match PLUGINS and have required fields."""
+    import json
+
+    tests: list[TestCase] = []
+    manifest_path = REPO_ROOT / ".claude-plugin" / "marketplace.json"
+
+    def _check_marketplace() -> None:
+        _assert(manifest_path.is_file(), "marketplace.json not found")
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        plugins_list: list[dict[str, t.Any]] = data.get("plugins", [])
+        names = {p["name"] for p in plugins_list}
+
+        for plugin in PLUGINS:
+            _assert(plugin in names, f"Plugin '{plugin}' missing from marketplace.json")
+
+        required_fields = {"name", "description", "version", "author", "category", "source"}
+        for entry in plugins_list:
+            entry_name = entry.get("name", "<unnamed>")
+            for field in required_fields:
+                _assert(
+                    field in entry,
+                    f"marketplace entry '{entry_name}': missing '{field}'",
+                )
+            source = entry.get("source", "")
+            if isinstance(source, str) and source.startswith("./"):
+                source_path = REPO_ROOT / source
+                _assert(
+                    source_path.is_dir(),
+                    f"marketplace entry '{entry_name}': source path '{source}' does not exist",
+                )
+
+    tests.append(("marketplace.json validation", _check_marketplace))
+    return tests
+
+
 # ---------------------------------------------------------------------------
 # Test case builders
 # ---------------------------------------------------------------------------
@@ -461,6 +497,7 @@ def main(
     static_tests.extend(_test_static_frontmatter())
     static_tests.extend(_test_static_plugin_structure())
     static_tests.extend(_test_static_agent_skill_frontmatter())
+    static_tests.extend(_test_static_marketplace_json())
     static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
     static_total = len(static_tests)
 
