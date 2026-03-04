@@ -823,8 +823,6 @@ Present the final result:
 ## Session artifacts: $SESSION_DIR
 ```
 
-At session end: update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now. Append a `session_complete` event to `events.jsonl`. Update `latest` symlink: `ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/architecture/latest"`.
-
 ---
 
 ## Rules
@@ -845,4 +843,5 @@ At session end: update `session.json` via atomic replace: set `status` to `"comp
 - Architecture artifacts must be language-agnostic where possible — reference "the project's test suite" not specific commands like "pytest"
 - Skills and agents must follow the frontmatter schemas defined in CLAUDE.md
 - AGENTS.md changes must be consistent with any existing CLAUDE.md content
+- At session end: update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now. Append a `session_complete` event to `events.jsonl`. Update `latest` symlink: `ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/architecture/latest"`
 - Include `**Session artifacts**: $SESSION_DIR` in the final output
