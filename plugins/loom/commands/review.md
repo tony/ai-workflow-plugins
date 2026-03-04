@@ -6,7 +6,7 @@ argument-hint: "[focus area] [--passes=N] [--timeout=N|none] [--mode=fast|balanc
 
 # Loom Code Review
 
-Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, then synthesize their findings into a unified report with consensus-weighted confidence.
+Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, then synthesize their findings into a unified report with evidence-backed adjudication. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, synthesis results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 
 ---
 
@@ -314,7 +314,7 @@ After presenting the report:
 
 ## Rules
 
-- Never modify project code — this is a read-only review. Writing to `$AI_AIP_ROOT` for artifact persistence is not a project modification.
+- Never modify project code — this is project-read-only review. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository.
 - Always attempt to run all available reviewers, even if one fails
 - Always clearly attribute which reviewer(s) found each issue
 - Consensus issues take priority over single-reviewer issues

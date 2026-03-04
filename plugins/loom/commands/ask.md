@@ -6,7 +6,7 @@ argument-hint: "<question> [--passes=N] [--timeout=N|none] [--mode=fast|balanced
 
 # Loom Ask
 
-Ask a question across multiple AI models (Claude, Gemini, GPT) in parallel, then synthesize the best answer from all responses. This is a **read-only** command — no files are written or edited.
+Ask a question across multiple AI models (Claude, Gemini, GPT) in parallel, then synthesize the best answer from all responses. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, synthesis results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 
 The question comes from `$ARGUMENTS`. If no arguments are provided, ask the user what they want to know.
 
@@ -211,7 +211,7 @@ Present the final-pass synthesis, adding a **Refinement Notes** section describi
 
 ## Rules
 
-- Never modify project files — this is read-only research. Writing to `$AI_AIP_ROOT` for artifact persistence is not a project modification.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository.
 - Always verify model claims against the actual codebase before including in the synthesis
 - Always cite specific files and line numbers when possible
 - If models contradict each other, check the code and state which is correct
