@@ -379,7 +379,6 @@ Use the resolved backend from Phase 2. The review prompt is the same regardless 
 
 ```bash
 <timeout_cmd> <timeout_seconds> codex exec \
-    --yolo \
     -c model_reasoning_effort=medium \
     "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
