@@ -106,6 +106,48 @@ Write to `$SESSION_DIR/context-packet.md`:
 
 ---
 
+## Role Assignment
+
+Each model receives a distinct evaluation lens to decorrelate outputs and reduce shared blind spots. The same context packet is included for all models, but a different role preamble is prepended to each prompt.
+
+| Slot | Role | Bias | Preamble |
+|------|------|------|----------|
+| Claude | **Maintainer** | Conservative, convention-enforcing, minimal-change | "You are the Maintainer. Prioritize correctness, convention adherence, and minimal scope. Challenge any change that isn't strictly necessary. Enforce all project conventions from CLAUDE.md/AGENTS.md." |
+| Gemini | **Skeptic** | Challenge assumptions, find edge cases, question necessity | "You are the Skeptic. Challenge every assumption. Find edge cases, failure modes, and unstated requirements. Question whether the proposed approach is even the right one. Prioritize what could go wrong." |
+| GPT | **Builder** | Pragmatic, shippable, favor simplicity over abstraction | "You are the Builder. Prioritize practical, shippable solutions. Favor simplicity over abstraction. Focus on what gets the job done with the least complexity. Call out over-engineering." |
+
+Role preambles are prepended before the task-specific prompt and context packet. The role does not change the task — it changes the lens through which the model approaches it.
+
+---
+
+## Blind Judging Protocol
+
+Before synthesis, strip model identity from responses to prevent brand bias during evaluation.
+
+### Step 1: Randomize Labels
+
+Assign random labels (Response A, Response B, Response C) to the model outputs. Use a random permutation — do not always assign Claude to A. Record the mapping in `$SESSION_DIR/pass-NNNN/label-map.json`:
+
+```json
+{
+  "A": "<model>",
+  "B": "<model>",
+  "C": "<model>"
+}
+```
+
+### Step 2: Evaluate Blindly
+
+During scoring and adjudication (see Synthesis Protocol), refer to responses only by their labels (A/B/C). Do not consider which model produced which output.
+
+### Step 3: Reveal After Scoring
+
+After all scoring and adjudication is complete, reveal the model identities in the attribution section of the final report. Include the label mapping so the user can trace which model produced which response.
+
+**Limitation**: Claude is both participant and judge. True blindness is impossible for Claude's own output — it may recognize its own writing style. The blind labeling primarily prevents bias when evaluating external model outputs against each other.
+
+---
+
 ## Model Detection
 
 ### Step 3: Detect Available Models

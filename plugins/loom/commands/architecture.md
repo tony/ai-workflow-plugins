@@ -96,9 +96,7 @@ Use the format `loom/<model>/<YYYYMMDD-HHMMSS>` for branch names.
 
 ### Prompt Preparation
 
-Write the prompt to the session directory for persistence and shell safety:
-
-Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md` using the Write tool.
+Prepend each model's role preamble (from the [Role Assignment](./_shared-infrastructure.md#role-assignment) protocol) to its prompt. Include the context packet from Phase 1b. Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md` using the Write tool.
 
 The architecture prompt should include:
 
@@ -192,6 +190,8 @@ After each model completes, persist its output to the session directory:
 ---
 
 ## Phase 5: Analyze All Architectures
+
+Before evaluation, apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol): randomize labels (A/B/C), evaluate without knowing which model produced which response, reveal identities only after scoring.
 
 **Goal**: Deep-compare every model's architecture artifacts to identify the best elements from each.
 
