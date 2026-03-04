@@ -314,6 +314,10 @@ Write to `$SESSION_DIR/metadata.md` containing:
 
 Store `$SESSION_DIR` for use in all subsequent phases.
 
+#### Step 9: Write Context Packet
+
+Write the Context Packet built in Phase 1b to `$SESSION_DIR/context-packet.md`.
+
 ---
 
 ## Phase 3: Create Isolated Worktrees
