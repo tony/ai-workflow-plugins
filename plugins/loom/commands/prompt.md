@@ -720,19 +720,19 @@ Present the final-pass comparison and wait for user to pick the winner.
 Remove all loom worktrees and branches:
 
 ```bash
-git worktree remove ../$REPO_SLUG-loom-gemini --force 2>/dev/null
+git worktree remove ../$REPO_SLUG-loom-gemini --force 2>/dev/null || true
 ```
 
 ```bash
-git worktree remove ../$REPO_SLUG-loom-gpt --force 2>/dev/null
+git worktree remove ../$REPO_SLUG-loom-gpt --force 2>/dev/null || true
 ```
 
 ```bash
-git branch -D loom/gemini/<timestamp> 2>/dev/null
+git branch -D loom/gemini/<timestamp> 2>/dev/null || true
 ```
 
 ```bash
-git branch -D loom/gpt/<timestamp> 2>/dev/null
+git branch -D loom/gpt/<timestamp> 2>/dev/null || true
 ```
 
 ---
