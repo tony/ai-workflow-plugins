@@ -22,6 +22,7 @@ The task description comes from `$ARGUMENTS`. If no arguments are provided, ask 
    ```bash
    git remote show origin | grep 'HEAD branch'
    ```
+   Fall back to `master` if detection fails.
 
 3. **Understand current branch state**:
 

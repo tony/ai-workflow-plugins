@@ -29,6 +29,7 @@ The architecture goal comes from `$ARGUMENTS`. If no arguments are provided, ask
    ```bash
    git remote show origin | grep 'HEAD branch'
    ```
+   Fall back to `master` if detection fails.
 
 4. **Record the current branch and commit**:
 
