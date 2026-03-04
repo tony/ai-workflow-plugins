@@ -50,19 +50,280 @@ The architecture goal comes from `$ARGUMENTS`. If no arguments are provided, ask
 
 ## Phase 1b: Build Context Packet
 
-Follow the context packet protocol in [_shared-infrastructure.md](./_shared-infrastructure.md). For `architecture`, include conventions summary (existing CLAUDE.md/AGENTS.md content), existing component inventory (skills, agents, hooks, MCP servers), and known unknowns about the architecture goal.
+After Phase 1 context gathering, assemble a structured context bundle that will be included verbatim in ALL model prompts. This ensures every model works from the same information.
+
+Write to `$SESSION_DIR/context-packet.md`:
+
+1. **Conventions summary** — key rules from CLAUDE.md/AGENTS.md (max 50 lines). Focus on commit format, test patterns, code style, and quality gates relevant to the task.
+
+2. **Repo state** — branch, HEAD ref, trunk branch, uncommitted changes summary:
+   ```bash
+   git status --short
+   ```
+
+3. **Changed files** — for review/plan commands that operate on branch changes:
+   ```bash
+   git diff --stat origin/<trunk>...HEAD
+   ```
+
+4. **Relevant file list** — files matching task keywords discovered during Phase 1 exploration. Include paths only, not content.
+
+5. **Key snippets** — critical function signatures, types, test patterns, or API contracts relevant to the task (max 200 lines). Prioritize interfaces over implementations.
+
+6. **Known unknowns** — aspects of the task that need discovery during execution. List what the model should investigate.
+
+**Size limit**: 400 lines total. Prioritize by task relevance. If the packet exceeds 400 lines, truncate the least relevant sections (snippets first, then file list).
+
+**Usage in model prompts**:
+- For the **Claude Task agent**: reference the file path (`$SESSION_DIR/context-packet.md`) — the agent reads it directly
+- For **external CLIs** (Gemini, GPT): inline the context packet content in their prompt, since they cannot read local files
+
+For `architecture`, include conventions summary (existing CLAUDE.md/AGENTS.md content), existing component inventory (skills, agents, hooks, MCP servers), and known unknowns about the architecture goal.
 
 ---
 
 ## Phase 2: Configuration and Model Detection
 
-Follow the shared infrastructure protocol in [_shared-infrastructure.md](./_shared-infrastructure.md) for flag parsing, interactive configuration, model detection, and timeout detection with these parameters:
+### Flag and Argument Parsing
 
-- **Command name**: `architecture`
-- **Default timeout**: 1200s
-- **Long timeout**: 30 min (1800s)
-- **Session type**: `sessions/architecture/`
-- **Write command**: Yes (stash user changes, create diff/files directories)
+#### Step 1: Parse Flags
+
+Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=value` syntax and are stripped from the prompt text before sending to models.
+
+| Flag | Values | Default | Description |
+|------|--------|---------|-------------|
+| `--passes=N` | 1–5 | 1 | Number of synthesis passes |
+| `--timeout=N\|none` | seconds or `none` | command-specific | Timeout for external model commands |
+| `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
+
+**Mode presets** set default passes and timeout when not explicitly overridden:
+
+| Mode | Passes | Timeout multiplier |
+|------|--------|--------------------|
+| `fast` | 1 | 0.5× default |
+| `balanced` | 1 | 1× default |
+| `deep` | 2 | 1.5× default |
+
+**Backward compatibility**: Legacy trigger words are silently recognized as aliases:
+- `multipass` (case-insensitive) → `--passes=2`
+- `x<N>` (N = 2–5, regex `\bx([2-5])\b`) → `--passes=N`
+- `timeout:<seconds>` → `--timeout=<seconds>`
+- `timeout:none` → `--timeout=none`
+
+Legacy triggers are scanned on the first and last line only (to avoid false positives in pasted content). Explicit `--` flags take priority over legacy triggers.
+
+Values above 5 for `--passes` are capped at 5 with a note to the user.
+
+**Config flags** (used in Step 2):
+- `pass_count` = parsed pass count from `--passes`, mode preset, or legacy trigger. Null if not provided.
+- `timeout_value` = parsed timeout from `--timeout`, mode preset, or legacy trigger. Null if not provided.
+
+### Interactive Configuration
+
+#### Step 2: Interactive Configuration
+
+**When flags are provided, skip the corresponding question.** When `--passes` is provided, skip the passes question. When `--timeout` is provided, skip the timeout question.
+
+If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_count` value if set, otherwise default to 1 pass. Timeout uses `timeout_value` if set, otherwise the command's default timeout (provided by the calling command).
+
+Use `AskUserQuestion` to prompt the user for any unresolved settings:
+
+**Question 1 — Passes** (skipped when `--passes` was provided):
+- question: "How many synthesis passes? Multi-pass re-runs all models with prior results for deeper refinement."
+- header: "Passes"
+- When `pass_count` exists (from mode preset or legacy trigger), move the matching option first with "(Recommended)" suffix. Other options follow in ascending order.
+- When `pass_count` is null, use default ordering:
+  - "1 — single pass (Recommended)" — Run models once and synthesize. Sufficient for most tasks.
+  - "2 — multipass" — One refinement round. Models see prior synthesis and can challenge or deepen it.
+  - "3 — triple pass" — Two refinement rounds. Maximum depth, highest token usage.
+
+**Question 2 — Timeout** (skipped when `--timeout` was provided):
+- question: "Timeout for external model commands?"
+- header: "Timeout"
+- options:
+  - "Default (1200s)" — Use this command's built-in default timeout.
+  - "Quick — 3 min (180s)" — For fast queries. May timeout on complex tasks.
+  - "Long — 1800s" — For complex tasks. Higher wait on failures.
+  - "None" — No timeout. Wait indefinitely for each model.
+
+### Model Detection
+
+#### Step 3: Detect Available Models
+
+**Goal**: Check which AI CLI tools are installed locally.
+
+Run these checks in parallel:
+
+```bash
+command -v gemini >/dev/null 2>&1 && echo "gemini:available" || echo "gemini:missing"
+```
+
+```bash
+command -v codex >/dev/null 2>&1 && echo "codex:available" || echo "codex:missing"
+```
+
+```bash
+command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missing"
+```
+
+#### Model resolution (priority order)
+
+| Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
+|------|---------------------|-----------------------------|-------------|
+| **Claude** | Always available (this agent) | — | — |
+| **Gemini** | `gemini` binary | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
+| **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
+
+**Resolution logic** for each external slot:
+1. Native CLI found → use it
+2. Else `agent` found → use `agent` with `--model` flag
+3. Else → slot unavailable, note in report
+
+Report which models will participate and which backend each uses.
+
+### Timeout Detection
+
+#### Step 4: Detect Timeout Command
+
+```bash
+command -v timeout >/dev/null 2>&1 && echo "timeout:available" || { command -v gtimeout >/dev/null 2>&1 && echo "gtimeout:available" || echo "timeout:none"; }
+```
+
+On Linux, `timeout` is available by default. On macOS, `gtimeout` is available
+via GNU coreutils. If neither is found, run external commands without a timeout
+prefix — time limits will not be enforced. Do not install packages automatically.
+
+Store the resolved timeout command (`timeout`, `gtimeout`, or empty) for use in all subsequent CLI invocations. When constructing bash commands, replace `<timeout_cmd>` with the resolved command and `<timeout_seconds>` with the resolved value (from trigger parsing, interactive config, or the command's default). If no timeout command is available, omit the prefix entirely.
+
+### Session Directory Initialization
+
+#### Step 1: Resolve storage root
+
+```bash
+if [ -n "$AI_AIP_ROOT" ]; then
+  AIP_ROOT="$AI_AIP_ROOT"
+elif [ -n "$XDG_STATE_HOME" ]; then
+  AIP_ROOT="$XDG_STATE_HOME/ai-aip"
+elif [ "$(uname -s)" = "Darwin" ]; then
+  AIP_ROOT="$HOME/Library/Application Support/ai-aip"
+else
+  AIP_ROOT="$HOME/.local/state/ai-aip"
+fi
+```
+
+Create a `/tmp/ai-aip` symlink to the resolved root for backward compatibility (if `/tmp/ai-aip` doesn't already exist or isn't already correct):
+
+```bash
+ln -sfn "$AIP_ROOT" /tmp/ai-aip 2>/dev/null || true
+```
+
+#### Step 2: Compute repo identity
+
+```bash
+REPO_TOPLEVEL="$(git rev-parse --show-toplevel)"
+```
+
+```bash
+REPO_SLUG="$(basename "$REPO_TOPLEVEL" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g')"
+```
+
+```bash
+REPO_ORIGIN="$(git remote get-url origin 2>/dev/null || true)"
+```
+
+```bash
+if [ -n "$REPO_ORIGIN" ]; then
+  REPO_KEY="${REPO_ORIGIN}|${REPO_SLUG}"
+else
+  REPO_KEY="$REPO_TOPLEVEL"
+fi
+```
+
+```bash
+if command -v sha256sum >/dev/null 2>&1; then
+  REPO_ID="$(printf '%s' "$REPO_KEY" | sha256sum | cut -c1-12)"
+else
+  REPO_ID="$(printf '%s' "$REPO_KEY" | shasum -a 256 | cut -c1-12)"
+fi
+```
+
+```bash
+REPO_DIR="${REPO_SLUG}--${REPO_ID}"
+```
+
+#### Step 3: Generate session ID
+
+```bash
+SESSION_ID="$(date -u '+%Y%m%d-%H%M%SZ')-$$-$(head -c2 /dev/urandom | od -An -tx1 | tr -d ' ')"
+```
+
+#### Step 4: Create session directory
+
+```bash
+SESSION_DIR="$AIP_ROOT/repos/$REPO_DIR/sessions/architecture/$SESSION_ID"
+mkdir -p -m 700 "$SESSION_DIR/pass-0001/outputs" "$SESSION_DIR/pass-0001/stderr"
+```
+
+```bash
+mkdir -p -m 700 "$SESSION_DIR/pass-0001/diffs" "$SESSION_DIR/pass-0001/files"
+```
+
+#### Step 4b: Stash user changes
+
+```bash
+git stash --include-untracked -m "loom-architecture: user-changes stash"
+```
+
+#### Step 5: Write `repo.json` (if missing)
+
+If `$AIP_ROOT/repos/$REPO_DIR/repo.json` does not exist, write it with these contents:
+
+```json
+{
+  "schema_version": 1,
+  "slug": "<REPO_SLUG>",
+  "id": "<REPO_ID>",
+  "toplevel": "<REPO_TOPLEVEL>",
+  "origin": "<REPO_ORIGIN or null>"
+}
+```
+
+#### Step 6: Write `session.json` (atomic replace)
+
+Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json`:
+
+```json
+{
+  "schema_version": 1,
+  "session_id": "<SESSION_ID>",
+  "command": "architecture",
+  "status": "in_progress",
+  "branch": "<current branch>",
+  "ref": "<short SHA>",
+  "models": ["claude", "..."],
+  "completed_passes": 0,
+  "prompt_summary": "<first 120 chars of user prompt>",
+  "created_at": "<ISO 8601 UTC>",
+  "updated_at": "<ISO 8601 UTC>"
+}
+```
+
+#### Step 7: Append `events.jsonl`
+
+Append one event line to `$SESSION_DIR/events.jsonl`:
+
+```json
+{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"architecture","models":["claude","..."]}
+```
+
+#### Step 8: Write `metadata.md`
+
+Write to `$SESSION_DIR/metadata.md` containing:
+- Command name, start time, configured pass count
+- Models detected, timeout setting
+- Git branch (`git branch --show-current`), commit ref (`git rev-parse --short HEAD`)
+
+Store `$SESSION_DIR` for use in all subsequent phases.
 
 ---
 
@@ -96,7 +357,17 @@ Use the format `loom/<model>/<YYYYMMDD-HHMMSS>` for branch names.
 
 ### Prompt Preparation
 
-Prepend each model's role preamble (from the [Role Assignment](./_shared-infrastructure.md#role-assignment) protocol) to its prompt. Include the context packet from Phase 1b. Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md` using the Write tool.
+Each model receives a distinct evaluation lens to decorrelate outputs and reduce shared blind spots. The same context packet is included for all models, but a different role preamble is prepended to each prompt.
+
+| Slot | Role | Bias | Preamble |
+|------|------|------|----------|
+| Claude | **Maintainer** | Conservative, convention-enforcing, minimal-change | "You are the Maintainer. Prioritize correctness, convention adherence, and minimal scope. Challenge any change that isn't strictly necessary. Enforce all project conventions from CLAUDE.md/AGENTS.md." |
+| Gemini | **Skeptic** | Challenge assumptions, find edge cases, question necessity | "You are the Skeptic. Challenge every assumption. Find edge cases, failure modes, and unstated requirements. Question whether the proposed approach is even the right one. Prioritize what could go wrong." |
+| GPT | **Builder** | Pragmatic, shippable, favor simplicity over abstraction | "You are the Builder. Prioritize practical, shippable solutions. Favor simplicity over abstraction. Focus on what gets the job done with the least complexity. Call out over-engineering." |
+
+Role preambles are prepended before the task-specific prompt and context packet. The role does not change the task — it changes the lens through which the model approaches it.
+
+Include the context packet from Phase 1b. Write the prompt content to `$SESSION_DIR/pass-0001/prompt.md` using the Write tool.
 
 The architecture prompt should include:
 
@@ -241,10 +512,84 @@ Write results to `$SESSION_DIR/pass-0001/quality-gates.md`.
 
 ### Step 3: Verify and Score per File
 
-Apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol), then follow the [Synthesis Protocol](./_shared-infrastructure.md#synthesis-protocol) with:
+### Blind Judging Protocol
 
-- **Rubric**: General (Correctness 3×, Completeness 2×, Convention adherence 2×, Risk awareness 1×, Invasiveness 1×)
-- **Convergence mode**: File-by-file
+Before synthesis, strip model identity from responses to prevent brand bias during evaluation.
+
+**Step 1: Randomize Labels**
+
+Assign random labels (Response A, Response B, Response C) to the model outputs. Use a random permutation — do not always assign Claude to A. Record the mapping in `$SESSION_DIR/pass-NNNN/label-map.json`:
+
+```json
+{
+  "A": "<model>",
+  "B": "<model>",
+  "C": "<model>"
+}
+```
+
+**Step 2: Evaluate Blindly**
+
+During scoring and adjudication (see Synthesis Protocol), refer to responses only by their labels (A/B/C). Do not consider which model produced which output.
+
+**Step 3: Reveal After Scoring**
+
+After all scoring and adjudication is complete, reveal the model identities in the attribution section of the final report. Include the label mapping so the user can trace which model produced which response.
+
+**Limitation**: Claude is both participant and judge. True blindness is impossible for Claude's own output — it may recognize its own writing style. The blind labeling primarily prevents bias when evaluating external model outputs against each other.
+
+### Synthesis Protocol
+
+After collecting model outputs and applying blind labels, follow this evidence-backed synthesis protocol. Convergence mode for this command: **file-by-file**.
+
+**Step 1: Verify Claims**
+
+For each blinded response (A/B/C), check factual claims against the codebase:
+
+- **File references**: Use `Glob` and `Read` to confirm referenced files exist
+- **Function/API references**: Read the file and verify function signatures, class names, and API contracts match what the response claims
+- **Convention claims**: Check against CLAUDE.md/AGENTS.md — does the response correctly apply project rules?
+- **Classify each claim**: `verified` (confirmed by reading code), `plausible-unverified` (reasonable but not checked), or `false` (contradicted by code)
+
+Write the verification results to `$SESSION_DIR/pass-NNNN/verification.md`.
+
+**Step 2: Score with Rubric**
+
+Rate each blinded response 0–10 per dimension using the General Rubric. Compute a weighted total for each response.
+
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| Correctness | 3× | Verified claims, no hallucinations |
+| Completeness | 2× | Covers all task aspects |
+| Convention adherence | 2× | Follows CLAUDE.md/AGENTS.md patterns |
+| Risk awareness | 1× | Edge cases, failure modes identified |
+| Invasiveness | 1× | Minimal scope — lower is better |
+
+Write scores to `$SESSION_DIR/pass-NNNN/scores.md` in a table showing per-dimension scores and weighted totals for each label (A/B/C).
+
+**Step 3: Adjudicate Conflicts**
+
+Compare responses to identify:
+
+- **Agreement points** — all responses concur on these → accept as foundation
+- **Conflicts** — responses disagree → verify against the codebase, accept the one supported by evidence
+- **Unresolvable conflicts** — cannot determine which is correct from code alone → note both positions with available evidence
+
+**Step 4: Converge (File-by-File)**
+
+For each modified file, select the best version based on per-file scores and verification results; integrate and fix cross-file consistency.
+
+**Step 5: Critic**
+
+Launch an independent Task agent (`subagent_type: "general-purpose"`) to challenge the synthesized result:
+
+> Review the following synthesis for errors. Your job is to BREAK it — find problems, not confirm it's good.
+>
+> Find: (1) remaining factual errors — file/function references that don't exist, (2) logical inconsistencies — steps that contradict each other, (3) missing edge cases — failure modes not addressed, (4) convention violations — rules from CLAUDE.md/AGENTS.md not followed.
+>
+> Emit ONLY deltas: each issue found and its specific fix. Do not rewrite the entire synthesis.
+
+Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md`. Incorporate valid findings into the final output — verify each critic finding against the codebase before accepting it.
 
 For each file created or modified by any model:
 
@@ -315,7 +660,30 @@ After presenting the analysis, persist the synthesis:
 
 If `pass_count` is 1, skip this phase.
 
-Follow the [Conflict-Only Multi-Pass Refinement](./_shared-infrastructure.md#conflict-only-multi-pass-refinement) protocol. For each pass from 2 to `pass_count`:
+For pass N >= 2, do NOT re-run the entire task. Instead, target only:
+
+1. **Unresolved conflicts** from the prior pass's adjudication (Step 3)
+2. **Critic findings** from the prior pass's critic (Step 5)
+3. **Low-confidence scores** — any dimension scoring < 5 on any response
+
+Construct refinement prompts that include ONLY these targeted items:
+
+> The following issues remain from the prior pass. Address ONLY these items:
+>
+> **Unresolved conflicts**: [list from prior adjudication]
+> **Critic findings**: [list from prior critic.md]
+> **Low-confidence areas**: [dimensions/responses that scored < 5]
+>
+> For each item: provide your resolution with evidence (file paths, line numbers, code references).
+
+After collecting targeted responses:
+- Re-score only affected dimensions (not the full rubric)
+- Re-adjudicate only the disputes targeted in this pass
+- **Early-stop**: If no material delta between this pass and the prior pass (no scores changed by more than 1, no new conflicts identified), stop refinement early and report convergence
+
+Write the conflict-only prompt to `$SESSION_DIR/pass-{N}/prompt.md`. Follow the same retry protocol and artifact capture as the initial pass.
+
+For each pass from 2 to `pass_count`:
 
 1. **Ask for user confirmation** before starting the next pass. Warn that each pass spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).
 
