@@ -1,7 +1,7 @@
 ---
 description: Loom architecture — generate project scaffolding, conventions, skills, and architectural docs across Claude, Gemini, and GPT, then synthesize the best architecture
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<architecture goal> [x2|multipass] [timeout:<seconds>]"
+argument-hint: "<architecture goal> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
 ---
 
 # Loom Architecture

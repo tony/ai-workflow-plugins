@@ -1,7 +1,7 @@
 ---
 description: Loom question — ask Claude, Gemini, and GPT the same question in parallel, then synthesize the best answer
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<question> [x2|multipass] [timeout:<seconds>]"
+argument-hint: "<question> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
 ---
 
 # Loom Ask

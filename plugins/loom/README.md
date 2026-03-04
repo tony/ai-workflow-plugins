@@ -55,36 +55,30 @@ Each command follows a consistent multi-phase workflow:
 
 Multi-pass re-runs all models with the prior synthesis prepended as context, allowing each model to challenge, deepen, or confirm the previous round's results. This produces higher-quality outputs at the cost of additional model invocations.
 
-### Trigger Words
+### Flags
 
-Append trigger words to any command's arguments to hint at pass count:
+Control pass count, timeout, and execution mode with explicit flags:
 
-| Trigger | Effect | Example |
-|---------|--------|---------|
-| `multipass` | Hints 2 passes | `/loom:ask what is this? multipass` |
-| `x<N>` (N = 2–5) | Hints N passes | `/loom:plan add auth x3` |
+| Flag | Values | Default | Example |
+|------|--------|---------|---------|
+| `--passes=N` | 1–5 | 1 | `/loom:plan add auth --passes=2` |
+| `--timeout=N\|none` | seconds or `none` | command-specific | `/loom:ask question --timeout=300` |
+| `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/loom:execute task --mode=deep` |
 
-Triggers are hints — commands always prompt for confirmation. Values above 5 are capped at 5. Only the first and last line of arguments are scanned; trigger-like words found elsewhere prompt for disambiguation.
-
-### Timeout Triggers
-
-Override the default timeout per command:
-
-| Trigger | Effect | Example |
-|---------|--------|---------|
-| `timeout:<seconds>` | Set custom timeout | `/loom:ask question timeout:300` |
-| `timeout:none` | Disable timeout | `/loom:execute task timeout:none` |
+Mode presets set default passes and timeout when not explicitly overridden: `fast` (1 pass, half timeout), `balanced` (1 pass, default timeout), `deep` (2 passes, 1.5× timeout).
 
 Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s), architecture (1200s).
 
+Legacy trigger words (`multipass`, `x<N>`, `timeout:<seconds>`) are still recognized as aliases for backward compatibility.
+
 ### Interactive Configuration
 
-Commands always prompt via `AskUserQuestion` for pass count, with trigger hints biasing the recommended option:
+When flags are provided, the corresponding interactive question is skipped. Otherwise, commands prompt via `AskUserQuestion`:
 
-1. **Pass count** (always asked) — choose single pass (1), multipass (2), or triple pass (3). If a trigger hint is present, the matching option is marked as recommended.
-2. **Timeout** (asked unless structured trigger present) — choose the default, quick (180s), long (900–1800s, varies by command), or no timeout. Skipped when `timeout:<seconds>` or `timeout:none` is provided.
+1. **Pass count** (skipped when `--passes` is provided) — choose single pass (1), multipass (2), or triple pass (3).
+2. **Timeout** (skipped when `--timeout` is provided) — choose the default, quick (180s), long (900–1800s, varies by command), or no timeout.
 
-In headless mode (`claude -p`), pass count uses the trigger hint value if present, otherwise defaults to 1. Timeout uses the parsed value if provided, otherwise the per-command default.
+In headless mode (`claude -p`), pass count uses the flag value if provided, otherwise defaults to 1. Timeout uses the flag value if provided, otherwise the per-command default.
 
 ## Session Artifacts
 

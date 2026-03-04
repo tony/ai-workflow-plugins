@@ -6,29 +6,37 @@ This file contains the canonical protocols shared across all loom commands. Each
 
 ## Flag and Argument Parsing
 
-### Step 1: Parse Trigger Words
+### Step 1: Parse Flags
 
-Only the **first line and last line** of `$ARGUMENTS` are scanned for triggers (case-insensitively). This prevents pasted content in the body from accidentally matching. If a trigger-like word appears elsewhere in `$ARGUMENTS` but not on the first/last line, use `AskUserQuestion` to ask the user whether they intended it as a trigger. Strip matched triggers from the prompt text before sending to models.
+Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=value` syntax and are stripped from the prompt text before sending to models.
 
-**Multi-pass triggers**:
+| Flag | Values | Default | Description |
+|------|--------|---------|-------------|
+| `--passes=N` | 1–5 | 1 | Number of synthesis passes |
+| `--timeout=N\|none` | seconds or `none` | command-specific | Timeout for external model commands |
+| `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
 
-| Trigger | Effect |
-|---------|--------|
-| `multipass` (case-insensitive) | Hint for 2 passes |
-| `x<N>` (N = 2–5, regex `\bx([2-5])\b`) | Hint for N passes |
+**Mode presets** set default passes and timeout when not explicitly overridden:
 
-Values above 5 are capped at 5 with a note to the user.
+| Mode | Passes | Timeout multiplier |
+|------|--------|--------------------|
+| `fast` | 1 | 0.5× default |
+| `balanced` | 1 | 1× default |
+| `deep` | 2 | 1.5× default |
 
-**Timeout triggers**:
+**Backward compatibility**: Legacy trigger words are silently recognized as aliases:
+- `multipass` (case-insensitive) → `--passes=2`
+- `x<N>` (N = 2–5, regex `\bx([2-5])\b`) → `--passes=N`
+- `timeout:<seconds>` → `--timeout=<seconds>`
+- `timeout:none` → `--timeout=none`
 
-| Trigger | Effect |
-|---------|--------|
-| `timeout:<seconds>` | Override default timeout |
-| `timeout:none` | Disable timeout |
+Legacy triggers are scanned on the first and last line only (to avoid false positives in pasted content). Explicit `--` flags take priority over legacy triggers.
+
+Values above 5 for `--passes` are capped at 5 with a note to the user.
 
 **Config flags** (used in Step 2):
-- `pass_hint` = parsed pass count if trigger found on first/last line, else null. If trigger found only in body, ask user to disambiguate before setting.
-- `has_timeout_config` = true if `timeout:<seconds>` or `timeout:none` found on first/last line. If found only in body, ask user to disambiguate before setting.
+- `pass_count` = parsed pass count from `--passes`, mode preset, or legacy trigger. Null if not provided.
+- `timeout_value` = parsed timeout from `--timeout`, mode preset, or legacy trigger. Null if not provided.
 
 ---
 
@@ -36,22 +44,22 @@ Values above 5 are capped at 5 with a note to the user.
 
 ### Step 2: Interactive Configuration
 
-**Question 1 (Passes) — always asked**. Trigger hints only change option ordering.
+**When flags are provided, skip the corresponding question.** When `--passes` is provided, skip the passes question. When `--timeout` is provided, skip the timeout question.
 
-If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_hint` value if set, otherwise default to 1 pass. Timeout uses parsed value if `has_timeout_config`, otherwise the command's default timeout (provided by the calling command).
+If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_count` value if set, otherwise default to 1 pass. Timeout uses `timeout_value` if set, otherwise the command's default timeout (provided by the calling command).
 
-Use `AskUserQuestion` to prompt the user:
+Use `AskUserQuestion` to prompt the user for any unresolved settings:
 
-**Question 1 — Passes** (always asked):
+**Question 1 — Passes** (skipped when `--passes` was provided):
 - question: "How many synthesis passes? Multi-pass re-runs all models with prior results for deeper refinement."
 - header: "Passes"
-- When `pass_hint` exists (trigger found), move the matching option first with "(Recommended)" suffix. Other options follow in ascending order.
-- When `pass_hint` is null (no trigger), use default ordering:
+- When `pass_count` exists (from mode preset or legacy trigger), move the matching option first with "(Recommended)" suffix. Other options follow in ascending order.
+- When `pass_count` is null, use default ordering:
   - "1 — single pass (Recommended)" — Run models once and synthesize. Sufficient for most tasks.
   - "2 — multipass" — One refinement round. Models see prior synthesis and can challenge or deepen it.
   - "3 — triple pass" — Two refinement rounds. Maximum depth, highest token usage.
 
-**Question 2 — Timeout** (skipped only when `has_timeout_config` is true):
+**Question 2 — Timeout** (skipped when `--timeout` was provided):
 - question: "Timeout for external model commands?"
 - header: "Timeout"
 - options:
