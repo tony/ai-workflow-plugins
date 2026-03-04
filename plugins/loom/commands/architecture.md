@@ -84,9 +84,7 @@ For `architecture`, include conventions summary (existing CLAUDE.md/AGENTS.md co
 
 ## Phase 2: Configuration and Model Detection
 
-### Flag and Argument Parsing
-
-#### Step 1: Parse Flags
+### Step 1: Parse Flags
 
 Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=value` syntax and are stripped from the prompt text before sending to models.
 
@@ -118,9 +116,7 @@ Values above 5 for `--passes` are capped at 5 with a note to the user.
 - `pass_count` = parsed pass count from `--passes`, mode preset, or legacy trigger. Null if not provided.
 - `timeout_value` = parsed timeout from `--timeout`, mode preset, or legacy trigger. Null if not provided.
 
-### Interactive Configuration
-
-#### Step 2: Interactive Configuration
+### Step 2: Interactive Configuration
 
 **When flags are provided, skip the corresponding question.** When `--passes` is provided, skip the passes question. When `--timeout` is provided, skip the timeout question.
 
@@ -146,9 +142,7 @@ Use `AskUserQuestion` to prompt the user for any unresolved settings:
   - "Long — 1800s" — For complex tasks. Higher wait on failures.
   - "None" — No timeout. Wait indefinitely for each model.
 
-### Model Detection
-
-#### Step 3: Detect Available Models
+### Step 3: Detect Available Models
 
 **Goal**: Check which AI CLI tools are installed locally.
 
@@ -181,9 +175,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 Report which models will participate and which backend each uses.
 
-### Timeout Detection
-
-#### Step 4: Detect Timeout Command
+### Step 4: Detect Timeout Command
 
 ```bash
 command -v timeout >/dev/null 2>&1 && echo "timeout:available" || { command -v gtimeout >/dev/null 2>&1 && echo "gtimeout:available" || echo "timeout:none"; }
