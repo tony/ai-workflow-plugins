@@ -457,6 +457,8 @@ Write the verification results to `$SESSION_DIR/pass-NNNN/verification.md`.
 
 Rate each blinded response 0–10 per dimension using the Review Rubric:
 
+#### Review Rubric
+
 | Dimension | Weight | Description |
 |-----------|--------|-------------|
 | Correctness | 3× | Real bugs found, no false positives |
