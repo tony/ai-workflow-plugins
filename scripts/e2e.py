@@ -157,11 +157,12 @@ def _test_static_frontmatter() -> list[TestCase]:
                     "description" in fm,
                     f"{p.relative_to(REPO_ROOT)}: missing 'description' in frontmatter",
                 )
-                allowed: str = t.cast(str, fm.get("allowed-tools", ""))
+                allowed: str = t.cast("str", fm.get("allowed-tools", ""))
                 if allowed:
                     _assert(
                         "(" not in allowed,
-                        f"{p.relative_to(REPO_ROOT)}: allowed-tools should use bare names (no parenthesized patterns): {allowed}",
+                        f"{p.relative_to(REPO_ROOT)}: allowed-tools should use bare"
+                        f" names (no parenthesized patterns): {allowed}",
                     )
 
             tests.append(
