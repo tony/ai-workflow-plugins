@@ -32,6 +32,7 @@ Test both sources:
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -131,10 +132,13 @@ def _parse_frontmatter(path: Path) -> dict[str, t.Any]:
     m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
     if not m:
         return {}
-    parsed = yaml.safe_load(m.group(1))
+    parsed = t.cast(
+        "dict[str, t.Any] | None",
+        yaml.safe_load(m.group(1)),
+    )
     if not isinstance(parsed, dict):
         return {}
-    return t.cast("dict[str, t.Any]", parsed)
+    return parsed
 
 
 def _test_static_frontmatter() -> list[TestCase]:
@@ -254,15 +258,18 @@ def _test_static_agent_skill_frontmatter() -> list[TestCase]:
 
 def _test_static_marketplace_json() -> list[TestCase]:
     """Verify marketplace.json entries match PLUGINS and have required fields."""
-    import json
-
     tests: list[TestCase] = []
     manifest_path = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 
     def _check_marketplace() -> None:
         _assert(manifest_path.is_file(), "marketplace.json not found")
-        data = json.loads(manifest_path.read_text(encoding="utf-8"))
-        plugins_list: list[dict[str, t.Any]] = data.get("plugins", [])
+        data: dict[str, t.Any] = json.loads(  # pyright: ignore[reportAny]
+            manifest_path.read_text(encoding="utf-8"),
+        )
+        plugins_list = t.cast(
+            "list[dict[str, t.Any]]",
+            data.get("plugins", []),
+        )
         names = {p["name"] for p in plugins_list}
 
         for plugin in PLUGINS:
@@ -270,14 +277,14 @@ def _test_static_marketplace_json() -> list[TestCase]:
 
         required_fields = {"name", "description", "version", "author", "category", "source"}
         for entry in plugins_list:
-            entry_name = entry.get("name", "<unnamed>")
+            entry_name = t.cast("str", entry.get("name", "<unnamed>"))
             for field in required_fields:
                 _assert(
                     field in entry,
                     f"marketplace entry '{entry_name}': missing '{field}'",
                 )
-            source = entry.get("source", "")
-            if isinstance(source, str) and source.startswith("./"):
+            source = t.cast("str", entry.get("source", ""))
+            if source.startswith("./"):
                 source_path = REPO_ROOT / source
                 _assert(
                     source_path.is_dir(),
@@ -285,6 +292,67 @@ def _test_static_marketplace_json() -> list[TestCase]:
                 )
 
     tests.append(("marketplace.json validation", _check_marketplace))
+    return tests
+
+
+def _test_static_loom_timeouts() -> list[TestCase]:
+    """Verify loom command timeout multipliers are consistent (0.5x/1.5x)."""
+    tests: list[TestCase] = []
+    loom_commands_dir = REPO_ROOT / "plugins" / "loom" / "commands"
+    if not loom_commands_dir.is_dir():
+        return tests
+
+    timeout_pattern = re.compile(
+        r'"Default \((\d+)s\)".*\n.*"Quick — (\d+)s".*\n.*"Long — (\d+)s"',
+    )
+
+    for cmd_file in sorted(loom_commands_dir.glob("*.md")):
+
+        def _check_timeouts(p: Path = cmd_file) -> None:
+            text = p.read_text(encoding="utf-8")
+            m = timeout_pattern.search(text)
+            if not m:
+                return
+            default = int(m.group(1))
+            quick = int(m.group(2))
+            long_ = int(m.group(3))
+            rel = p.relative_to(REPO_ROOT)
+            _assert(
+                quick == default // 2,
+                f"{rel}: Quick={quick}s but expected {default // 2}s (0.5x {default}s)",
+            )
+            expected_long = default + default // 2
+            _assert(
+                long_ == expected_long,
+                f"{rel}: Long={long_}s but expected {expected_long}s (1.5x {default}s)",
+            )
+
+        tests.append((f"loom timeouts: {cmd_file.name}", _check_timeouts))
+
+    return tests
+
+
+def _test_static_loom_stderr_redirects() -> list[TestCase]:
+    """Verify fallback agent CLI uses append (2>>) not overwrite (2>)."""
+    tests: list[TestCase] = []
+    loom_commands_dir = REPO_ROOT / "plugins" / "loom" / "commands"
+    if not loom_commands_dir.is_dir():
+        return tests
+
+    def _check_redirects() -> None:
+        bad_files: list[str] = []
+        for cmd_file in sorted(loom_commands_dir.glob("*.md")):
+            text = cmd_file.read_text(encoding="utf-8")
+            for line in text.splitlines():
+                if "agent " in line and '2>"$SESSION_DIR' in line:
+                    bad_files.append(str(cmd_file.relative_to(REPO_ROOT)))
+                    break
+        _assert(
+            len(bad_files) == 0,
+            f"Agent fallbacks using 2> instead of 2>>: {', '.join(bad_files)}",
+        )
+
+    tests.append(("loom stderr redirects", _check_redirects))
     return tests
 
 
@@ -498,6 +566,8 @@ def main(
     static_tests.extend(_test_static_plugin_structure())
     static_tests.extend(_test_static_agent_skill_frontmatter())
     static_tests.extend(_test_static_marketplace_json())
+    static_tests.extend(_test_static_loom_timeouts())
+    static_tests.extend(_test_static_loom_stderr_redirects())
     static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
     static_total = len(static_tests)
 
@@ -505,7 +575,9 @@ def main(
     total_tests = static_total
 
     if shutil.which("claude") is None:
-        console.print("\n[yellow]Warning:[/yellow] 'claude' CLI not found in PATH — skipping CLI tests")
+        console.print(
+            "\n[yellow]Warning:[/yellow] 'claude' CLI not found in PATH -- skipping CLI tests",
+        )
     else:
         sources: list[t.Literal["local", "github"]]
         if source == "both":
