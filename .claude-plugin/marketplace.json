@@ -1,9 +1,9 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ai-workflow-plugins",
-  "description": "Language-agnostic workflow plugins for Claude Code — multi-model AI collaboration, rebase automation, changelog generation, and TDD workflows",
+  "description": "Language-agnostic workflow plugins for Claude Code — loom multi-model AI collaboration, rebase automation, changelog generation, and TDD workflows",
   "metadata": {
-    "description": "Language-agnostic workflow plugins for Claude Code — multi-model AI collaboration, rebase automation, changelog generation, and TDD workflows"
+    "description": "Language-agnostic workflow plugins for Claude Code — loom multi-model AI collaboration, rebase automation, changelog generation, and TDD workflows"
   },
   "owner": {
     "name": "Tony Narlock",
@@ -11,16 +11,16 @@
   },
   "plugins": [
     {
-      "name": "multi-model",
-      "description": "Run prompts across Claude, Gemini, and GPT in parallel — plan, execute, architect, review, and synthesize the best of all models",
+      "name": "loom",
+      "description": "Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, architect, review, and synthesize the best of all models",
       "version": "0.0.1",
       "author": {
         "name": "Tony Narlock",
         "email": "tony@git-pull.com"
       },
-      "source": "./plugins/multi-model",
+      "source": "./plugins/loom",
       "category": "development",
-      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/multi-model",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/loom",
       "license": "MIT"
     },
     {

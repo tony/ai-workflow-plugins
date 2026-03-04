@@ -70,12 +70,12 @@ brew install coreutils
 
 If neither `timeout` nor `gtimeout` is found, skills run without a time limit.
 
-## Comparison with multi-model
+## Comparison with loom
 
-The **multi-model** plugin runs all models in parallel and synthesizes results. The **model-cli** plugin runs a single model at a time — useful when you want to target a specific model without the overhead of parallel orchestration.
+The **loom** plugin runs all models in parallel and synthesizes results. The **model-cli** plugin runs a single model at a time — useful when you want to target a specific model without the overhead of parallel orchestration.
 
-| Feature | multi-model | model-cli |
-|---------|-------------|-----------|
+| Feature | loom | model-cli |
+|---------|------|-----------|
 | Parallel execution | All models at once | Single model |
 | Synthesis | Best-of-all merge | Direct output |
 | Multi-pass refinement | Supported | Not applicable |

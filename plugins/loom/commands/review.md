@@ -1,10 +1,10 @@
 ---
-description: Multi-model code review — runs Claude, Gemini, and GPT reviews in parallel, then synthesizes findings
+description: Loom code review — runs Claude, Gemini, and GPT reviews in parallel, then synthesizes findings
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "[focus area] [x2|multipass] [timeout:<seconds>]"
 ---
 
-# Multi-Model Code Review
+# Loom Code Review
 
 Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, then synthesize their findings into a unified report with consensus-weighted confidence.
 
@@ -392,7 +392,7 @@ Group findings that refer to the same issue (same file, similar description). Fo
 Present the synthesized report in this format:
 
 ```markdown
-# Multi-Model Code Review Report
+# Loom Code Review Report
 
 **Reviewers**: Claude, Gemini, GPT (or whichever participated)
 **Branch**: <branch-name>
