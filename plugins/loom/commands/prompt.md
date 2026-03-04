@@ -176,7 +176,7 @@ On Linux, `timeout` is available by default. On macOS, `gtimeout` is available
 via GNU coreutils. If neither is found, run external commands without a timeout
 prefix — time limits will not be enforced. Do not install packages automatically.
 
-Store the resolved timeout command (`timeout`, `gtimeout`, or empty) for use in all subsequent CLI invocations. When constructing bash commands, replace `<timeout_cmd>` with the resolved command and `<timeout_seconds>` with the resolved value (from trigger parsing, interactive config, or the command's default). If no timeout command is available, omit the prefix entirely.
+Store the resolved timeout command (`timeout`, `gtimeout`, or empty) for use in all subsequent CLI invocations. When constructing bash commands, replace `<timeout_cmd>` with the resolved command and `<timeout_seconds>` with the resolved value (from trigger parsing, interactive config, or the command's default). If no timeout command is available, omit the prefix entirely. When `--timeout=none` is configured (via flag or interactive selection), also omit `<timeout_cmd>` and `<timeout_seconds>` entirely — run external commands without any timeout prefix.
 
 ### Session Directory Initialization
 
