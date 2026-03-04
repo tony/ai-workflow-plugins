@@ -139,8 +139,8 @@ Use `AskUserQuestion` to prompt the user for any unresolved settings:
 - header: "Timeout"
 - options:
   - "Default (1200s)" — Use this command's built-in default timeout.
-  - "Quick — 3 min (180s)" — For fast queries. May timeout on complex tasks.
-  - "Long — 1800s" — For complex tasks. Higher wait on failures.
+  - "Quick — 600s" — For fast queries (0.5× default). May timeout on complex tasks.
+  - "Long — 1800s" — For complex tasks (1.5× default). Higher wait on failures.
   - "None" — No timeout. Wait indefinitely for each model.
 
 ### Step 3: Detect Available Models
