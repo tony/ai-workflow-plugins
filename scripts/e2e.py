@@ -407,10 +407,6 @@ def main(
     source: t.Annotated[Source, typer.Option(help="Source type: local, github, or both")] = "local",
 ) -> None:
     """Run E2E plugin lifecycle tests against the Claude CLI."""
-    if shutil.which("claude") is None:
-        console.print("[red]Error:[/red] 'claude' CLI not found in PATH")
-        raise SystemExit(1)
-
     console.print("[bold]E2E Plugin Lifecycle Tests[/bold]")
     console.print("=" * 40)
 
@@ -422,19 +418,22 @@ def main(
     static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
     static_total = len(static_tests)
 
-    sources: list[t.Literal["local", "github"]]
-    if source == "both":
-        sources = ["local", "github"]
-    else:
-        sources = [source]
-
     total_passed = static_passed
     total_tests = static_total
 
-    for src in sources:
-        passed, total = _run_suite(src)
-        total_passed += passed
-        total_tests += total
+    if shutil.which("claude") is None:
+        console.print("\n[yellow]Warning:[/yellow] 'claude' CLI not found in PATH — skipping CLI tests")
+    else:
+        sources: list[t.Literal["local", "github"]]
+        if source == "both":
+            sources = ["local", "github"]
+        else:
+            sources = [source]
+
+        for src in sources:
+            passed, total = _run_suite(src)
+            total_passed += passed
+            total_tests += total
 
     console.print()
     if total_passed == total_tests:
