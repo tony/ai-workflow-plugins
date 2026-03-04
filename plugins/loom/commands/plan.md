@@ -146,36 +146,14 @@ After each model completes, persist its output to the session directory:
 
 ## Phase 4: Synthesize the Best Plan
 
-**Goal**: Combine the strongest elements from all plans into a single, superior plan.
+**Goal**: Combine the strongest elements from all plans into a single, superior plan using evidence-backed adjudication.
 
-Before evaluation, apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol): randomize labels (A/B/C), evaluate without knowing which model produced which response, reveal identities only in the attribution section.
+Apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol), then follow the [Synthesis Protocol](./_shared-infrastructure.md#synthesis-protocol) with:
 
-### Step 1: Compare Plans
+- **Rubric**: General (Correctness 3×, Completeness 2×, Convention adherence 2×, Risk awareness 1×, Invasiveness 1×)
+- **Convergence mode**: Merge
 
-For each model's plan, evaluate:
-- **File coverage**: Which files does it identify for modification? Are any missing?
-- **Sequence correctness**: Are dependencies between steps correct?
-- **Pattern adherence**: Does it follow the project's existing patterns (from CLAUDE.md)?
-- **Test strategy**: Does it extend existing tests or create new ones appropriately?
-- **Risk awareness**: Does it identify realistic edge cases?
-- **Unique approaches**: What novel ideas does this plan have that others don't?
-
-### Step 2: Verify Claims
-
-For each plan's claims about the codebase:
-- **Read the referenced files** to confirm they exist and the plan's understanding is correct
-- **Check function signatures** and APIs to verify the proposed integration points
-- **Validate test patterns** — confirm that the test approach matches the project's conventions from AGENTS.md/CLAUDE.md
-
-### Step 3: Build the Synthesized Plan
-
-1. **Start with the most architecturally sound plan** as the base
-2. **Incorporate better file coverage** from other plans (if one model identified a file others missed)
-3. **Adopt the strongest test strategy** — prefer the plan that best extends existing test patterns
-4. **Merge unique risk mitigations** from each plan
-5. **Resolve approach conflicts** — when models propose different architectures, pick the one that best fits existing patterns (verify by reading code)
-
-### Step 4: Present the Final Plan
+### Present the Final Plan
 
 ```markdown
 # Implementation Plan
@@ -212,16 +190,34 @@ For each plan's claims about the codebase:
 
 ---
 
-## Model Contributions
+## Scores
 
-**Base plan from**: <model>
-**Incorporated from other models**:
-- [Gemini] <what was taken from Gemini's plan>
-- [GPT] <what was taken from GPT's plan>
+| Dimension | A | B | C |
+|-----------|---|---|---|
+| Correctness (3×) | /10 | /10 | /10 |
+| Completeness (2×) | /10 | /10 | /10 |
+| Convention adherence (2×) | /10 | /10 | /10 |
+| Risk awareness (1×) | /10 | /10 | /10 |
+| Invasiveness (1×) | /10 | /10 | /10 |
+| **Weighted total** | | | |
 
-**Rejected approaches**:
-- [Model] <approach> — rejected because <reason with code reference>
+## Verification Summary
 
+**Verified claims**: <count> | **Plausible-unverified**: <count> | **False**: <count>
+
+## Adjudication
+
+**Agreed**: <key points all plans concurred on>
+**Conflicts resolved**: <disagreements and which was correct, with code references>
+**Rejected approaches**: <approach — rejected because reason with code reference>
+
+## Critic Findings
+
+<Deltas from critic pass, or "No issues found">
+
+## Attribution
+
+**Label mapping**: A = <model>, B = <model>, C = <model>
 **Models participated**: Claude, Gemini, GPT (or subset)
 **Models unavailable/failed**: (if any)
 **Session artifacts**: $SESSION_DIR
@@ -238,36 +234,25 @@ After presenting the plan, persist the synthesis:
 
 If `pass_count` is 1, skip this phase.
 
-For each pass from 2 to `pass_count`:
+Follow the [Conflict-Only Multi-Pass Refinement](./_shared-infrastructure.md#conflict-only-multi-pass-refinement) protocol. For each pass from 2 to `pass_count`:
 
-1. **Create the pass directory** (N is the pass number, zero-padded to 4 digits):
+1. **Create the pass directory**:
 
    ```bash
    mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr"
    ```
 
-2. **Construct refinement prompts** using the prior pass's artifacts:
+2. **Construct conflict-only prompts** targeting unresolved conflicts, critic findings, and low-confidence scores from the prior pass. For Claude, reference prior artifacts by path; for external models, inline them.
 
-   - Read `$SESSION_DIR/pass-{prev}/synthesis.md` as the canonical prior synthesis (where `{prev}` is the zero-padded previous pass number).
-   - For the **Claude Task agent**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly (synthesis.md and optionally individual model outputs) instead of inlining the entire prior synthesis in the prompt. This reduces Claude's prompt size on later passes.
-   - For **external models** (Gemini, GPT): Inline the prior synthesis in their prompt (they cannot read local files).
+3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available models in parallel (same backends, same timeouts, same retry logic as Phase 3).
 
-   > Prior synthesized plan from the previous pass: [contents of $SESSION_DIR/pass-{prev}/synthesis.md]. For this refinement:
-   > (1) Identify weaknesses, missing steps, or incorrect assumptions.
-   > (2) Propose better architectures if the current one has flaws.
-   > (3) Verify that referenced files, functions, and APIs exist.
-   > (4) Strengthen the test strategy.
-   > (5) Add missed risks and edge cases.
+4. **Capture outputs** to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
-3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available models in parallel (same backends, same timeouts, same retry logic as Phase 3). Redirect stderr to `$SESSION_DIR/pass-{N}/stderr/<model>.txt`.
+5. **Re-synthesize** following Phase 4 (re-score only affected dimensions, re-adjudicate only targeted disputes). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
 
-4. **Capture outputs**: Write each model's response to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
+6. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
 
-5. **Re-synthesize** following the same procedure as Phase 4. Write the result to `$SESSION_DIR/pass-{N}/synthesis.md`.
-
-6. **Update session**: Update `session.json` via atomic replace: set `completed_passes` to N, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
-
-Present the final-pass synthesis as the result, adding a **Plan Evolution** section that describes what was strengthened, corrected, or added across passes.
+Present the final-pass synthesis, adding a **Plan Evolution** section describing what was strengthened, corrected, or added across passes.
 
 ---
 

@@ -148,6 +148,108 @@ After all scoring and adjudication is complete, reveal the model identities in t
 
 ---
 
+## Synthesis Protocol
+
+After collecting model outputs and applying blind labels, follow this evidence-backed synthesis protocol. Each command specifies which convergence mode to use (merge, pick-winner, or file-by-file).
+
+### Step 1: Verify Claims
+
+For each blinded response (A/B/C), check factual claims against the codebase:
+
+- **File references**: Use `Glob` and `Read` to confirm referenced files exist
+- **Function/API references**: Read the file and verify function signatures, class names, and API contracts match what the response claims
+- **Convention claims**: Check against CLAUDE.md/AGENTS.md — does the response correctly apply project rules?
+- **Classify each claim**: `verified` (confirmed by reading code), `plausible-unverified` (reasonable but not checked), or `false` (contradicted by code)
+
+Write the verification results to `$SESSION_DIR/pass-NNNN/verification.md`.
+
+### Step 2: Score with Rubric
+
+Rate each blinded response 0–10 per dimension. Use the rubric appropriate to the command type (see Scoring Rubrics below). Compute a weighted total for each response.
+
+Write scores to `$SESSION_DIR/pass-NNNN/scores.md` in a table showing per-dimension scores and weighted totals for each label (A/B/C).
+
+### Step 3: Adjudicate Conflicts
+
+Compare responses to identify:
+
+- **Agreement points** — all responses concur on these → accept as foundation
+- **Conflicts** — responses disagree → verify against the codebase, accept the one supported by evidence
+- **Unresolvable conflicts** — cannot determine which is correct from code alone → note both positions with available evidence
+
+### Step 4: Converge
+
+Build the final result using the convergence mode specified by the command:
+
+- **Merge** (ask, plan): Combine agreed points as foundation, apply adjudicated conflict resolutions, incorporate best unique contributions ordered by score, strip unverified claims
+- **Pick-winner** (prompt): Select the highest-scoring implementation as the winner; do not merge code from different implementations
+- **File-by-file** (execute, architecture): For each modified file, select the best version based on per-file scores and verification results; integrate and fix cross-file consistency
+
+### Step 5: Critic
+
+Launch an independent Task agent (`subagent_type: "general-purpose"`) to challenge the synthesized result:
+
+> Review the following synthesis for errors. Your job is to BREAK it — find problems, not confirm it's good.
+>
+> Find: (1) remaining factual errors — file/function references that don't exist, (2) logical inconsistencies — steps that contradict each other, (3) missing edge cases — failure modes not addressed, (4) convention violations — rules from CLAUDE.md/AGENTS.md not followed.
+>
+> Emit ONLY deltas: each issue found and its specific fix. Do not rewrite the entire synthesis.
+
+Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md`. Incorporate valid findings into the final output — verify each critic finding against the codebase before accepting it.
+
+---
+
+## Scoring Rubrics
+
+### General Rubric (ask, plan, execute, architecture)
+
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| Correctness | 3× | Verified claims, no hallucinations |
+| Completeness | 2× | Covers all task aspects |
+| Convention adherence | 2× | Follows CLAUDE.md/AGENTS.md patterns |
+| Risk awareness | 1× | Edge cases, failure modes identified |
+| Invasiveness | 1× | Minimal scope — lower is better |
+
+### Review Rubric (review)
+
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| Correctness | 3× | Real bugs found, no false positives |
+| Specificity | 2× | Exact file/line, reproducible issue |
+| Severity calibration | 2× | Critical is truly critical, not inflated |
+| Actionability | 1× | Clear fix recommendations |
+| Convention coverage | 1× | Checks project-specific rules from CLAUDE.md |
+
+---
+
+## Conflict-Only Multi-Pass Refinement
+
+For pass N ≥ 2, do NOT re-run the entire task. Instead, target only:
+
+1. **Unresolved conflicts** from the prior pass's adjudication (Step 3)
+2. **Critic findings** from the prior pass's critic (Step 5)
+3. **Low-confidence scores** — any dimension scoring < 5 on any response
+
+Construct refinement prompts that include ONLY these targeted items:
+
+> The following issues remain from the prior pass. Address ONLY these items:
+>
+> **Unresolved conflicts**: [list from prior adjudication]
+> **Critic findings**: [list from prior critic.md]
+> **Low-confidence areas**: [dimensions/responses that scored < 5]
+>
+> For each item: provide your resolution with evidence (file paths, line numbers, code references).
+
+After collecting targeted responses:
+- Re-score only affected dimensions (not the full rubric)
+- Re-adjudicate only the disputes targeted in this pass
+- **Early-stop**: If no material delta between this pass and the prior pass (no scores changed by more than 1, no new conflicts identified), stop refinement early and report convergence
+
+Write the conflict-only prompt to `$SESSION_DIR/pass-{N}/prompt.md`. Follow the same retry protocol and artifact capture as the initial pass.
+
+---
+
 ## Model Detection
 
 ### Step 3: Detect Available Models
