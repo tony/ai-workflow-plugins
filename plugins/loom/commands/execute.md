@@ -461,6 +461,12 @@ git add -A
 git diff HEAD
 ```
 
+Unstage after capturing the diff to avoid side effects on the user's index:
+
+```bash
+git reset HEAD
+```
+
 **External models** (worktrees):
 ```bash
 git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" add -A
@@ -468,6 +474,10 @@ git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" add -A
 
 ```bash
 git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" diff HEAD
+```
+
+```bash
+git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" reset HEAD
 ```
 
 Write diffs to: `$SESSION_DIR/pass-0001/diffs/claude.diff`, `gemini.diff`, `gpt.diff`.
