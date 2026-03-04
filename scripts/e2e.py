@@ -2,6 +2,7 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
+#     "pyyaml>=6.0",
 #     "rich>=13.0",
 #     "typer>=0.15",
 # ]
@@ -41,6 +42,7 @@ from pathlib import Path
 
 import rich.console
 import typer
+import yaml
 from _private_path import PrivatePath  # pyright: ignore[reportImplicitRelativeImport]
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -129,12 +131,10 @@ def _parse_frontmatter(path: Path) -> dict[str, t.Any]:
     m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
     if not m:
         return {}
-    result: dict[str, t.Any] = {}
-    for line in m.group(1).splitlines():
-        if ":" in line:
-            key, _, value = line.partition(":")
-            result[key.strip()] = value.strip()
-    return result
+    parsed = yaml.safe_load(m.group(1))
+    if not isinstance(parsed, dict):
+        return {}
+    return t.cast("dict[str, t.Any]", parsed)
 
 
 def _test_static_frontmatter() -> list[TestCase]:
