@@ -6,7 +6,7 @@ argument-hint: "<task description> [--passes=N] [--timeout=N|none] [--mode=fast|
 
 # Loom Plan
 
-Get implementation plans from multiple AI models (Claude, Gemini, GPT) in parallel, then synthesize the best plan. This is a **read-only** command — no files are written or edited. The output is a finalized Claude Code plan ready for execution.
+Get implementation plans from multiple AI models (Claude, Gemini, GPT) in parallel, then synthesize the best plan. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, synthesis results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository. The output is a finalized Claude Code plan ready for execution.
 
 The task description comes from `$ARGUMENTS`. If no arguments are provided, ask the user what they want planned.
 
@@ -258,7 +258,7 @@ Present the final-pass synthesis, adding a **Plan Evolution** section describing
 
 ## Rules
 
-- Never modify project files — this is read-only planning. Writing to `$AI_AIP_ROOT` for artifact persistence is not a project modification.
+- Never modify project files — this is project-read-only planning. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository.
 - Always verify each plan's claims by reading the actual codebase
 - Always resolve conflicts by checking what the code actually does
 - The final plan must follow project conventions from CLAUDE.md/AGENTS.md
