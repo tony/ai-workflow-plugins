@@ -52,11 +52,16 @@ Write to `$SESSION_DIR/context-packet.md` *(the actual file write happens after 
    git diff --stat origin/<trunk>...HEAD
    ```
 
-4. **Relevant file list** — files matching task keywords discovered during Phase 1 exploration. Include paths only, not content.
+4. **Full diff** — the complete diff output for external CLI models that cannot generate it themselves:
+   ```bash
+   git diff origin/<trunk>...HEAD
+   ```
 
-5. **Key snippets** — critical function signatures, types, test patterns, or API contracts relevant to the task (max 200 lines). Prioritize interfaces over implementations.
+5. **Relevant file list** — files matching task keywords discovered during Phase 1 exploration. Include paths only, not content.
 
-6. **Known unknowns** — aspects of the task that need discovery during execution. List what the model should investigate.
+6. **Key snippets** — critical function signatures, types, test patterns, or API contracts relevant to the task (max 200 lines). Prioritize interfaces over implementations.
+
+7. **Known unknowns** — aspects of the task that need discovery during execution. List what the model should investigate.
 
 **Size limit**: 400 lines total. Prioritize by task relevance. If the packet exceeds 400 lines, truncate the least relevant sections (snippets first, then file list).
 
