@@ -319,7 +319,13 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 
 **Goal**: Set up an isolated git worktree for each available external model.
 
-For each external model (Gemini, GPT — Claude works in the main tree):
+For each external model (Gemini, GPT — Claude works in the main tree), first remove any stale worktree from a prior run:
+
+```bash
+git worktree remove ../$REPO_SLUG-loom-<model> --force 2>/dev/null || true
+```
+
+Then create the fresh worktree:
 
 ```bash
 git worktree add ../$REPO_SLUG-loom-<model> -b loom/<model>/<timestamp>
