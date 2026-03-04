@@ -438,7 +438,7 @@ After all scoring and adjudication is complete, reveal the model identities in t
 
 ### Synthesis Protocol
 
-After collecting model outputs and applying blind labels, follow this evidence-backed synthesis protocol.
+After collecting model outputs and applying blind labels, follow this evidence-backed synthesis protocol. The convergence mode for `plan` is **Merge**.
 
 **Step 1: Verify Claims**
 
