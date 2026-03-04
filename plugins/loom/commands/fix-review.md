@@ -1,6 +1,6 @@
 ---
 description: Fix loom review findings — validate, add test coverage, fix, and commit each as atomic changes
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task"]
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
 ---
 
 # Fix Review Findings
