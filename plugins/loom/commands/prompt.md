@@ -498,7 +498,7 @@ Record pass/fail status for each gate and model. Write to `$SESSION_DIR/pass-000
 
 ### Step 3: Score and Verify
 
-#### Blind Judging Protocol
+### Blind Judging Protocol
 
 Before synthesis, strip model identity from responses to prevent brand bias during evaluation.
 
@@ -518,7 +518,7 @@ Before synthesis, strip model identity from responses to prevent brand bias duri
 
 **Limitation**: Claude is both participant and judge. True blindness is impossible for Claude's own output — it may recognize its own writing style. The blind labeling primarily prevents bias when evaluating external model outputs against each other.
 
-#### Synthesis Protocol
+### Synthesis Protocol
 
 After collecting model outputs and applying blind labels, follow this evidence-backed synthesis protocol.
 
