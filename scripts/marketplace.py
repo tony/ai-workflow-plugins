@@ -591,8 +591,6 @@ def validate_plugin_dir(plugin_dir: Path) -> list[str]:
         if not md_files:
             errors.append(f"[{name}] No .md files in commands/")
         for md_file in md_files:
-            if md_file.name.startswith("_"):
-                continue  # Skip internal reference documents (not commands)
             fm = parse_frontmatter(md_file)
             if fm is None:
                 errors.append(f"[{name}] commands/{md_file.name}: Missing YAML frontmatter")
