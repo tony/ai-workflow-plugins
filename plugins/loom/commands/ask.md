@@ -22,7 +22,7 @@ The question comes from `$ARGUMENTS`. If no arguments are provided, ask the user
    ```bash
    git remote show origin | grep 'HEAD branch'
    ```
-   Fall back to `master` if detection fails.
+   Fall back to `main`, then `master`, if detection fails.
 
 3. **Capture the question**: Use `$ARGUMENTS` as the user's question. If `$ARGUMENTS` is empty, ask the user what question they want answered.
 

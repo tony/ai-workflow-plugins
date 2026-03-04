@@ -22,7 +22,7 @@ The task comes from `$ARGUMENTS`. If no arguments are provided, ask the user wha
    ```bash
    git remote show origin | grep 'HEAD branch'
    ```
-   Fall back to `master` if detection fails.
+   Fall back to `main`, then `master`, if detection fails.
 
 3. **Record the current branch and commit**:
 
