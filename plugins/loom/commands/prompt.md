@@ -507,7 +507,9 @@ Record pass/fail status for each gate and model. Write to `$SESSION_DIR/pass-000
 
 Before synthesis, strip model identity from responses to prevent brand bias during evaluation.
 
-**Randomize Labels**: Assign random labels (Response A, Response B, Response C) to the model outputs. Use a random permutation — do not always assign Claude to A. Record the mapping in `$SESSION_DIR/pass-NNNN/label-map.json`:
+**Step 1: Randomize Labels**
+
+Assign random labels (Response A, Response B, Response C) to the model outputs. Use a random permutation — do not always assign Claude to A. Record the mapping in `$SESSION_DIR/pass-NNNN/label-map.json`:
 
 ```json
 {
@@ -517,9 +519,13 @@ Before synthesis, strip model identity from responses to prevent brand bias duri
 }
 ```
 
-**Evaluate Blindly**: During scoring and adjudication (see Synthesis Protocol), refer to responses only by their labels (A/B/C). Do not consider which model produced which output.
+**Step 2: Evaluate Blindly**
 
-**Reveal After Scoring**: After all scoring and adjudication is complete, reveal the model identities in the attribution section of the final report. Include the label mapping so the user can trace which model produced which response.
+During scoring and adjudication (see Synthesis Protocol), refer to responses only by their labels (A/B/C). Do not consider which model produced which output.
+
+**Step 3: Reveal After Scoring**
+
+After all scoring and adjudication is complete, reveal the model identities in the attribution section of the final report. Include the label mapping so the user can trace which model produced which response.
 
 **Limitation**: Claude is both participant and judge. True blindness is impossible for Claude's own output — it may recognize its own writing style. The blind labeling primarily prevents bias when evaluating external model outputs against each other.
 
