@@ -760,7 +760,7 @@ git branch -D loom/gpt/<timestamp> 2>/dev/null
 If user changes were stashed in Phase 2, Step 4b, restore them. Only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake.
 
 ```bash
-git stash list | grep -q "loom-execute: user-changes stash" && git stash pop || true
+STASH_REF="$(git stash list | grep -m1 "loom-execute: user-changes stash" | cut -d: -f1)" && [ -n "$STASH_REF" ] && git stash pop "$STASH_REF" || true
 ```
 
 If the pop fails due to merge conflicts with the synthesized changes, notify the user: "Pre-existing uncommitted changes conflicted with the synthesis. Resolve conflicts, then run `git stash drop` to remove the stash entry."
