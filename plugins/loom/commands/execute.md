@@ -377,12 +377,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to implement in the 
 
 **Native (`gemini` CLI)** — run in the worktree directory:
 ```bash
-cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Implementation (worktree)
@@ -398,12 +398,12 @@ cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --mo
 cd ../$REPO_SLUG-loom-gpt && <timeout_cmd> <timeout_seconds> codex exec \
     --yolo \
     -c model_reasoning_effort=medium \
-    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../$REPO_SLUG-loom-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+cd ../$REPO_SLUG-loom-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 ### Artifact Capture
@@ -411,8 +411,8 @@ cd ../$REPO_SLUG-loom-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model
 After each model completes, persist its output to the session directory:
 
 - **Claude**: Write the Task agent's response to `$SESSION_DIR/pass-0001/outputs/claude.md`
-- **Gemini**: Write Gemini's stdout to `$SESSION_DIR/pass-0001/outputs/gemini.md`
-- **GPT**: Write GPT's stdout to `$SESSION_DIR/pass-0001/outputs/gpt.md`
+- **Gemini**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gemini.md`
+- **GPT**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gpt.md`
 
 ### Execution Strategy
 
