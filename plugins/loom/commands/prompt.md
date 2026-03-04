@@ -675,7 +675,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 - Changes are already in the main tree — nothing to do.
 - Restore stashed user changes (only pop if the named stash exists):
   ```bash
-  git stash list | grep -q "loom-prompt: user-changes stash" && git stash pop || true
+  STASH_REF="$(git stash list | grep -m1 "loom-prompt: user-changes stash" | cut -d: -f1)" && [ -n "$STASH_REF" ] && git stash pop "$STASH_REF" || true
   ```
 - Clean up external worktrees (see cleanup below).
 
@@ -695,7 +695,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 3. **Snapshot fallback**: If the worktree is unavailable (e.g., cleaned up during multi-pass), apply changes from the snapshot instead — read each file from `$SESSION_DIR/pass-NNNN/files/<model>/` and use Edit/Write to apply to the main tree.
 4. **Restore stashed changes** (only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake):
    ```bash
-   git stash list | grep -q "loom-prompt: user-changes stash" && git stash pop || true
+   STASH_REF="$(git stash list | grep -m1 "loom-prompt: user-changes stash" | cut -d: -f1)" && [ -n "$STASH_REF" ] && git stash pop "$STASH_REF" || true
    ```
    If the pop fails due to merge conflicts with the adopted changes, notify the user: "Pre-existing uncommitted changes conflicted with the adoption. Resolve conflicts, then run `git stash drop` to remove the stash entry."
 
