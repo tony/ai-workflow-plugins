@@ -165,9 +165,7 @@ After each model completes, persist its output to the session directory:
 
 ## Phase 5: Compare Implementations
 
-Before evaluation, apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol): randomize labels (A/B/C), evaluate without knowing which model produced which response, reveal identities only after scoring.
-
-**Goal**: Evaluate each model's implementation to pick the best one.
+**Goal**: Evaluate each model's implementation to pick the best one using evidence-backed scoring.
 
 ### Step 1: Gather Diffs
 
@@ -183,30 +181,25 @@ git diff HEAD
 git -C ../$REPO_SLUG-loom-<model> diff HEAD
 ```
 
-After capturing each diff, write it to the session directory:
-- `$SESSION_DIR/pass-0001/diffs/claude.diff`
-- `$SESSION_DIR/pass-0001/diffs/gemini.diff`
-- `$SESSION_DIR/pass-0001/diffs/gpt.diff`
+Write diffs to: `$SESSION_DIR/pass-0001/diffs/claude.diff`, `gemini.diff`, `gpt.diff`.
 
 ### Step 1b: Snapshot Changed Files
 
-For each model that completed, snapshot its changed files into `$SESSION_DIR/pass-0001/files/<model>/` preserving repo-relative paths. Only new and modified files are snapshotted — deleted files appear in the diff only.
-
-For each changed file (from `git diff --name-only --diff-filter=d HEAD`):
+For each model, snapshot changed files into `$SESSION_DIR/pass-0001/files/<model>/` preserving repo-relative paths. Only new and modified files are snapshotted — deleted files appear in the diff only.
 
 **Claude** (main worktree):
 ```bash
 git diff --name-only --diff-filter=d HEAD
 ```
 
-For each file in the list, copy it to `$SESSION_DIR/pass-0001/files/claude/<filepath>` using `mkdir -p` to create intermediate directories.
+Copy each file to `$SESSION_DIR/pass-0001/files/claude/<filepath>`.
 
 **External models** (worktrees):
 ```bash
 git -C ../$REPO_SLUG-loom-<model> diff --name-only --diff-filter=d HEAD
 ```
 
-For each file in the list, copy it from the worktree (`../$REPO_SLUG-loom-<model>/<filepath>`) to `$SESSION_DIR/pass-0001/files/<model>/<filepath>` using `mkdir -p` to create intermediate directories.
+Copy each file from `../$REPO_SLUG-loom-<model>/<filepath>` to `$SESSION_DIR/pass-0001/files/<model>/<filepath>`.
 
 ### Step 2: Run Quality Gates on Each
 
@@ -219,17 +212,16 @@ For each implementation, run the project's quality gates in its worktree. Discov
 | Type checker | `mypy`, `tsc --noEmit`, `basedpyright` |
 | Tests | `pytest`, `jest`, `cargo test`, `go test` |
 
-Record pass/fail status for each gate and each model. Write the results to `$SESSION_DIR/pass-0001/quality-gates.md`.
+Record pass/fail status for each gate and model. Write to `$SESSION_DIR/pass-0001/quality-gates.md`.
 
-### Step 3: Evaluate and Compare
+### Step 3: Score and Verify
 
-For each implementation, assess:
-- **Quality gate results**: Does it pass the project's quality gates?
-- **Correctness**: Does it actually solve the task?
-- **Pattern adherence**: Does it follow project conventions from CLAUDE.md?
-- **Code quality**: Readability, naming, structure
-- **Test coverage**: Did it add/extend tests appropriately?
-- **Scope discipline**: Did it make only the requested changes (no unnecessary refactoring)?
+Apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol), then follow the [Synthesis Protocol](./_shared-infrastructure.md#synthesis-protocol) with:
+
+- **Rubric**: General (Correctness 3×, Completeness 2×, Convention adherence 2×, Risk awareness 1×, Invasiveness 1×)
+- **Convergence mode**: Pick-winner (select highest-scoring implementation; do not merge code from different implementations)
+
+In the verification step, additionally check quality gate results — a failing implementation gets Correctness capped at 3.
 
 ### Step 4: Present Comparison to User
 
@@ -238,22 +230,45 @@ For each implementation, assess:
 
 **Task**: <user's prompt>
 
-## Results
+## Quality Gate Results
 
-| Model | Quality Gates | Correctness | Convention Adherence | Files Changed |
-|-------|--------------|-------------|---------------------|---------------|
-| Claude | pass/fail | pass/fail | pass/fail | N files |
-| Gemini | pass/fail | pass/fail | pass/fail | N files |
-| GPT | pass/fail | pass/fail | pass/fail | N files |
+| Model | Formatter | Linter | Type checker | Tests | Overall |
+|-------|-----------|--------|--------------|-------|---------|
+| (label) | pass/fail | pass/fail | pass/fail | pass/fail | pass/fail |
+
+## Scores
+
+| Dimension | A | B | C |
+|-----------|---|---|---|
+| Correctness (3×) | /10 | /10 | /10 |
+| Completeness (2×) | /10 | /10 | /10 |
+| Convention adherence (2×) | /10 | /10 | /10 |
+| Risk awareness (1×) | /10 | /10 | /10 |
+| Invasiveness (1×) | /10 | /10 | /10 |
+| **Weighted total** | | | |
+
+## Verification Summary
+
+**Verified claims**: <count> | **False**: <count>
 
 ## Recommendation
 
-**Best implementation**: <model> — <reason>
+**Best implementation**: <label> (revealed: <model>) — <reason based on scores>
 
 ## Key Differences
 
-- <Model A> did X while <Model B> did Y — <which is better and why>
-- ...
+- <Label A> did X while <Label B> did Y — <which scored higher and why>
+
+## Critic Findings
+
+<Issues found by critic in the recommended implementation, or "No issues found">
+
+## Attribution
+
+**Label mapping**: A = <model>, B = <model>, C = <model>
+**Models participated**: Claude, Gemini, GPT (or subset)
+**Models unavailable/failed**: (if any)
+**Session artifacts**: $SESSION_DIR
 ```
 
 **Wait for user to pick** which implementation to adopt, or accept the recommendation.
@@ -269,60 +284,27 @@ After presenting the comparison, persist the synthesis:
 
 If `pass_count` is 1, skip this phase.
 
-For each pass from 2 to `pass_count`:
+Follow the [Conflict-Only Multi-Pass Refinement](./_shared-infrastructure.md#conflict-only-multi-pass-refinement) protocol. For each pass from 2 to `pass_count`:
 
 1. **Ask for user confirmation** before starting the next pass. Warn that each pass spawns external AI agents that may consume tokens billed to other provider accounts (Gemini, OpenAI, Cursor, etc.).
 
-2. **Create the pass directory** (N is the pass number, zero-padded to 4 digits):
+2. **Create the pass directory**:
 
    ```bash
    mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr" "$SESSION_DIR/pass-$(printf '%04d' $N)/diffs" "$SESSION_DIR/pass-$(printf '%04d' $N)/files"
    ```
 
-3. **Clean up old worktrees**:
+3. **Clean up old worktrees and branches**, discard Claude's changes, create fresh worktrees with new timestamps.
 
-   ```bash
-   git worktree remove ../$REPO_SLUG-loom-gemini --force 2>/dev/null
-   ```
+4. **Construct conflict-only prompts** targeting low scores, critic findings, and quality gate failures from the prior pass. For Claude, reference prior artifacts by path; for external models, inline them.
 
-   ```bash
-   git worktree remove ../$REPO_SLUG-loom-gpt --force 2>/dev/null
-   ```
+5. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all models in parallel (same backends, same timeouts, same retry logic as Phase 4).
 
-   ```bash
-   git for-each-ref --format='%(refname:short)' refs/heads/loom/gemini/ | while read -r b; do git branch -D "$b" 2>/dev/null; done
-   ```
+6. **Capture outputs** to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
-   ```bash
-   git for-each-ref --format='%(refname:short)' refs/heads/loom/gpt/ | while read -r b; do git branch -D "$b" 2>/dev/null; done
-   ```
+7. **Re-compare** following Phase 5 (including snapshots to `$SESSION_DIR/pass-{N}/files/<model>/`). Re-score only affected dimensions. Write diffs, quality gates, and synthesis to `$SESSION_DIR/pass-{N}/`.
 
-4. **Discard Claude's changes** in the main tree (tracked and untracked):
-   ```bash
-   git checkout -- .
-   ```
-   ```bash
-   git clean -fd
-   ```
-
-5. **Create fresh worktrees** with new timestamps.
-
-6. **Construct refinement prompts** using the prior pass's artifacts:
-
-   - Read `$SESSION_DIR/pass-{prev}/synthesis.md` as the canonical prior comparison (where `{prev}` is the zero-padded previous pass number).
-   - For the **Claude Task agent**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly (synthesis.md, diffs, quality-gates.md) instead of inlining everything in the prompt.
-   - For **external models** (Gemini, GPT): Inline the prior synthesis in their prompt (they cannot read local files).
-
-   > Feedback from the previous pass: [contents of $SESSION_DIR/pass-{prev}/synthesis.md].
-   > Address these weaknesses. [Specific improvements listed based on comparison.]
-
-7. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all models in parallel (same backends, same timeouts, same retry logic as Phase 4). Redirect stderr to `$SESSION_DIR/pass-{N}/stderr/<model>.txt`.
-
-8. **Capture outputs**: Write each model's response to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
-
-9. **Re-compare** following the same procedure as Phase 5 (including Step 1b — snapshot changed files to `$SESSION_DIR/pass-{N}/files/<model>/`). Write diffs to `$SESSION_DIR/pass-{N}/diffs/<model>.diff`, quality gate results to `$SESSION_DIR/pass-{N}/quality-gates.md`, and the comparison to `$SESSION_DIR/pass-{N}/synthesis.md`.
-
-10. **Update session**: Update `session.json` via atomic replace: set `completed_passes` to N, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
+8. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
 
 Present the final-pass comparison and wait for user to pick the winner.
 

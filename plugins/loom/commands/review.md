@@ -157,22 +157,24 @@ After each model completes, persist its output to the session directory:
 
 ## Phase 4: Synthesize Findings
 
-**Goal**: Combine all reviewer outputs into a unified, consensus-weighted report.
+**Goal**: Combine all reviewer outputs into a unified, evidence-verified report.
 
-Before evaluation, apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol): randomize labels (A/B/C), evaluate without knowing which model produced which response, reveal identities only in the attribution section.
+Apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol), then follow the [Synthesis Protocol](./_shared-infrastructure.md#synthesis-protocol) with:
 
-### Step 1: Parse Each Reviewer's Output
+- **Rubric**: Review (Correctness 3×, Specificity 2×, Severity calibration 2×, Actionability 1×, Convention coverage 1×)
+- **Convergence mode**: Merge
 
-Read through each reviewer's output and extract individual findings. Normalize each finding to:
-- **Reviewer**: which model found it
-- **Severity**: Critical / Important / Suggestion
-- **File**: file path and line number (if provided)
-- **Description**: the issue
-- **Recommendation**: suggested fix
+### Verification for Review Findings
 
-### Step 2: Cross-Reference and Deduplicate
+In Step 1 (Verify Claims) of the synthesis protocol, apply review-specific verification:
 
-Group findings that refer to the same issue (same file, similar description). For each unique issue:
+- For each reported bug or issue, **read the file and line** to confirm the issue exists
+- For severity claims, verify the actual impact — is a "Critical" truly exploitable or crash-worthy?
+- For convention violations, check the specific rule in CLAUDE.md/AGENTS.md
+
+### Cross-Reference and Deduplicate
+
+After verification, group findings that refer to the same issue (same file, similar description). For each unique issue:
 
 - **Consensus count**: how many reviewers flagged it (1, 2, or 3)
 - **Consensus boost**: Issues flagged by multiple reviewers get higher confidence
@@ -180,54 +182,77 @@ Group findings that refer to the same issue (same file, similar description). Fo
   - 2 reviewers: promote severity by one level (Suggestion → Important, Important → Critical)
   - 3 reviewers: mark as Critical regardless
 
-### Step 3: Generate Unified Report
-
-Present the synthesized report in this format:
+### Present the Report
 
 ```markdown
 # Loom Code Review Report
 
-**Reviewers**: Claude, Gemini, GPT (or whichever participated)
 **Branch**: <branch-name>
 **Compared against**: origin/<trunk>
 **Files changed**: <count>
 
-## Consensus Issues (flagged by multiple reviewers)
+## Scores
 
-### Critical
-- [Claude + Gemini + GPT] **file:42** — Description of issue
+| Dimension | A | B | C |
+|-----------|---|---|---|
+| Correctness (3×) | /10 | /10 | /10 |
+| Specificity (2×) | /10 | /10 | /10 |
+| Severity calibration (2×) | /10 | /10 | /10 |
+| Actionability (1×) | /10 | /10 | /10 |
+| Convention coverage (1×) | /10 | /10 | /10 |
+| **Weighted total** | | | |
+
+## Verified Issues
+
+### Consensus Issues (flagged by multiple reviewers)
+
+#### Critical
+- [2+ reviewers] **file:42** — Description of verified issue
   - Recommendation: ...
 
-### Important
-- [Claude + Gemini] **file:15** — Description of issue
+#### Important
+- [2+ reviewers] **file:15** — Description of verified issue
   - Recommendation: ...
 
-## Single-Reviewer Issues
+### Single-Reviewer Issues (verified)
 
-### Critical
-- [Claude] **file:88** — Description
+#### Critical
+- **file:88** — Description
   - Recommendation: ...
 
-### Important
-- [Gemini] **file:23** — Description
+#### Important
+- **file:23** — Description
   - Recommendation: ...
 
-### Suggestions
-- [GPT] **file:55** — Description
+#### Suggestions
+- **file:55** — Description
   - Recommendation: ...
+
+## False Positives Rejected
+
+- **file:30** — Claimed issue: <description>. Rejected: <why it's not a real issue, with code reference>
 
 ## Reviewer Disagreements
 
-List any cases where reviewers explicitly contradicted each other, noting both positions.
+<Adjudicated conflicts — which reviewer was correct and why>
+
+## Critic Findings
+
+<Additional issues found by critic pass, or "No additional issues">
 
 ## Summary
 
-- **Total issues**: X
-- **Consensus issues**: Y (flagged by 2+ reviewers)
-- **Critical**: Z
-- **Reviewers participated**: Claude, Gemini, GPT
-- **Reviewers unavailable/failed**: (if any)
-- **Session artifacts**: $SESSION_DIR
+- **Total verified issues**: X
+- **False positives rejected**: Y
+- **Consensus issues**: Z (flagged by 2+ reviewers)
+- **Critical**: N
+
+## Attribution
+
+**Label mapping**: A = <model>, B = <model>, C = <model>
+**Reviewers participated**: Claude, Gemini, GPT (or subset)
+**Reviewers unavailable/failed**: (if any)
+**Session artifacts**: $SESSION_DIR
 ```
 
 After presenting the report, persist the synthesis:
@@ -241,36 +266,25 @@ After presenting the report, persist the synthesis:
 
 If `pass_count` is 1, skip this phase.
 
-For each pass from 2 to `pass_count`:
+Follow the [Conflict-Only Multi-Pass Refinement](./_shared-infrastructure.md#conflict-only-multi-pass-refinement) protocol. For each pass from 2 to `pass_count`:
 
-1. **Create the pass directory** (N is the pass number, zero-padded to 4 digits):
+1. **Create the pass directory**:
 
    ```bash
    mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr"
    ```
 
-2. **Construct refinement prompts** using the prior pass's artifacts:
+2. **Construct conflict-only prompts** targeting: reviewer disagreements from adjudication, critic findings, and low-confidence scores (< 5 on any dimension). For Claude, reference prior artifacts by path; for external models, inline them.
 
-   - Read `$SESSION_DIR/pass-{prev}/synthesis.md` as the canonical prior synthesis (where `{prev}` is the zero-padded previous pass number).
-   - For the **Claude Task agent**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly (synthesis.md and optionally individual model outputs) instead of inlining the entire prior synthesis in the prompt. This reduces Claude's prompt size on later passes.
-   - For **external models** (Gemini, GPT): Inline the prior synthesis in their prompt (they cannot read local files).
+3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available reviewers in parallel (same backends, same timeouts, same retry logic as Phase 3).
 
-   > Prior review synthesis from the previous pass: [contents of $SESSION_DIR/pass-{prev}/synthesis.md]. For this refinement:
-   > (1) Re-examine findings where reviewers disagreed.
-   > (2) Confirm or refute low-confidence findings.
-   > (3) Look for entirely new issues missed previously.
-   > (4) Verify resolved contradictions.
-   > (5) Only report independently verified findings.
+4. **Capture outputs** to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
-3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available reviewers in parallel (same backends, same timeouts, same retry logic as Phase 3). Redirect stderr to `$SESSION_DIR/pass-{N}/stderr/<model>.txt`.
+5. **Re-synthesize** following Phase 4 (re-score only affected dimensions, re-adjudicate only targeted disputes). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
 
-4. **Capture outputs**: Write each model's response to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
+6. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
 
-5. **Re-synthesize** following the same procedure as Phase 4. Write the result to `$SESSION_DIR/pass-{N}/synthesis.md`.
-
-6. **Update session**: Update `session.json` via atomic replace: set `completed_passes` to N, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
-
-Present the final-pass synthesis as the result, adding a **Confidence Evolution** table that tracks findings across passes:
+Present the final-pass synthesis, adding a **Confidence Evolution** table:
 
 ```markdown
 ## Confidence Evolution

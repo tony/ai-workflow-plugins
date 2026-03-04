@@ -127,47 +127,50 @@ After each model completes, persist its output to the session directory:
 
 ## Phase 4: Synthesize Best Answer
 
-**Goal**: Combine all model responses into the single best answer.
+**Goal**: Combine all model responses into the single best answer using evidence-backed adjudication.
 
-Before evaluation, apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol): randomize labels (A/B/C), evaluate without knowing which model produced which response, reveal identities only in the attribution section.
+Apply the [Blind Judging Protocol](./_shared-infrastructure.md#blind-judging-protocol), then follow the [Synthesis Protocol](./_shared-infrastructure.md#synthesis-protocol) with:
 
-### Step 1: Compare Responses
+- **Rubric**: General (Correctness 3×, Completeness 2×, Convention adherence 2×, Risk awareness 1×, Invasiveness 1×)
+- **Convergence mode**: Merge
 
-For each model's response, note:
-- **Key points**: What facts, files, or explanations did it provide?
-- **Unique insights**: What did this model mention that others didn't?
-- **Accuracy**: Does the answer match the actual codebase? (Verify claims by reading files.)
-- **Completeness**: Did it answer all parts of the question?
-
-### Step 2: Build Synthesized Answer
-
-Combine the best elements from all responses:
-
-1. **Start with the most complete and accurate answer** as the base
-2. **Add unique insights** from other models that are verified as correct
-3. **Resolve contradictions** by checking the actual codebase — cite the file and line that proves which model is correct
-4. **Remove inaccuracies** — if a model hallucinated a file or function, drop that claim
-
-### Step 3: Present the Answer
+### Present the Answer
 
 ```markdown
 # Answer
 
-<Synthesized best answer here, citing files and lines>
+<Synthesized answer here, citing files and lines>
 
 ---
 
-## Model Agreement
+## Scores
 
-**All models agreed on**: <key points of consensus>
+| Dimension | A | B | C |
+|-----------|---|---|---|
+| Correctness (3×) | /10 | /10 | /10 |
+| Completeness (2×) | /10 | /10 | /10 |
+| Convention adherence (2×) | /10 | /10 | /10 |
+| Risk awareness (1×) | /10 | /10 | /10 |
+| Invasiveness (1×) | /10 | /10 | /10 |
+| **Weighted total** | | | |
 
-**Unique insights from individual models**:
-- [Claude] <insight not mentioned by others>
-- [Gemini] <insight not mentioned by others>
-- [GPT] <insight not mentioned by others>
+## Verification Summary
 
-**Contradictions resolved**: <any disagreements and how they were resolved>
+**Verified claims**: <count> | **Plausible-unverified**: <count> | **False**: <count>
 
+## Adjudication
+
+**Agreed**: <key points all models concurred on>
+**Conflicts resolved**: <disagreements and which was correct, with code references>
+**Unresolvable**: <if any — both positions noted>
+
+## Critic Findings
+
+<Deltas from critic pass, or "No issues found">
+
+## Attribution
+
+**Label mapping**: A = <model>, B = <model>, C = <model>
 **Models participated**: Claude, Gemini, GPT (or subset)
 **Models unavailable/failed**: (if any)
 **Session artifacts**: $SESSION_DIR
@@ -184,35 +187,25 @@ After presenting the answer, persist the synthesis:
 
 If `pass_count` is 1, skip this phase.
 
-For each pass from 2 to `pass_count`:
+Follow the [Conflict-Only Multi-Pass Refinement](./_shared-infrastructure.md#conflict-only-multi-pass-refinement) protocol. For each pass from 2 to `pass_count`:
 
-1. **Create the pass directory** (N is the pass number, zero-padded to 4 digits):
+1. **Create the pass directory**:
 
    ```bash
    mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr"
    ```
 
-2. **Construct refinement prompts** using the prior pass's artifacts:
+2. **Construct conflict-only prompts** targeting unresolved conflicts, critic findings, and low-confidence scores from the prior pass. For Claude, reference prior artifacts by path; for external models, inline them.
 
-   - Read `$SESSION_DIR/pass-{prev}/synthesis.md` as the canonical prior synthesis (where `{prev}` is the zero-padded previous pass number).
-   - For the **Claude Task agent**: Instruct it to read files from `$SESSION_DIR/pass-{prev}/` directly (synthesis.md and optionally individual model outputs) instead of inlining the entire prior synthesis in the prompt. This reduces Claude's prompt size on later passes.
-   - For **external models** (Gemini, GPT): Inline the prior synthesis in their prompt (they cannot read local files).
+3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available models in parallel (same backends, same timeouts, same retry logic as Phase 3).
 
-   > Prior synthesis from the previous pass: [contents of $SESSION_DIR/pass-{prev}/synthesis.md]. For this refinement:
-   > (1) Challenge incorrect or unsupported claims — verify against the codebase.
-   > (2) Deepen shallow areas — add file references and line numbers.
-   > (3) Identify anything missed by the prior synthesis.
-   > (4) State explicit agreement where the prior synthesis is correct.
+4. **Capture outputs** to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
-3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available models in parallel (same backends, same timeouts, same retry logic as Phase 3). Redirect stderr to `$SESSION_DIR/pass-{N}/stderr/<model>.txt`.
+5. **Re-synthesize** following Phase 4 (re-score only affected dimensions, re-adjudicate only targeted disputes). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
 
-4. **Capture outputs**: Write each model's response to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
+6. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
 
-5. **Re-synthesize** following the same procedure as Phase 4. Write the result to `$SESSION_DIR/pass-{N}/synthesis.md`.
-
-6. **Update session**: Update `session.json` via atomic replace: set `completed_passes` to N, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
-
-Present the final-pass synthesis as the result, adding a **Refinement Notes** section that describes what was deepened, corrected, or confirmed across passes.
+Present the final-pass synthesis, adding a **Refinement Notes** section describing what was deepened, corrected, or confirmed across passes.
 
 ---
 
