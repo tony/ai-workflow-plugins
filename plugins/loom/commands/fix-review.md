@@ -135,6 +135,11 @@ Use the project's commit message format from AGENTS.md/CLAUDE.md. Include a refe
 After committing, confirm:
 ```bash
 git status
+```
+
+Verify no uncommitted changes remain:
+
+```bash
 git diff
 ```
 
