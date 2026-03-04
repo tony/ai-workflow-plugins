@@ -571,7 +571,7 @@ Rate each blinded response 0–10 per dimension using the General Rubric. Comput
 | Completeness | 2× | Covers all task aspects |
 | Convention adherence | 2× | Follows CLAUDE.md/AGENTS.md patterns |
 | Risk awareness | 1× | Edge cases, failure modes identified |
-| Invasiveness | 1× | Minimal scope — lower is better |
+| Scope discipline | 1× | Minimal unnecessary changes — higher is better |
 
 Write scores to `$SESSION_DIR/pass-NNNN/scores.md` in a table showing per-dimension scores and weighted totals for each label (A/B/C).
 
@@ -621,7 +621,7 @@ For each file created or modified by any model:
 | Completeness (2×) | /10 | /10 | /10 |
 | Convention adherence (2×) | /10 | /10 | /10 |
 | Risk awareness (1×) | /10 | /10 | /10 |
-| Invasiveness (1×) | /10 | /10 | /10 |
+| Scope discipline (1×) | /10 | /10 | /10 |
 | **Weighted total** | | | |
 
 ## File-by-File Best Approach
