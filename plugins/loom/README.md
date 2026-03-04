@@ -1,6 +1,6 @@
-# multi-model
+# loom
 
-Run prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
+Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
 
 ## Installation
 
@@ -13,30 +13,39 @@ Add the marketplace:
 Install the plugin:
 
 ```console
-/plugin install multi-model@ai-workflow-plugins
+/plugin install loom@ai-workflow-plugins
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `/multi-model:ask` | Ask all models a question, synthesize the best answer |
-| `/multi-model:plan` | Get implementation plans from all models, synthesize the best plan |
-| `/multi-model:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
-| `/multi-model:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
-| `/multi-model:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
-| `/multi-model:review` | Run code review with all models, produce consensus-weighted report |
-| `/multi-model:fix-review` | Fix review findings as atomic commits with test coverage |
+| `/loom:ask` | Ask all models a question, synthesize the best answer |
+| `/loom:plan` | Get implementation plans from all models, synthesize the best plan |
+| `/loom:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
+| `/loom:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
+| `/loom:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
+| `/loom:review` | Run code review with all models, produce consensus-weighted report |
+| `/loom:fix-review` | Fix review findings as atomic commits with test coverage |
 
 ## How It Works
 
-Each command follows a consistent multi-phase workflow:
+The six orchestration commands (ask, plan, prompt, execute, architecture, review) follow a consistent multi-phase workflow. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
 
-1. **Configure** — Parse trigger words and prompt for settings if none provided.
+1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
 2. **Detect models** — Check for `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available, fall back to the `agent` CLI with `--model` flags.
 3. **Run in parallel** — Execute the task across all available models simultaneously.
 4. **Synthesize** — Compare outputs, verify claims against the codebase, and combine the best elements.
 5. **Refine** (multi-pass) — Optionally re-run all models with the prior synthesis as context for deeper results.
+
+### Protocols
+
+All commands share four quality protocols that decorrelate model outputs and improve synthesis:
+
+- **Context packets** — a structured bundle (conventions, repo state, key snippets) included verbatim in every model prompt so all models work from the same information
+- **Role differentiation** — each model receives a distinct evaluation lens (Maintainer, Skeptic, Builder) to reduce shared blind spots
+- **Blind judging** — model outputs are randomly labeled (A/B/C) during scoring to prevent brand bias
+- **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence
 
 ### Read-Only Commands
 
@@ -55,36 +64,30 @@ Each command follows a consistent multi-phase workflow:
 
 Multi-pass re-runs all models with the prior synthesis prepended as context, allowing each model to challenge, deepen, or confirm the previous round's results. This produces higher-quality outputs at the cost of additional model invocations.
 
-### Trigger Words
+### Flags
 
-Append trigger words to any command's arguments to hint at pass count:
+Control pass count, timeout, and execution mode with explicit flags:
 
-| Trigger | Effect | Example |
-|---------|--------|---------|
-| `multipass` | Hints 2 passes | `/multi-model:ask what is this? multipass` |
-| `x<N>` (N = 2–5) | Hints N passes | `/multi-model:plan add auth x3` |
+| Flag | Values | Default | Example |
+|------|--------|---------|---------|
+| `--passes=N` | 1–5 | 1 | `/loom:plan add auth --passes=2` |
+| `--timeout=N\|none` | seconds or `none` | command-specific | `/loom:ask question --timeout=300` |
+| `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/loom:execute task --mode=deep` |
 
-Triggers are hints — commands always prompt for confirmation. Values above 5 are capped at 5. Only the first and last line of arguments are scanned; trigger-like words found elsewhere prompt for disambiguation.
-
-### Timeout Triggers
-
-Override the default timeout per command:
-
-| Trigger | Effect | Example |
-|---------|--------|---------|
-| `timeout:<seconds>` | Set custom timeout | `/multi-model:ask question timeout:300` |
-| `timeout:none` | Disable timeout | `/multi-model:execute task timeout:none` |
+Mode presets set default passes and timeout when not explicitly overridden: `fast` (1 pass, half timeout), `balanced` (1 pass, default timeout), `deep` (2 passes, 1.5× timeout).
 
 Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s), architecture (1200s).
 
+Legacy trigger words (`multipass`, `x<N>`, `timeout:<seconds>`) are still recognized as aliases for backward compatibility.
+
 ### Interactive Configuration
 
-Commands always prompt via `AskUserQuestion` for pass count, with trigger hints biasing the recommended option:
+When flags are provided, the corresponding interactive question is skipped. Otherwise, commands prompt via `AskUserQuestion`:
 
-1. **Pass count** (always asked) — choose single pass (1), multipass (2), or triple pass (3). If a trigger hint is present, the matching option is marked as recommended.
-2. **Timeout** (asked unless structured trigger present) — choose the default, quick (180s), long (900–1800s, varies by command), or no timeout. Skipped when `timeout:<seconds>` or `timeout:none` is provided.
+1. **Pass count** (skipped when `--passes` is provided) — choose single pass (1), multipass (2), or triple pass (3).
+2. **Timeout** (skipped when `--timeout` is provided) — choose the default, quick (0.5× default), long (1.5× default), or no timeout.
 
-In headless mode (`claude -p`), pass count uses the trigger hint value if present, otherwise defaults to 1. Timeout uses the parsed value if provided, otherwise the per-command default.
+In headless mode (`claude -p`), pass count uses the flag value if provided, otherwise defaults to 1. Timeout uses the flag value if provided, otherwise the per-command default.
 
 ## Session Artifacts
 
@@ -248,7 +251,7 @@ To list sessions, scan `session.json` files under `$AI_AIP_ROOT/repos/<slug>--<h
 
 ## Prerequisites
 
-At minimum, Claude (this agent) is always available. For multi-model functionality, install one or more external CLIs:
+At minimum, Claude (this agent) is always available. For loom functionality, install one or more external CLIs:
 
 | CLI | Model | Install |
 |-----|-------|---------|
