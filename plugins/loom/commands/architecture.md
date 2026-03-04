@@ -747,6 +747,7 @@ For each file, apply the best model's version from the file snapshots:
 
 - Read the file from `$SESSION_DIR/pass-NNNN/files/<model>/<filepath>` (where NNNN is the final pass number)
 - Use Edit/Write to apply those changes to the main tree
+- Check the diffs for deleted files (lines starting with `deleted file mode` or `--- a/path` with `+++ /dev/null`) and `rm` them from the main tree
 
 This reads from snapshots rather than worktrees, so synthesis works even if worktrees have been cleaned up during multi-pass refinement.
 
