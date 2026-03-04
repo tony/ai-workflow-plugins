@@ -159,11 +159,10 @@ def _test_static_frontmatter() -> list[TestCase]:
                 )
                 allowed: str = t.cast("str", fm.get("allowed-tools", ""))
                 if allowed:
-                    _assert(
-                        "(" not in allowed,
-                        f"{p.relative_to(REPO_ROOT)}: allowed-tools should use bare"
-                        f" names (no parenthesized patterns): {allowed}",
-                    )
+                    rel = p.relative_to(REPO_ROOT)
+                    detail = f"(no parenthesized patterns): {allowed}"
+                    msg = f"{rel}: allowed-tools must use bare names {detail}"
+                    _assert("(" not in allowed, msg)
 
             tests.append(
                 (f"frontmatter: {plugin}/{cmd_file.name}", _check_frontmatter),
