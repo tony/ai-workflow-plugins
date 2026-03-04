@@ -207,6 +207,51 @@ def _test_static_plugin_structure() -> list[TestCase]:
     return tests
 
 
+def _test_static_agent_skill_frontmatter() -> list[TestCase]:
+    """Verify agent and skill frontmatter has required fields."""
+    tests: list[TestCase] = []
+
+    for plugin in PLUGINS:
+        agents_dir = REPO_ROOT / "plugins" / plugin / "agents"
+        if agents_dir.is_dir():
+            for agent_file in sorted(agents_dir.glob("*.md")):
+
+                def _check_agent(p: Path = agent_file) -> None:
+                    fm = _parse_frontmatter(p)
+                    rel = p.relative_to(REPO_ROOT)
+                    _assert(bool(fm), f"{rel}: no YAML frontmatter found")
+                    _assert("name" in fm, f"{rel}: missing 'name' in frontmatter")
+                    _assert(
+                        "description" in fm,
+                        f"{rel}: missing 'description' in frontmatter",
+                    )
+
+                tests.append(
+                    (f"agent frontmatter: {plugin}/{agent_file.name}", _check_agent),
+                )
+
+        skills_dir = REPO_ROOT / "plugins" / plugin / "skills"
+        if skills_dir.is_dir():
+            for skill_file in sorted(skills_dir.glob("*/SKILL.md")):
+
+                def _check_skill(p: Path = skill_file) -> None:
+                    fm = _parse_frontmatter(p)
+                    rel = p.relative_to(REPO_ROOT)
+                    _assert(bool(fm), f"{rel}: no YAML frontmatter found")
+                    _assert("name" in fm, f"{rel}: missing 'name' in frontmatter")
+                    _assert(
+                        "description" in fm,
+                        f"{rel}: missing 'description' in frontmatter",
+                    )
+
+                skill_name = skill_file.parent.name
+                tests.append(
+                    (f"skill frontmatter: {plugin}/{skill_name}", _check_skill),
+                )
+
+    return tests
+
+
 # ---------------------------------------------------------------------------
 # Test case builders
 # ---------------------------------------------------------------------------
@@ -415,6 +460,7 @@ def main(
     static_tests: list[TestCase] = []
     static_tests.extend(_test_static_frontmatter())
     static_tests.extend(_test_static_plugin_structure())
+    static_tests.extend(_test_static_agent_skill_frontmatter())
     static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
     static_total = len(static_tests)
 
