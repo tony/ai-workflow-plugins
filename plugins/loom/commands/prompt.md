@@ -323,13 +323,13 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 For each external model (Gemini, GPT — Claude works in the main tree), first remove any stale worktree from a prior run:
 
 ```bash
-git worktree remove ../$REPO_SLUG-loom-<model> --force 2>/dev/null || true
+git worktree remove "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" --force 2>/dev/null || true
 ```
 
 Then create the fresh worktree:
 
 ```bash
-git worktree add ../$REPO_SLUG-loom-<model> -b loom/<model>/<timestamp>
+git worktree add "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" -b loom/<model>/<timestamp>
 ```
 
 Example:
@@ -387,12 +387,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to implement in the 
 
 **Native (`gemini` CLI)** — run in the worktree directory:
 ```bash
-cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
 ```
 
 ### GPT Implementation (worktree)
@@ -405,15 +405,15 @@ cd ../$REPO_SLUG-loom-gemini && <timeout_cmd> <timeout_seconds> agent -p -f --mo
 
 **Native (`codex` CLI)** — run in the worktree directory:
 ```bash
-cd ../$REPO_SLUG-loom-gpt && <timeout_cmd> <timeout_seconds> codex exec \
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> codex exec \
     --yolo \
     -c model_reasoning_effort=medium \
-    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-cd ../$REPO_SLUG-loom-gpt && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
 ```
 
 ### Artifact Capture
@@ -457,11 +457,11 @@ git diff HEAD
 
 **External models** (worktrees):
 ```bash
-git -C ../$REPO_SLUG-loom-<model> add -A
+git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" add -A
 ```
 
 ```bash
-git -C ../$REPO_SLUG-loom-<model> diff HEAD
+git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" diff HEAD
 ```
 
 Write diffs to: `$SESSION_DIR/pass-0001/diffs/claude.diff`, `gemini.diff`, `gpt.diff`.
@@ -479,10 +479,10 @@ Copy each file to `$SESSION_DIR/pass-0001/files/claude/<filepath>`.
 
 **External models** (worktrees):
 ```bash
-git -C ../$REPO_SLUG-loom-<model> diff --name-only --diff-filter=d HEAD
+git -C "$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>" diff --name-only --diff-filter=d HEAD
 ```
 
-Copy each file from `../$REPO_SLUG-loom-<model>/<filepath>` to `$SESSION_DIR/pass-0001/files/<model>/<filepath>`.
+Copy each file from `$REPO_TOPLEVEL/../$REPO_SLUG-loom-<model>/<filepath>` to `$SESSION_DIR/pass-0001/files/<model>/<filepath>`.
 
 ### Step 2: Run Quality Gates on Each
 
@@ -721,11 +721,11 @@ Present the final-pass comparison and wait for user to pick the winner.
 Remove all loom worktrees and branches:
 
 ```bash
-git worktree remove ../$REPO_SLUG-loom-gemini --force 2>/dev/null || true
+git worktree remove "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" --force 2>/dev/null || true
 ```
 
 ```bash
-git worktree remove ../$REPO_SLUG-loom-gpt --force 2>/dev/null || true
+git worktree remove "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" --force 2>/dev/null || true
 ```
 
 ```bash
