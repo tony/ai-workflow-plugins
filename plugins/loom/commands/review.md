@@ -18,7 +18,7 @@ Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, t
    ```bash
    git remote show origin | grep 'HEAD branch'
    ```
-   Fall back to `master` if detection fails.
+   Fall back to `main`, then `master`, if detection fails.
 
 2. **Get the diff stats**:
    ```bash
