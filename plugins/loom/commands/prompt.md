@@ -432,14 +432,22 @@ After each model completes, persist its output to the session directory:
 
 ### Step 1: Gather Diffs
 
-For each model that completed, examine the changes:
+For each model that completed, stage all changes (including untracked files) before diffing so new files appear in the output:
 
 **Claude** (main worktree):
+```bash
+git add -A
+```
+
 ```bash
 git diff HEAD
 ```
 
 **External models** (worktrees):
+```bash
+git -C ../$REPO_SLUG-loom-<model> add -A
+```
+
 ```bash
 git -C ../$REPO_SLUG-loom-<model> diff HEAD
 ```
