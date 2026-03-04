@@ -422,7 +422,7 @@ Launch a Task agent with `subagent_type: "general-purpose"` to generate artifact
 
 **Fallback (`agent` CLI)**:
 ```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
 ```
 
 ### GPT Implementation (worktree)
@@ -443,7 +443,7 @@ Launch a Task agent with `subagent_type: "general-purpose"` to generate artifact
 
 **Fallback (`agent` CLI)**:
 ```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
 ```
 
 ### Artifact Capture
