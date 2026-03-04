@@ -53,7 +53,7 @@ The architecture goal comes from `$ARGUMENTS`. If no arguments are provided, ask
 
 After Phase 1 context gathering, assemble a structured context bundle that will be included verbatim in ALL model prompts. This ensures every model works from the same information.
 
-Write to `$SESSION_DIR/context-packet.md`:
+Write to `$SESSION_DIR/context-packet.md` *(the actual file write happens after Session Directory Initialization in Phase 2 creates `$SESSION_DIR`)*:
 
 1. **Conventions summary** — key rules from CLAUDE.md/AGENTS.md (max 50 lines). Focus on commit format, test patterns, code style, and quality gates relevant to the task.
 
