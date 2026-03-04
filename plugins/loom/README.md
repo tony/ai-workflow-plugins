@@ -30,7 +30,7 @@ Install the plugin:
 
 ## How It Works
 
-Each command follows a consistent multi-phase workflow:
+The six orchestration commands (ask, plan, prompt, execute, architecture, review) follow a consistent multi-phase workflow. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
 
 1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
 2. **Detect models** — Check for `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available, fall back to the `agent` CLI with `--model` flags.
