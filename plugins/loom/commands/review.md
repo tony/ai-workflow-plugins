@@ -68,7 +68,7 @@ For `review`, prioritize conventions summary (review should enforce these), chan
 
 ---
 
-## Phase 2: Configuration and Reviewer Detection
+## Phase 2: Configuration and Model Detection
 
 ### Step 1: Parse Flags
 
