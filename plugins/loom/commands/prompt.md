@@ -52,7 +52,7 @@ Write to `$SESSION_DIR/context-packet.md`:
    git status --short
    ```
 
-3. **Changed files** — for review/plan commands that operate on branch changes:
+3. **Changed files** — branch changes relative to trunk:
    ```bash
    git diff --stat origin/<trunk>...HEAD
    ```
@@ -111,7 +111,7 @@ Values above 5 for `--passes` are capped at 5 with a note to the user.
 
 **When flags are provided, skip the corresponding question.** When `--passes` is provided, skip the passes question. When `--timeout` is provided, skip the timeout question.
 
-If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_count` value if set, otherwise default to 1 pass. Timeout uses `timeout_value` if set, otherwise the command's default timeout (provided by the calling command).
+If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_count` value if set, otherwise default to 1 pass. Timeout uses `timeout_value` if set, otherwise the command's default timeout.
 
 Use `AskUserQuestion` to prompt the user for any unresolved settings:
 
@@ -667,7 +667,7 @@ Present the final-pass comparison and wait for user to pick the winner.
 - Clean up external worktrees (see cleanup below).
 
 ### If an external model's implementation was chosen:
-1. **Discard Claude's modifications** (user changes were already stashed in Phase 2b Step 4b):
+1. **Discard Claude's modifications** (user changes were already stashed in Phase 2, Step 4b):
    ```bash
    git checkout -- .
    ```

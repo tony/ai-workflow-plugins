@@ -54,7 +54,7 @@ Write to `$SESSION_DIR/context-packet.md`:
    git status --short
    ```
 
-3. **Changed files** — for review/plan commands that operate on branch changes:
+3. **Changed files** — branch changes relative to trunk:
    ```bash
    git diff --stat origin/<trunk>...HEAD
    ```
@@ -113,7 +113,7 @@ Values above 5 for `--passes` are capped at 5 with a note to the user.
 
 **When flags are provided, skip the corresponding question.** When `--passes` is provided, skip the passes question. When `--timeout` is provided, skip the timeout question.
 
-If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_count` value if set, otherwise default to 1 pass. Timeout uses `timeout_value` if set, otherwise the command's default timeout (provided by the calling command).
+If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_count` value if set, otherwise default to 1 pass. Timeout uses `timeout_value` if set, otherwise the command's default timeout.
 
 Use `AskUserQuestion` to prompt the user for any unresolved settings:
 
@@ -692,7 +692,7 @@ Present the final-pass analysis and wait for user confirmation before synthesizi
 
 ### Step 1: Start Fresh
 
-Discard Claude's modifications to start from a clean state (user changes were already stashed in Phase 2b Step 4b):
+Discard Claude's modifications to start from a clean state (user changes were already stashed in Phase 2, Step 4b):
 
 ```bash
 git checkout -- .
@@ -740,7 +740,7 @@ git branch -D loom/gpt/<timestamp> 2>/dev/null
 
 ### Step 6: Restore Stashed Changes
 
-If user changes were stashed in Phase 2b Step 4b, restore them. Only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake.
+If user changes were stashed in Phase 2, Step 4b, restore them. Only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake.
 
 ```bash
 git stash list | grep -q "loom-execute: user-changes stash" && git stash pop || true
