@@ -2,6 +2,7 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
+#     "pyyaml>=6.0",
 #     "rich>=13.0",
 #     "typer>=0.15",
 # ]
@@ -31,7 +32,9 @@ Test both sources:
 
 from __future__ import annotations
 
+import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -40,12 +43,13 @@ from pathlib import Path
 
 import rich.console
 import typer
+import yaml
 from _private_path import PrivatePath  # pyright: ignore[reportImplicitRelativeImport]
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_NAME = "ai-workflow-plugins"
 GITHUB_SOURCE = "tony/ai-workflow-plugins"
-PLUGINS = ["commit", "multi-model", "rebase", "changelog", "tdd", "model-cli", "research"]
+PLUGINS = ["commit", "loom", "rebase", "changelog", "tdd", "model-cli", "research"]
 
 app = typer.Typer(help="E2E plugin lifecycle tests for ai-workflow-plugins.")
 console = rich.console.Console()
@@ -112,6 +116,244 @@ def _run_test(label: str, fn: t.Callable[[], None]) -> bool:
         _fail(label, "Command timed out (120s)")
         return False
     return True
+
+
+# ---------------------------------------------------------------------------
+# Static validation helpers
+# ---------------------------------------------------------------------------
+
+
+def _parse_frontmatter(path: Path) -> dict[str, t.Any]:
+    """Parse YAML frontmatter from a markdown file.
+
+    Returns an empty dict if no frontmatter is found.
+    """
+    text = path.read_text(encoding="utf-8")
+    m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
+    if not m:
+        return {}
+    parsed = t.cast(
+        "dict[str, t.Any] | None",
+        yaml.safe_load(m.group(1)),
+    )
+    if not isinstance(parsed, dict):
+        return {}
+    return parsed
+
+
+def _test_static_frontmatter() -> list[TestCase]:
+    """Verify command frontmatter has required fields and bare tool names."""
+    tests: list[TestCase] = []
+
+    for plugin in PLUGINS:
+        commands_dir = REPO_ROOT / "plugins" / plugin / "commands"
+        if not commands_dir.is_dir():
+            continue
+        for cmd_file in sorted(commands_dir.glob("*.md")):
+
+            def _check_frontmatter(p: Path = cmd_file) -> None:
+                fm = _parse_frontmatter(p)
+                _assert(
+                    bool(fm),
+                    f"{p.relative_to(REPO_ROOT)}: no YAML frontmatter found",
+                )
+                _assert(
+                    "description" in fm,
+                    f"{p.relative_to(REPO_ROOT)}: missing 'description' in frontmatter",
+                )
+                allowed: str = t.cast("str", fm.get("allowed-tools", ""))
+                if allowed:
+                    rel = p.relative_to(REPO_ROOT)
+                    detail = f"(no parenthesized patterns): {allowed}"
+                    msg = f"{rel}: allowed-tools must use bare names {detail}"
+                    _assert("(" not in allowed, msg)
+
+            tests.append(
+                (f"frontmatter: {plugin}/{cmd_file.name}", _check_frontmatter),
+            )
+
+    return tests
+
+
+def _test_static_plugin_structure() -> list[TestCase]:
+    """Verify each plugin has required directory structure."""
+    tests: list[TestCase] = []
+
+    for plugin in PLUGINS:
+        plugin_dir = REPO_ROOT / "plugins" / plugin
+
+        def _check_structure(d: Path = plugin_dir, name: str = plugin) -> None:
+            _assert(
+                (d / ".claude-plugin" / "plugin.json").is_file(),
+                f"{name}: missing .claude-plugin/plugin.json",
+            )
+            _assert(
+                (d / "README.md").is_file(),
+                f"{name}: missing README.md",
+            )
+            has_component = any(
+                [
+                    (d / "commands").is_dir(),
+                    (d / "agents").is_dir(),
+                    (d / "skills").is_dir(),
+                    (d / "hooks").is_dir(),
+                    (d / ".mcp.json").is_file(),
+                    (d / ".lsp.json").is_file(),
+                ],
+            )
+            _assert(
+                has_component,
+                f"{name}: no component directories or config files found",
+            )
+
+        tests.append((f"structure: {plugin}", _check_structure))
+
+    return tests
+
+
+def _test_static_agent_skill_frontmatter() -> list[TestCase]:
+    """Verify agent and skill frontmatter has required fields."""
+    tests: list[TestCase] = []
+
+    for plugin in PLUGINS:
+        agents_dir = REPO_ROOT / "plugins" / plugin / "agents"
+        if agents_dir.is_dir():
+            for agent_file in sorted(agents_dir.glob("*.md")):
+
+                def _check_agent(p: Path = agent_file) -> None:
+                    fm = _parse_frontmatter(p)
+                    rel = p.relative_to(REPO_ROOT)
+                    _assert(bool(fm), f"{rel}: no YAML frontmatter found")
+                    _assert("name" in fm, f"{rel}: missing 'name' in frontmatter")
+                    _assert(
+                        "description" in fm,
+                        f"{rel}: missing 'description' in frontmatter",
+                    )
+
+                tests.append(
+                    (f"agent frontmatter: {plugin}/{agent_file.name}", _check_agent),
+                )
+
+        skills_dir = REPO_ROOT / "plugins" / plugin / "skills"
+        if skills_dir.is_dir():
+            for skill_file in sorted(skills_dir.glob("*/SKILL.md")):
+
+                def _check_skill(p: Path = skill_file) -> None:
+                    fm = _parse_frontmatter(p)
+                    rel = p.relative_to(REPO_ROOT)
+                    _assert(bool(fm), f"{rel}: no YAML frontmatter found")
+                    _assert("name" in fm, f"{rel}: missing 'name' in frontmatter")
+                    _assert(
+                        "description" in fm,
+                        f"{rel}: missing 'description' in frontmatter",
+                    )
+
+                skill_name = skill_file.parent.name
+                tests.append(
+                    (f"skill frontmatter: {plugin}/{skill_name}", _check_skill),
+                )
+
+    return tests
+
+
+def _test_static_marketplace_json() -> list[TestCase]:
+    """Verify marketplace.json entries match PLUGINS and have required fields."""
+    tests: list[TestCase] = []
+    manifest_path = REPO_ROOT / ".claude-plugin" / "marketplace.json"
+
+    def _check_marketplace() -> None:
+        _assert(manifest_path.is_file(), "marketplace.json not found")
+        data: dict[str, t.Any] = json.loads(  # pyright: ignore[reportAny]
+            manifest_path.read_text(encoding="utf-8"),
+        )
+        plugins_list = t.cast(
+            "list[dict[str, t.Any]]",
+            data.get("plugins", []),
+        )
+        names = {p["name"] for p in plugins_list}
+
+        for plugin in PLUGINS:
+            _assert(plugin in names, f"Plugin '{plugin}' missing from marketplace.json")
+
+        required_fields = {"name", "description", "version", "author", "category", "source"}
+        for entry in plugins_list:
+            entry_name = t.cast("str", entry.get("name", "<unnamed>"))
+            for field in required_fields:
+                _assert(
+                    field in entry,
+                    f"marketplace entry '{entry_name}': missing '{field}'",
+                )
+            source = t.cast("str", entry.get("source", ""))
+            if source.startswith("./"):
+                source_path = REPO_ROOT / source
+                _assert(
+                    source_path.is_dir(),
+                    f"marketplace entry '{entry_name}': source path '{source}' does not exist",
+                )
+
+    tests.append(("marketplace.json validation", _check_marketplace))
+    return tests
+
+
+def _test_static_loom_timeouts() -> list[TestCase]:
+    """Verify loom command timeout multipliers are consistent (0.5x/1.5x)."""
+    tests: list[TestCase] = []
+    loom_commands_dir = REPO_ROOT / "plugins" / "loom" / "commands"
+    if not loom_commands_dir.is_dir():
+        return tests
+
+    timeout_pattern = re.compile(
+        r'"Default \((\d+)s\)".*\n.*"Quick — (\d+)s".*\n.*"Long — (\d+)s"',
+    )
+
+    for cmd_file in sorted(loom_commands_dir.glob("*.md")):
+
+        def _check_timeouts(p: Path = cmd_file) -> None:
+            text = p.read_text(encoding="utf-8")
+            m = timeout_pattern.search(text)
+            if not m:
+                return
+            default = int(m.group(1))
+            quick = int(m.group(2))
+            long_ = int(m.group(3))
+            rel = p.relative_to(REPO_ROOT)
+            _assert(
+                quick == default // 2,
+                f"{rel}: Quick={quick}s but expected {default // 2}s (0.5x {default}s)",
+            )
+            expected_long = default + default // 2
+            _assert(
+                long_ == expected_long,
+                f"{rel}: Long={long_}s but expected {expected_long}s (1.5x {default}s)",
+            )
+
+        tests.append((f"loom timeouts: {cmd_file.name}", _check_timeouts))
+
+    return tests
+
+
+def _test_static_loom_stderr_redirects() -> list[TestCase]:
+    """Verify fallback agent CLI uses append (2>>) not overwrite (2>)."""
+    tests: list[TestCase] = []
+    loom_commands_dir = REPO_ROOT / "plugins" / "loom" / "commands"
+    if not loom_commands_dir.is_dir():
+        return tests
+
+    def _check_redirects() -> None:
+        bad_files: list[str] = []
+        for cmd_file in sorted(loom_commands_dir.glob("*.md")):
+            text = cmd_file.read_text(encoding="utf-8")
+            for line in text.splitlines():
+                if "agent " in line and '2>"$SESSION_DIR' in line:
+                    bad_files.append(str(cmd_file.relative_to(REPO_ROOT)))
+                    break
+        _assert(
+            len(bad_files) == 0,
+            f"Agent fallbacks using 2> instead of 2>>: {', '.join(bad_files)}",
+        )
+
+    tests.append(("loom stderr redirects", _check_redirects))
+    return tests
 
 
 # ---------------------------------------------------------------------------
@@ -314,26 +556,39 @@ def main(
     source: t.Annotated[Source, typer.Option(help="Source type: local, github, or both")] = "local",
 ) -> None:
     """Run E2E plugin lifecycle tests against the Claude CLI."""
-    if shutil.which("claude") is None:
-        console.print("[red]Error:[/red] 'claude' CLI not found in PATH")
-        raise SystemExit(1)
-
     console.print("[bold]E2E Plugin Lifecycle Tests[/bold]")
     console.print("=" * 40)
 
-    sources: list[t.Literal["local", "github"]]
-    if source == "both":
-        sources = ["local", "github"]
+    # Run static validation tests first (no CLI needed)
+    console.print("\n[bold]Static Validation[/bold]")
+    static_tests: list[TestCase] = []
+    static_tests.extend(_test_static_frontmatter())
+    static_tests.extend(_test_static_plugin_structure())
+    static_tests.extend(_test_static_agent_skill_frontmatter())
+    static_tests.extend(_test_static_marketplace_json())
+    static_tests.extend(_test_static_loom_timeouts())
+    static_tests.extend(_test_static_loom_stderr_redirects())
+    static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
+    static_total = len(static_tests)
+
+    total_passed = static_passed
+    total_tests = static_total
+
+    if shutil.which("claude") is None:
+        console.print(
+            "\n[yellow]Warning:[/yellow] 'claude' CLI not found in PATH -- skipping CLI tests",
+        )
     else:
-        sources = [source]
+        sources: list[t.Literal["local", "github"]]
+        if source == "both":
+            sources = ["local", "github"]
+        else:
+            sources = [source]
 
-    total_passed = 0
-    total_tests = 0
-
-    for src in sources:
-        passed, total = _run_suite(src)
-        total_passed += passed
-        total_tests += total
+        for src in sources:
+            passed, total = _run_suite(src)
+            total_passed += passed
+            total_tests += total
 
     console.print()
     if total_passed == total_tests:
