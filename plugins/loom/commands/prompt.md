@@ -675,9 +675,12 @@ Present the final-pass comparison and wait for user to pick the winner.
 - Clean up external worktrees (see cleanup below).
 
 ### If an external model's implementation was chosen:
-1. **Discard Claude's modifications** (user changes were already stashed in Phase 2, Step 4b):
+1. **Discard Claude's modifications** (user changes were already stashed in Phase 2, Step 4b). This must remove both tracked changes and untracked files created by the model:
    ```bash
-   git checkout -- .
+   git reset --hard HEAD
+   ```
+   ```bash
+   git clean -fd
    ```
 2. **Cherry-pick or merge** the external model's commit(s):
    ```bash

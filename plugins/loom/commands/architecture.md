@@ -723,10 +723,14 @@ Present the final-pass analysis and wait for user confirmation before synthesizi
 
 ### Step 1: Start Fresh
 
-Discard Claude's modifications to start from a clean state (user changes were already stashed in Phase 2, Step 4b):
+Discard Claude's modifications to start from a clean state (user changes were already stashed in Phase 2, Step 4b). This must remove both tracked changes and untracked files created by the model:
 
 ```bash
-git checkout -- .
+git reset --hard HEAD
+```
+
+```bash
+git clean -fd
 ```
 
 ### Step 2: Apply Best-of-Breed Changes
