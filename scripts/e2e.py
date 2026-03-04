@@ -32,6 +32,7 @@ Test both sources:
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -112,6 +113,99 @@ def _run_test(label: str, fn: t.Callable[[], None]) -> bool:
         _fail(label, "Command timed out (120s)")
         return False
     return True
+
+
+# ---------------------------------------------------------------------------
+# Static validation helpers
+# ---------------------------------------------------------------------------
+
+
+def _parse_frontmatter(path: Path) -> dict[str, t.Any]:
+    """Parse YAML frontmatter from a markdown file.
+
+    Returns an empty dict if no frontmatter is found.
+    """
+    text = path.read_text(encoding="utf-8")
+    m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
+    if not m:
+        return {}
+    result: dict[str, t.Any] = {}
+    for line in m.group(1).splitlines():
+        if ":" in line:
+            key, _, value = line.partition(":")
+            result[key.strip()] = value.strip()
+    return result
+
+
+def _test_static_frontmatter() -> list[TestCase]:
+    """Verify command frontmatter has required fields and bare tool names."""
+    tests: list[TestCase] = []
+
+    for plugin in PLUGINS:
+        commands_dir = REPO_ROOT / "plugins" / plugin / "commands"
+        if not commands_dir.is_dir():
+            continue
+        for cmd_file in sorted(commands_dir.glob("*.md")):
+
+            def _check_frontmatter(p: Path = cmd_file) -> None:
+                fm = _parse_frontmatter(p)
+                _assert(
+                    bool(fm),
+                    f"{p.relative_to(REPO_ROOT)}: no YAML frontmatter found",
+                )
+                _assert(
+                    "description" in fm,
+                    f"{p.relative_to(REPO_ROOT)}: missing 'description' in frontmatter",
+                )
+                allowed = fm.get("allowed-tools", "")
+                if allowed:
+                    _assert(
+                        "(" not in allowed,
+                        f"{p.relative_to(REPO_ROOT)}: allowed-tools should use bare "
+                        f"names (no parenthesized patterns): {allowed}",
+                    )
+
+            tests.append(
+                (f"frontmatter: {plugin}/{cmd_file.name}", _check_frontmatter),
+            )
+
+    return tests
+
+
+def _test_static_plugin_structure() -> list[TestCase]:
+    """Verify each plugin has required directory structure."""
+    tests: list[TestCase] = []
+
+    for plugin in PLUGINS:
+        plugin_dir = REPO_ROOT / "plugins" / plugin
+
+        def _check_structure(d: Path = plugin_dir, name: str = plugin) -> None:
+            _assert(
+                (d / ".claude-plugin" / "plugin.json").is_file(),
+                f"{name}: missing .claude-plugin/plugin.json",
+            )
+            _assert(
+                (d / "README.md").is_file(),
+                f"{name}: missing README.md",
+            )
+            has_component = any(
+                [
+                    (d / "commands").is_dir(),
+                    (d / "agents").is_dir(),
+                    (d / "skills").is_dir(),
+                    (d / "hooks").is_dir(),
+                    (d / ".mcp.json").is_file(),
+                    (d / ".lsp.json").is_file(),
+                ],
+            )
+            _assert(
+                has_component,
+                f"{name}: no component directories or config files found",
+            )
+
+        tests.append((f"structure: {plugin}", _check_structure))
+
+    return tests
 
 
 # ---------------------------------------------------------------------------
@@ -321,14 +415,22 @@ def main(
     console.print("[bold]E2E Plugin Lifecycle Tests[/bold]")
     console.print("=" * 40)
 
+    # Run static validation tests first (no CLI needed)
+    console.print("\n[bold]Static Validation[/bold]")
+    static_tests: list[TestCase] = []
+    static_tests.extend(_test_static_frontmatter())
+    static_tests.extend(_test_static_plugin_structure())
+    static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
+    static_total = len(static_tests)
+
     sources: list[t.Literal["local", "github"]]
     if source == "both":
         sources = ["local", "github"]
     else:
         sources = [source]
 
-    total_passed = 0
-    total_tests = 0
+    total_passed = static_passed
+    total_tests = static_total
 
     for src in sources:
         passed, total = _run_suite(src)
