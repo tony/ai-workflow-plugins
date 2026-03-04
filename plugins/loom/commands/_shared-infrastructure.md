@@ -72,6 +72,40 @@ The calling command provides `<DEFAULT_TIMEOUT>` and `<LONG_TIMEOUT>` values.
 
 ---
 
+## Context Packet
+
+### Phase 1b: Build Context Packet
+
+After the calling command's Phase 1 context gathering (reading CLAUDE.md, exploring files, capturing the task), assemble a structured context bundle that will be included verbatim in ALL model prompts. This ensures every model works from the same information.
+
+Write to `$SESSION_DIR/context-packet.md`:
+
+1. **Conventions summary** — key rules from CLAUDE.md/AGENTS.md (max 50 lines). Focus on commit format, test patterns, code style, and quality gates relevant to the task.
+
+2. **Repo state** — branch, HEAD ref, trunk branch, uncommitted changes summary:
+   ```bash
+   git status --short
+   ```
+
+3. **Changed files** — for review/plan commands that operate on branch changes:
+   ```bash
+   git diff --stat origin/<trunk>...HEAD
+   ```
+
+4. **Relevant file list** — files matching task keywords discovered during Phase 1 exploration. Include paths only, not content.
+
+5. **Key snippets** — critical function signatures, types, test patterns, or API contracts relevant to the task (max 200 lines). Prioritize interfaces over implementations.
+
+6. **Known unknowns** — aspects of the task that need discovery during execution. List what the model should investigate.
+
+**Size limit**: 400 lines total. Prioritize by task relevance. If the packet exceeds 400 lines, truncate the least relevant sections (snippets first, then file list).
+
+**Usage in model prompts**:
+- For the **Claude Task agent**: reference the file path (`$SESSION_DIR/context-packet.md`) — the agent reads it directly
+- For **external CLIs** (Gemini, GPT): inline the context packet content in their prompt, since they cannot read local files
+
+---
+
 ## Model Detection
 
 ### Step 3: Detect Available Models

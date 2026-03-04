@@ -39,6 +39,12 @@ The prompt comes from `$ARGUMENTS`. If no arguments are provided, ask the user w
 
 ---
 
+## Phase 1b: Build Context Packet
+
+Follow the context packet protocol in [_shared-infrastructure.md](./_shared-infrastructure.md). For `prompt`, include key snippets of existing code that implementations must integrate with, relevant file list, and known unknowns.
+
+---
+
 ## Phase 2: Configuration and Model Detection
 
 Follow the shared infrastructure protocol in [_shared-infrastructure.md](./_shared-infrastructure.md) for flag parsing, interactive configuration, model detection, and timeout detection with these parameters:

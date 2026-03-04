@@ -48,6 +48,12 @@ The architecture goal comes from `$ARGUMENTS`. If no arguments are provided, ask
 
 ---
 
+## Phase 1b: Build Context Packet
+
+Follow the context packet protocol in [_shared-infrastructure.md](./_shared-infrastructure.md). For `architecture`, include conventions summary (existing CLAUDE.md/AGENTS.md content), existing component inventory (skills, agents, hooks, MCP servers), and known unknowns about the architecture goal.
+
+---
+
 ## Phase 2: Configuration and Model Detection
 
 Follow the shared infrastructure protocol in [_shared-infrastructure.md](./_shared-infrastructure.md) for flag parsing, interactive configuration, model detection, and timeout detection with these parameters:

@@ -27,6 +27,12 @@ The question comes from `$ARGUMENTS`. If no arguments are provided, ask the user
 
 ---
 
+## Phase 1b: Build Context Packet
+
+Follow the context packet protocol in [_shared-infrastructure.md](./_shared-infrastructure.md). For `ask`, prioritize conventions summary and relevant file list. Changed files are included only if the question relates to branch changes.
+
+---
+
 ## Phase 2: Configuration and Model Detection
 
 Follow the shared infrastructure protocol in [_shared-infrastructure.md](./_shared-infrastructure.md) for flag parsing, interactive configuration, model detection, and timeout detection with these parameters:
