@@ -352,7 +352,6 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 **Native (`codex` CLI)**:
 ```bash
 <timeout_cmd> <timeout_seconds> codex exec \
-    --yolo \
     -c model_reasoning_effort=medium \
     "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
