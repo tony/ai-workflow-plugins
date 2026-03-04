@@ -163,11 +163,11 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 #### Model resolution (priority order)
 
-| Slot | Priority 1 (native) | Priority 2 (agent fallback) | Agent model |
-|------|---------------------|-----------------------------|-------------|
-| **Claude** | Always available (this agent) | — | — |
-| **Gemini** | `gemini` binary | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
-| **GPT** | `codex` binary | `agent --model gpt-5.2` | `gpt-5.2` |
+| Slot | Priority 1 (native) | Native model | Priority 2 (agent fallback) | Agent model |
+|------|---------------------|--------------|-----------------------------|-----------  |
+| **Claude** | Always available (this agent) | — | — | — |
+| **Gemini** | `gemini` binary | `gemini-3.1-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
+| **GPT** | `codex` binary | (default) | `agent --model gpt-5.2` | `gpt-5.2` |
 
 **Resolution logic** for each external slot:
 1. Native CLI found → use it
