@@ -719,7 +719,7 @@ Present the final-pass comparison and wait for user to pick the winner.
    git merge loom/<model>/<timestamp> --no-ff
    ```
    Or if there are conflicts, cherry-pick individual commits.
-3. **Snapshot fallback**: If the worktree is unavailable (e.g., cleaned up during multi-pass), apply changes from the snapshot instead — read each file from `$SESSION_DIR/pass-NNNN/files/<model>/` and use Edit/Write to apply to the main tree.
+3. **Snapshot fallback**: If the worktree is unavailable (e.g., cleaned up during multi-pass), apply changes from the snapshot instead — read each file from `$SESSION_DIR/pass-NNNN/files/<model>/` and use Edit/Write to apply to the main tree. Check the diffs for deleted files (lines starting with `deleted file mode` or `--- a/path` with `+++ /dev/null`) and `rm` them from the main tree.
 4. **Restore stashed changes** (only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake):
    ```bash
    STASH_REF="$(git stash list | grep -m1 "loom-prompt: user-changes stash" | cut -d: -f1)" && [ -n "$STASH_REF" ] && git stash pop "$STASH_REF" || true
