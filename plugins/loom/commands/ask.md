@@ -327,12 +327,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 
 **Native (`gemini` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+<timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
 ```
 
 ### GPT Answer (if available)
@@ -348,12 +348,12 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 <timeout_cmd> <timeout_seconds> codex exec \
     --yolo \
     -c model_reasoning_effort=medium \
-    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 **Fallback (`agent` CLI)**:
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
 ```
 
 ### Artifact Capture
@@ -361,8 +361,8 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 After each model completes, persist its output to the session directory:
 
 - **Claude**: Write the Task agent's response to `$SESSION_DIR/pass-0001/outputs/claude.md`
-- **Gemini**: Write Gemini's stdout to `$SESSION_DIR/pass-0001/outputs/gemini.md`
-- **GPT**: Write GPT's stdout to `$SESSION_DIR/pass-0001/outputs/gpt.md`
+- **Gemini**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gemini.md`
+- **GPT**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gpt.md`
 
 ### Execution Strategy
 
