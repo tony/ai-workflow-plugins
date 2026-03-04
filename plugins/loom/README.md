@@ -1,6 +1,6 @@
-# multi-model
+# loom
 
-Run prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
+Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
 
 ## Installation
 
@@ -13,20 +13,20 @@ Add the marketplace:
 Install the plugin:
 
 ```console
-/plugin install multi-model@ai-workflow-plugins
+/plugin install loom@ai-workflow-plugins
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `/multi-model:ask` | Ask all models a question, synthesize the best answer |
-| `/multi-model:plan` | Get implementation plans from all models, synthesize the best plan |
-| `/multi-model:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
-| `/multi-model:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
-| `/multi-model:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
-| `/multi-model:review` | Run code review with all models, produce consensus-weighted report |
-| `/multi-model:fix-review` | Fix review findings as atomic commits with test coverage |
+| `/loom:ask` | Ask all models a question, synthesize the best answer |
+| `/loom:plan` | Get implementation plans from all models, synthesize the best plan |
+| `/loom:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
+| `/loom:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
+| `/loom:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
+| `/loom:review` | Run code review with all models, produce consensus-weighted report |
+| `/loom:fix-review` | Fix review findings as atomic commits with test coverage |
 
 ## How It Works
 
@@ -61,8 +61,8 @@ Append trigger words to any command's arguments to hint at pass count:
 
 | Trigger | Effect | Example |
 |---------|--------|---------|
-| `multipass` | Hints 2 passes | `/multi-model:ask what is this? multipass` |
-| `x<N>` (N = 2–5) | Hints N passes | `/multi-model:plan add auth x3` |
+| `multipass` | Hints 2 passes | `/loom:ask what is this? multipass` |
+| `x<N>` (N = 2–5) | Hints N passes | `/loom:plan add auth x3` |
 
 Triggers are hints — commands always prompt for confirmation. Values above 5 are capped at 5. Only the first and last line of arguments are scanned; trigger-like words found elsewhere prompt for disambiguation.
 
@@ -72,8 +72,8 @@ Override the default timeout per command:
 
 | Trigger | Effect | Example |
 |---------|--------|---------|
-| `timeout:<seconds>` | Set custom timeout | `/multi-model:ask question timeout:300` |
-| `timeout:none` | Disable timeout | `/multi-model:execute task timeout:none` |
+| `timeout:<seconds>` | Set custom timeout | `/loom:ask question timeout:300` |
+| `timeout:none` | Disable timeout | `/loom:execute task timeout:none` |
 
 Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s), architecture (1200s).
 
@@ -248,7 +248,7 @@ To list sessions, scan `session.json` files under `$AI_AIP_ROOT/repos/<slug>--<h
 
 ## Prerequisites
 
-At minimum, Claude (this agent) is always available. For multi-model functionality, install one or more external CLIs:
+At minimum, Claude (this agent) is always available. For loom functionality, install one or more external CLIs:
 
 | CLI | Model | Install |
 |-----|-------|---------|
