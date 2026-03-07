@@ -30,19 +30,9 @@ The remaining text after stripping flags is the **filter** — a package name, `
 ## Step 1: Detect Preferred Tools
 
 ```bash
-command -v rg >/dev/null 2>&1 && echo "rg:available" || echo "rg:missing"
-```
-
-```bash
-command -v ag >/dev/null 2>&1 && echo "ag:available" || echo "ag:missing"
-```
-
-```bash
-command -v fd >/dev/null 2>&1 && echo "fd:available" || echo "fd:missing"
-```
-
-```bash
-command -v jq >/dev/null 2>&1 && echo "jq:available" || echo "jq:missing"
+for tool in rg ag fd jq; do
+  command -v "$tool" >/dev/null 2>&1 && echo "$tool:available" || echo "$tool:missing"
+done
 ```
 
 For content search, prefer `rg` over `ag` over `grep`. For file finding, prefer `fd` over `find`. For JSON parsing, use `jq` when available, otherwise parse manually.
