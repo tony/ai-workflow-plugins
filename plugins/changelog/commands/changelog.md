@@ -85,7 +85,7 @@ Parse the commit type from the commit subject. Adapt to the project's commit con
 | `docs` | Documentation | Doc changes |
 | `test` | Tests | Test additions/changes |
 | `refactor` | (only if user-visible) | Skip internal-only refactors |
-| `chore`, `deps` | Development | Maintenance, dependency bumps |
+| `chore`, `deps` | Development (only if consumer-visible) | e.g., minimum version bumps, build system changes that alter installation; skip CI, linter, editor, dev-tooling, and test-infrastructure changes |
 | `style` | (skip) | Formatting-only changes |
 
 ### Grouping rules
@@ -157,8 +157,8 @@ A structured list of entries grouped by section, each with:
 - Use present tense for the entry title ("Add support for..." not "Added support for...")
 - Don't repeat the section heading in the entry text
 - Keep bullet entries to 1-2 lines; use the sub-heading format for anything needing more explanation
-- Never include counts of files, lines, or tests changed — these are brittle and duplicate the diff
-- Never include git SHAs, commit hashes, or line numbers
+- Never include numeric tallies — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). These are brittle and duplicate the diff
+- Never include git refs — SHAs, commit hashes, branch names, tag names, or line numbers. These break when history is rebased or tags move
 
 ### Whole-branch perspective
 
