@@ -119,9 +119,19 @@ For removal or migration PRs, include "verify zero matches for X" items proving 
 
 #### What NOT to include
 
-- Brittle details the reviewer can see themselves (line numbers, exact test counts, commit SHAs)
-- Redundant context already visible in the diff (don't re-explain obvious one-liners)
+- Test counts or passing numbers ("875 tests pass", "42 tests added")
+- Git SHAs or commit hashes
+- File-level line numbers
+- Number of files or lines changed ("updated 12 files", "adds 340 lines")
+- Details the reviewer can see in the diff
+- Redundant context already visible in `git log`
 - `Fixes #N` hardcoded in the body — use `gh pr create` flags or let GitHub auto-link
+
+#### Whole-branch perspective
+
+Describe the branch's **net shipped result**, not its internal evolution. Ignore
+fixup commits, reverts-then-re-adds, and intermediate WIP states — the PR
+description is a product changelog for reviewers, not a commit-by-commit diary.
 
 ### 4. Present and Create
 
@@ -153,3 +163,5 @@ For removal or migration PRs, include "verify zero matches for X" items proving 
 - **Always** use heredoc for `gh pr create --body` to preserve formatting
 - **Language-agnostic**: discover test/lint commands from AGENTS.md/CLAUDE.md — never hardcode specific tool commands
 - **Proportional**: match the description's detail level to the diff size — a one-file fix doesn't need 20 bullets; a 30-file feature shouldn't be one sentence
+- **No brittle details**: no test counts, no SHAs, no line numbers, no file/line-changed counts
+- **Whole-branch perspective**: describe the net shipped result, not the branch's internal commit history

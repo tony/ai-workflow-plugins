@@ -37,6 +37,9 @@ Full diff:
 - Determine the nature: feature, bug fix, refactor, version bump, CI/infra, docs, breaking change, Python/runtime version drop, etc.
 - Assess scope: is this a small targeted fix or a large multi-module change?
 - Note any PR number visible in branch name or commits (e.g., `feature-name` with PR `#42`)
+- **Whole-branch perspective**: describe the net shipped result — collapse fixup
+  commits, reverts-then-re-adds, and WIP states. The merge commit is a product
+  summary, not a commit diary.
 
 ### 2. Read Project Conventions
 
