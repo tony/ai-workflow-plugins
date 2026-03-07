@@ -1,8 +1,9 @@
 ---
 name: GPT CLI
 description: >
-  Alias for the Codex CLI skill. Use /model-cli:gpt as an alternative entry point
-  for running prompts through OpenAI GPT via the codex or agent CLI.
+  Use when running a prompt through OpenAI GPT directly. An alternative invocation
+  point for /model-cli:codex — both use the same backend (codex binary or agent
+  --model gpt-5.4-high fallback). Use this or /model-cli:codex interchangeably.
 user-invocable: true
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
