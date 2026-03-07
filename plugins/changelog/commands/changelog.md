@@ -157,6 +157,15 @@ A structured list of entries grouped by section, each with:
 - Use present tense for the entry title ("Add support for..." not "Added support for...")
 - Don't repeat the section heading in the entry text
 - Keep bullet entries to 1-2 lines; use the sub-heading format for anything needing more explanation
+- Never include counts of files, lines, or tests changed — these are brittle and duplicate the diff
+- Never include git SHAs, commit hashes, or line numbers
+
+### Whole-branch perspective
+
+Changelog entries describe the **net shipped result** of the branch, not its
+internal commit history. Collapse fixup commits, reverts-then-re-adds, and
+intermediate states. A TDD sequence (add failing test → fix → clean up) becomes
+one bug fix entry, not three.
 
 ---
 

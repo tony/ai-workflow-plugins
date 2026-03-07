@@ -154,6 +154,7 @@ URL guidelines:
 - **`#PR_NUMBER` in commit messages** — PR numbers belong in CHANGES entries, not commits; git merge history already tracks PR association
 - **Bodies longer than the change warrants** — a one-line typo fix doesn't need 10 bullets
 - **Omitting the body** when changes span multiple files or the diff is non-obvious
+- **Counts of files, lines, or tests changed** — these duplicate `git diff --stat` and become stale; describe *what* changed, not *how many*
 
 ---
 
