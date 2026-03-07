@@ -5,7 +5,7 @@ description: >
   explicitly asks to use Codex, GPT, or OpenAI for a task, or when you determine
   that GPT would provide better results for a specific task (e.g., tasks requiring
   OpenAI-specific strengths). Detects the codex binary, falls back to agent --model
-  gpt-5.2 if unavailable.
+  gpt-5.4-high if unavailable.
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 argument-hint: <prompt> [timeout:<seconds>]
@@ -13,7 +13,7 @@ argument-hint: <prompt> [timeout:<seconds>]
 
 # Codex CLI Skill
 
-Run a prompt through the Codex CLI (OpenAI GPT). If the `codex` binary is not installed, falls back to the `agent` CLI with `--model gpt-5.2`.
+Run a prompt through the Codex CLI (OpenAI GPT). If the `codex` binary is not installed, falls back to the `agent` CLI with `--model gpt-5.4-high`.
 
 Use `$ARGUMENTS` as the user's prompt. If `$ARGUMENTS` is empty, ask the user what they want to run.
 
@@ -39,7 +39,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 **Resolution** (priority order):
 
 1. `codex` found → use `codex exec --yolo -c model_reasoning_effort=medium`
-2. Else `agent` found → use `agent -p -f --model gpt-5.2`
+2. Else `agent` found → use `agent -p -f --model gpt-5.4-high`
 3. Else → report both CLIs unavailable and stop
 
 ## Step 2: Detect Timeout Command
@@ -69,7 +69,7 @@ Write the prompt content to the temp file using `printf '%s'`.
 **Fallback (`agent` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat /tmp/mc-prompt-XXXXXX.txt)" 2>/tmp/mc-stderr-codex.txt
+<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat /tmp/mc-prompt-XXXXXX.txt)" 2>/tmp/mc-stderr-codex.txt
 ```
 
 Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>` with the resolved timeout value. If no timeout command is available, omit the prefix entirely.
@@ -79,7 +79,7 @@ Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>
 1. **Record**: exit code, stderr (from `/tmp/mc-stderr-codex.txt`), elapsed time
 2. **Classify**: timeout → retry with 1.5x timeout; rate-limit → retry after 10s delay; crash → stop; empty output → retry once
 3. **Retry**: max 1 retry with the same backend
-4. **Agent fallback**: if retry fails AND native `codex` was used AND `agent` is available, re-run the command using `agent -p -f --model gpt-5.2` (1 attempt, same timeout). Note the backend switch in the output.
+4. **Agent fallback**: if retry fails AND native `codex` was used AND `agent` is available, re-run the command using `agent -p -f --model gpt-5.4-high` (1 attempt, same timeout). Note the backend switch in the output.
 5. **After all retries exhausted**: report failure with stderr details from both backends
 
 ## Step 6: Clean Up and Return
