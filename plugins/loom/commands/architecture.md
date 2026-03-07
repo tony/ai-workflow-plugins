@@ -167,7 +167,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 |------|---------------------|--------------|-----------------------------|-----------  |
 | **Claude** | Always available (this agent) | — | — | — |
 | **Gemini** | `gemini` binary | `gemini-3.1-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
-| **GPT** | `codex` binary | (default) | `agent --model gpt-5.2` | `gpt-5.2` |
+| **GPT** | `codex` binary | (default) | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
 
 **Resolution logic** for each external slot:
 1. Native CLI found → use it
@@ -443,7 +443,7 @@ Launch a Task agent with `subagent_type: "general-purpose"` to generate artifact
 
 **Fallback (`agent` CLI)**:
 ```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.2 "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
 ```
 
 ### Artifact Capture
