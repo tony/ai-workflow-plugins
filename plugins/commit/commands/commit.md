@@ -72,6 +72,24 @@ Match the style of the recent commits shown above — capitalization, tense, lev
   - The diff is not self-explanatory
 - **Show the proposed commit message** to the user before executing
 
+#### Line wrapping
+
+Wrap commit message body lines at **72 characters**. This is the git
+convention and ensures readable output in `git log`, terminals, and
+email-based review.
+
+**Overflow exceptions** — do NOT break these tokens across lines;
+place them at the end of a line or on their own line:
+
+- URLs
+- commit hashes
+- stack traces
+- file paths
+- long identifiers (class names, function signatures)
+
+If a bullet point exceeds 72 characters due to an overflow token,
+let the line run long rather than wrapping mid-token.
+
 ### 3a. Version & Dependency Bump Commits
 
 When the changes are version bumps or dependency updates, use this specialized format:
@@ -146,6 +164,8 @@ URL guidelines:
 - **List specific files** changed when multiple modules are touched
 - **Version bumps** — include release date, release tag URL, and changelog URL
 - **Arrow notation** for version transitions: `v1.2.0 → v1.3.0` or `1.2.0 -> 1.3.0`
+- **Wrap body at 72 characters** — the git convention; let URLs, paths,
+  hashes, and identifiers overflow rather than breaking mid-token
 
 ### Don't
 

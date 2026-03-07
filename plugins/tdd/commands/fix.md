@@ -190,3 +190,6 @@ Use the project's commit message format from AGENTS.md/CLAUDE.md. If no format i
 - Whether this is a test addition, a fix, or xfail removal
 - Why the change was needed
 - What specifically changed
+
+Wrap body lines at **72 characters**. Let URLs, file paths, hashes,
+and long identifiers overflow rather than breaking mid-token.
