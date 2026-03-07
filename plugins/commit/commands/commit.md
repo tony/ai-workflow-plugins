@@ -72,6 +72,37 @@ Match the style of the recent commits shown above — capitalization, tense, lev
   - The diff is not self-explanatory
 - **Show the proposed commit message** to the user before executing
 
+### 3a. Version & Dependency Bump Commits
+
+When the changes are version bumps or dependency updates, use this specialized format:
+
+**Single package** — compact subject with body:
+```
+scope(tool) old_version -> new_version
+```
+Body: link the release tag and changelog:
+```
+- https://github.com/owner/repo/releases/tag/vX.Y.Z
+- https://github.com/owner/repo/blob/vX.Y.Z/CHANGELOG.md
+```
+
+**Multiple packages** — list each in the body:
+```
+scope(chore) Bump tool1, tool2, tool3
+
+- tool1 1.2.0 -> 1.3.0 (March 5, 2026)
+  - https://github.com/owner/tool1/releases/tag/v1.3.0
+  - https://github.com/owner/tool1/blob/v1.3.0/CHANGELOG.md
+- tool2 0.9.1 -> 0.10.0 (February 28, 2026)
+  - https://github.com/owner/tool2/releases/tag/v0.10.0
+  - https://github.com/owner/tool2/blob/v0.10.0/CHANGELOG.md
+```
+
+URL guidelines:
+- Use `/releases/tag/` for release pages
+- Use `/blob/<tag>/CHANGELOG.md` for changelogs pinned to the release tag — not `/blob/main/` unless no tags exist
+- Use arrow notation for version transitions: `v1.2.0 → v1.3.0` or `1.2.0 -> 1.3.0`
+
 ### 4. Commit
 
 - For single-line messages:
@@ -100,6 +131,29 @@ Match the style of the recent commits shown above — capitalization, tense, lev
 - Run `git log --oneline -1` to show the created commit
 - Run `git status` to show the remaining working tree state
 - Report success to the user
+
+---
+
+## Commit Quality Guide
+
+### Do
+
+- **Proportional detail** — small fix gets a concise body; large feature gets structured sub-sections (Changes, Test coverage)
+- **`why:` explains motivation; `what:` lists specific technical changes** — reader understands the reason before the implementation
+- **Quantify impact** for performance changes — include before/after numbers and percentages
+- **Before/after examples** for bug fixes — show broken vs fixed behavior inline when helpful
+- **Cross-reference** related PRs/issues with `Fixes #N` or `See also: <URL>`
+- **List specific files** changed when multiple modules are touched
+- **Version bumps** — include release date, release tag URL, and changelog URL
+- **Arrow notation** for version transitions: `v1.2.0 → v1.3.0` or `1.2.0 -> 1.3.0`
+
+### Don't
+
+- **Vague subjects**: "update code", "fix bug", "misc changes"
+- **Redundant type-in-description**: "feat: add new feature" — the type already says feat
+- **`#PR_NUMBER` in commit messages** — PR numbers belong in CHANGES entries, not commits; git merge history already tracks PR association
+- **Bodies longer than the change warrants** — a one-line typo fix doesn't need 10 bullets
+- **Omitting the body** when changes span multiple files or the diff is non-obvious
 
 ---
 

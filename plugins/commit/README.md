@@ -26,7 +26,7 @@ Install the plugin:
 
 1. **Analyze changes** — review the diff, determine commit type and scope, check topic coherence
 2. **Determine staging** — respect existing staged files; auto-stage only if nothing is staged; exclude secrets
-3. **Draft commit message** — read AGENTS.md/CLAUDE.md for the project's format; match recent commit style
+3. **Draft commit message** — read AGENTS.md/CLAUDE.md for the project's format; match recent commit style; applies commit quality guidelines — proportional detail, version bump URLs, before/after patterns
 4. **Commit** — present the message, then execute; handle pre-commit hook failures by fixing and retrying
 5. **Confirm result** — show the created commit and remaining working tree state
 
