@@ -57,6 +57,24 @@ Full diff:
 
 #### Body — Proportional to the Change
 
+#### Line wrapping
+
+Wrap commit message body lines at **72 characters**. This is the git
+convention and ensures readable output in `git log`, terminals, and
+email-based review.
+
+**Overflow exceptions** — do NOT break these tokens across lines;
+place them at the end of a line or on their own line:
+
+- URLs
+- commit hashes
+- stack traces
+- file paths
+- long identifiers (class names, function signatures)
+
+If a bullet point exceeds 72 characters due to an overflow token,
+let the line run long rather than wrapping mid-token.
+
 **Small changes** (1-3 file fix, simple bump): title line only, no body needed.
 
 **Medium changes** (feature, targeted refactor, bug fix with root cause):
