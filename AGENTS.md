@@ -36,6 +36,10 @@ what:
 - Focused on a single topic
 ```
 
+Line wrapping: wrap body lines at **72 characters**. Let URLs, file
+paths, commit hashes, and long identifiers overflow rather than
+breaking mid-token.
+
 Common commit types:
 - **feat**: New features or enhancements
 - **fix**: Bug fixes
