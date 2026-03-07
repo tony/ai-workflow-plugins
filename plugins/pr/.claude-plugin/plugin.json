@@ -1,7 +1,7 @@
 {
   "name": "pr",
-  "description": "Generate and review gold-standard pull request descriptions with structured headings, tables, and test plans",
-  "version": "0.0.1",
+  "description": "Generate and review gold-standard PR descriptions and merge commit messages with structured headings, tables, and test plans",
+  "version": "0.1.0",
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"

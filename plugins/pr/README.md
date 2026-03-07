@@ -21,6 +21,7 @@ Install the plugin:
 | Command | Description |
 |---------|-------------|
 | `/pr` | Generate a gold-standard PR description from branch diff |
+| `/pr:merge-commit` | Generate a gold-standard merge commit message from branch diff |
 | `/pr:review` | Review an existing PR description against gold-standard patterns |
 
 ## How It Works
@@ -31,6 +32,13 @@ Install the plugin:
 2. **Read conventions** — check AGENTS.md/CLAUDE.md for PR description conventions and `.github/pull_request_template.md` for templates
 3. **Draft description** — apply gold-standard patterns: bold impact labels, structured headings, comparison tables, verification commands, test plan checklists
 4. **Present and create** — show the proposed title and body, then optionally create the PR via `gh pr create`
+
+### `/pr:merge-commit` — Generate merge commit message
+
+1. **Gather context** — collect branch diff, commit log, and file change summary
+2. **Read conventions** — check AGENTS.md/CLAUDE.md for merge commit format preferences
+3. **Draft message** — apply proportional patterns: title-only for small fixes, structured body with bold labels, arrow notation, breaking change sections, and cross-references for larger changes
+4. **Present message** — show the complete merge commit message for the user to copy/paste into their merge workflow (GitHub merge button, `git merge --edit`, etc.)
 
 ### `/pr:review` — Review PR description
 
@@ -46,6 +54,14 @@ Generate a PR description with an optional hint:
 ```
 /pr
 /pr fixes the race condition in new_session
+```
+
+Generate a merge commit message with an optional hint:
+
+```
+/pr:merge-commit
+/pr:merge-commit version bump
+/pr:merge-commit breaking change in the session API
 ```
 
 Review an existing PR:
