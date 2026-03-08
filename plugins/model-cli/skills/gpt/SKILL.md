@@ -15,3 +15,5 @@ argument-hint: <prompt> [timeout:<seconds>]
 This is an alias for `/model-cli:codex`. Both entry points use the same backend.
 
 Invoke the Codex CLI skill with `$ARGUMENTS`. If `$ARGUMENTS` is empty, ask the user what they want to run.
+
+All triggers supported by `/model-cli:codex` are passed through, including `timeout:<seconds>`, `timeout:none`, and `mode:plan`.

@@ -1,12 +1,54 @@
 ---
 description: Loom code review — runs Claude, Gemini, and GPT reviews in parallel, then synthesizes findings
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion", "EnterPlanMode", "ExitPlanMode"]
 argument-hint: "[focus area] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
 ---
 
 # Loom Code Review
 
 Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, then synthesize their findings into a unified report with evidence-backed adjudication. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, synthesis results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
+
+---
+
+## Orchestration Plan
+
+Before dispatching the review to models, enter plan mode to create a review
+strategy.
+
+**Enter your tool's plan mode:**
+
+- **Claude Code**: Call `EnterPlanMode`
+- **Cursor**: Use `/plan` or press `Shift+Tab`
+- **Codex**: Use `/plan` to switch to Plan mode
+- **Gemini**: Use `/plan` or press `Shift+Tab`
+- **Other tools**: Use your tool's planning/read-only mode if available
+
+If plan mode is not available, proceed — context gathering in Phase 1 still
+guides the review.
+
+**Create an orchestration plan covering:**
+
+1. **Branch summary** — What does this branch do? Summarize from commit
+   messages and diff stats
+2. **Review focus areas** — Which files/changes are highest risk or most
+   complex? Where should reviewers concentrate?
+3. **Relevant conventions** — Which CLAUDE.md/AGENTS.md rules are most
+   relevant to the changes in this branch?
+4. **Known concerns** — Any areas the user flagged, or patterns in the
+   diff that look risky (large functions, missing tests, API changes)
+5. **Model prompt strategy** — What specific instructions should each
+   model's review prompt emphasize, given the above?
+
+**Present the orchestration plan to the user.** Wait for approval before
+proceeding to Phase 1. The user may adjust focus areas or add concerns.
+
+**After approval, exit plan mode:**
+
+- **Claude Code**: Call `ExitPlanMode`
+- **Cursor/Codex/Gemini**: Exit plan mode per your tool's method
+
+Then proceed to Phase 1, using the approved strategy to guide context
+gathering and prompt construction.
 
 ---
 
@@ -35,6 +77,10 @@ Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, t
 ---
 
 ## Phase 1b: Build Context Packet
+
+Use the approved orchestration plan to prioritize which conventions,
+files, and concerns to include in the context packet. If no orchestration
+plan was created, proceed with default context gathering.
 
 After Phase 1 context gathering, assemble a structured context bundle that will be included verbatim in ALL model prompts. This ensures every model works from the same information.
 

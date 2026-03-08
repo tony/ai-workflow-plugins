@@ -60,6 +60,32 @@ All commands share four quality protocols that decorrelate model outputs and imp
 
 **fix-review** processes findings from a review, applying each as an atomic commit with test coverage. Multi-pass does not apply to fix-review since it is already iterative.
 
+## Orchestration Plan Mode
+
+The **review** and **fix-review** commands include an Orchestration Plan phase
+that runs before execution begins. The host tool enters its native plan mode,
+creates a strategy for the task, and presents it for user approval before
+proceeding.
+
+This works portably across AI coding tools:
+
+| Tool | Enter plan mode | Exit plan mode |
+|------|----------------|----------------|
+| Claude Code | `EnterPlanMode` tool | `ExitPlanMode` tool |
+| Cursor | `/plan` or `Shift+Tab` | Exit per tool method |
+| Codex | `/plan` | Exit per tool method |
+| Gemini | `/plan` or `Shift+Tab` | Exit per tool method |
+
+If plan mode is unavailable, the commands still work — the phase structure
+guides analysis before execution.
+
+**review** plans: branch summary, review focus areas, relevant conventions,
+known concerns, and model prompt strategy.
+
+**fix-review** plans: findings inventory, validity pre-assessment, fix
+ordering, test strategy per finding, risk assessment, and expected commit
+sequence.
+
 ## Multi-Pass Refinement
 
 Multi-pass re-runs all models with the prior synthesis prepended as context, allowing each model to challenge, deepen, or confirm the previous round's results. This produces higher-quality outputs at the cost of additional model invocations.

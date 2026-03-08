@@ -254,6 +254,24 @@ at runtime rather than assuming a particular ecosystem. When listing examples of
 or frameworks, present them as illustrative examples (e.g., in tables or lists), never
 as hardcoded instructions.
 
+### Orchestration Plan Convention
+
+Skills with analysis-then-execute phases should include a portable
+"Orchestration Plan" section before execution begins. This section:
+
+1. Instructs the host to enter plan mode with tool-specific activation hints:
+   Claude Code (`EnterPlanMode`), Cursor/Codex/Gemini (`/plan` or `Shift+Tab`)
+2. Defines what the orchestration plan should contain (skill-specific checklist)
+3. Requires presenting the plan and waiting for user approval
+4. Instructs exiting plan mode before execution
+
+The orchestration plan is the host's STRATEGY for the task — not just
+write-prevention. It demonstrates understanding of the task and lets the
+user course-correct before work begins.
+
+Include graceful degradation: if plan mode is unavailable, the skill's
+phase structure still guides analysis before execution.
+
 ### Accessible Code Blocks
 
 - **One command per code block** — never combine multiple commands in a single
