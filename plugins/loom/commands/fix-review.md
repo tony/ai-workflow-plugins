@@ -1,6 +1,6 @@
 ---
 description: Fix loom review findings — validate, add test coverage, fix, and commit each as atomic changes
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion", "EnterPlanMode", "ExitPlanMode"]
 ---
 
 # Fix Review Findings
@@ -11,7 +11,55 @@ Multi-pass (`multipass`, `x2`, etc.) is not applicable to this command — it is
 
 ---
 
+## Orchestration Plan
+
+Before executing any fixes, enter plan mode to create a fix strategy from the
+review findings.
+
+**Enter your tool's plan mode:**
+
+- **Claude Code**: Call `EnterPlanMode`
+- **Cursor**: Use `/plan` or press `Shift+Tab`
+- **Codex**: Use `/plan` to switch to Plan mode
+- **Gemini**: Use `/plan` or press `Shift+Tab`
+- **Other tools**: Use your tool's planning/read-only mode if available
+
+If plan mode is not available, proceed — the phase structure still guides the
+analysis before execution.
+
+**Create an orchestration plan covering:**
+
+1. **Findings inventory** — List each review finding with its consensus level
+   and severity
+2. **Validity pre-assessment** — For each finding, note your initial read:
+   likely valid, likely incorrect, needs investigation
+3. **Fix ordering** — Propose the sequence: dependencies first, then highest
+   consensus, then by file proximity (minimize context switches)
+4. **Test strategy per finding** — For each likely-valid finding: extend
+   existing test, add new case, or no test needed (and why)
+5. **Risk assessment** — Flag findings where the fix could break other code
+   or conflict with other findings
+6. **Expected commit sequence** — Predict the atomic commits this session
+   will produce
+
+**Present the orchestration plan to the user.** Wait for approval before
+proceeding to Phase 1. The user may adjust priorities, skip findings, or
+reorder the sequence.
+
+**After approval, exit plan mode:**
+
+- **Claude Code**: Call `ExitPlanMode`
+- **Cursor/Codex/Gemini**: Exit plan mode per your tool's method
+
+Then proceed to Phase 1 with the approved plan as your guide.
+
+---
+
 ## Phase 1: Parse and Prioritize Findings
+
+Follow the approved orchestration plan for finding order and priority.
+If no orchestration plan was created (plan mode unavailable), proceed
+with the default priority ordering below.
 
 **Goal**: Extract structured findings from the loom review report in the conversation.
 
@@ -65,9 +113,10 @@ For EACH finding:
    - If valid: note the planned fix AND test coverage strategy
    - If invalid: note the specific reason (cite code, tests, or conventions)
 
-7. **Present the validation results** to the user before making changes:
-   - List each finding with its verdict
-   - For valid findings, describe: the fix + the test approach
+7. **Present the validation results** to the user:
+   - List each finding with its verdict (compare against orchestration plan predictions)
+   - For findings where validity differs from the plan, highlight the change
+   - For valid findings, confirm: the fix + the test approach from the plan
    - **Wait for user confirmation** before proceeding to Phase 3
 
 ---

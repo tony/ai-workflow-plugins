@@ -22,6 +22,7 @@ Parse `$ARGUMENTS` case-insensitively for timeout triggers and strip matched tri
 |---------|--------|
 | `timeout:<seconds>` | Override default timeout |
 | `timeout:none` | Disable timeout |
+| `mode:plan` | Request plan-only output (no execution) |
 
 Default timeout: 600 seconds.
 
@@ -48,6 +49,13 @@ TMPFILE=$(mktemp /tmp/mc-prompt-XXXXXX.txt)
 ```
 
 Write the prompt content to the temp file using `printf '%s'`.
+
+If `mode:plan` was detected, prepend this preamble to the prompt content:
+
+> IMPORTANT: Produce a detailed implementation plan for this task. Analyze
+> the codebase, identify files to modify, describe the specific changes
+> needed, and list risks or edge cases. Do NOT make any changes to any
+> files — plan only. Output the plan in structured markdown.
 
 ## Step 4: Run CLI
 

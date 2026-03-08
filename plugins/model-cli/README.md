@@ -70,6 +70,25 @@ brew install coreutils
 
 If neither `timeout` nor `gtimeout` is found, skills run without a time limit.
 
+## Plan-Only Mode
+
+Add `mode:plan` to any skill invocation to request a detailed implementation
+plan without making changes. The skill prepends a plan-only preamble to the
+prompt, instructing the external model to analyze the codebase and describe
+what it would do rather than executing.
+
+Example:
+
+```
+/model-cli:codex analyze the auth module mode:plan
+```
+
+```
+/model-cli:gemini refactor the database layer mode:plan
+```
+
+The `mode:plan` trigger works with all four skills (codex, gpt, gemini, cursor).
+
 ## Comparison with loom
 
 The **loom** plugin runs all models in parallel and synthesizes results. The **model-cli** plugin runs a single model at a time — useful when you want to target a specific model without the overhead of parallel orchestration.
