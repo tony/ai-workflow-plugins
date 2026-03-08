@@ -1,0 +1,82 @@
+[
+  {
+    "query": "ask chatgpt to summarize this code for me — it's the main.py in the current directory",
+    "should_trigger": true
+  },
+  {
+    "query": "use gpt to review my pull request, it's in branch feat/auth-refactor",
+    "should_trigger": true
+  },
+  {
+    "query": "run this through openai - i want to see what it thinks of my microservices architecture",
+    "should_trigger": true
+  },
+  {
+    "query": "codex, what do you think of this function? wondering if there's a cleaner way",
+    "should_trigger": true
+  },
+  {
+    "query": "can you have chatgpt explain this regex? /^(?:[a-z0-9!#$%&'*+/=?^_{|}~-]+(?:\\.[a-z0-9]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")/ — i find it confusing",
+    "should_trigger": true
+  },
+  {
+    "query": "use the openai model to review my PR description before i submit it",
+    "should_trigger": true
+  },
+  {
+    "query": "ask gpt if this is a good approach for handling concurrency in my rust service",
+    "should_trigger": true
+  },
+  {
+    "query": "run my question through codex cli and see what it says about my database schema",
+    "should_trigger": true
+  },
+  {
+    "query": "gpt, can you rewrite this function to be more readable? it's around line 45 in auth.ts",
+    "should_trigger": true
+  },
+  {
+    "query": "i want a second opinion from chatgpt on this API design — can you route it there?",
+    "should_trigger": true
+  },
+  {
+    "query": "generate a unit test for this function",
+    "should_trigger": false
+  },
+  {
+    "query": "use gemini to check my code style and suggest improvements",
+    "should_trigger": false
+  },
+  {
+    "query": "ask claude to explain this confusing error message about lifetime annotations",
+    "should_trigger": false
+  },
+  {
+    "query": "analyze this architecture diagram and tell me what you think",
+    "should_trigger": false
+  },
+  {
+    "query": "run my tests and tell me which ones are failing",
+    "should_trigger": false
+  },
+  {
+    "query": "summarize this README file for me",
+    "should_trigger": false
+  },
+  {
+    "query": "use bard to review this technical essay before i publish it",
+    "should_trigger": false
+  },
+  {
+    "query": "ask the agent CLI to refactor this module — give it full context",
+    "should_trigger": false
+  },
+  {
+    "query": "have gemini look at this SQL query, i think there's an N+1 problem",
+    "should_trigger": false
+  },
+  {
+    "query": "write unit tests for my auth service using pytest",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "query": "run this through gemini and see what it thinks about my error handling strategy",
+    "should_trigger": true
+  },
+  {
+    "query": "use google's model to analyze this architecture doc — curious if it spots any issues",
+    "should_trigger": true
+  },
+  {
+    "query": "ask bard to summarize this research paper on distributed systems consensus",
+    "should_trigger": true
+  },
+  {
+    "query": "gemini, explain this algorithm to me like i'm a junior dev",
+    "should_trigger": true
+  },
+  {
+    "query": "can you have the gemini cli review my dockerfile? it's at the project root",
+    "should_trigger": true
+  },
+  {
+    "query": "use google AI to check if this is a good regex pattern for validating UUIDs",
+    "should_trigger": true
+  },
+  {
+    "query": "i want gemini-pro to take a look at my database schema and suggest indexes",
+    "should_trigger": true
+  },
+  {
+    "query": "route this to google's model - curious what it thinks of my component naming conventions",
+    "should_trigger": true
+  },
+  {
+    "query": "run through gemini flash this time, it's just a quick question about list comprehensions",
+    "should_trigger": true
+  },
+  {
+    "query": "ask gemini about best practices for async error handling in typescript — i keep getting unhandled rejections",
+    "should_trigger": true
+  },
+  {
+    "query": "use gpt to review my code for security issues",
+    "should_trigger": false
+  },
+  {
+    "query": "ask claude to help me understand this codebase structure",
+    "should_trigger": false
+  },
+  {
+    "query": "analyze this with an AI model and tell me if the approach is sound",
+    "should_trigger": false
+  },
+  {
+    "query": "use chatgpt to write a commit message for this change",
+    "should_trigger": false
+  },
+  {
+    "query": "run my tests and tell me the coverage percentage",
+    "should_trigger": false
+  },
+  {
+    "query": "use the agent CLI to implement this feature end-to-end",
+    "should_trigger": false
+  },
+  {
+    "query": "openai, what do you think of this approach to rate limiting?",
+    "should_trigger": false
+  },
+  {
+    "query": "have codex review this function and suggest a cleaner implementation",
+    "should_trigger": false
+  },
+  {
+    "query": "explain this in simple terms so i can include it in the docs",
+    "should_trigger": false
+  },
+  {
+    "query": "use anthropic's model to explain this error — it's been stumping me all morning",
+    "should_trigger": false
+  }
+]

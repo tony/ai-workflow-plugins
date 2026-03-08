@@ -1,0 +1,82 @@
+[
+  {
+    "query": "use the agent CLI for this implementation — give it the full context from the current directory",
+    "should_trigger": true
+  },
+  {
+    "query": "run through cursor's agent and implement this feature: paginated search results in my Express API",
+    "should_trigger": true
+  },
+  {
+    "query": "agent, complete this task: refactor the auth module to use JWT refresh tokens",
+    "should_trigger": true
+  },
+  {
+    "query": "use cursor to implement this new /users endpoint with full CRUD operations",
+    "should_trigger": true
+  },
+  {
+    "query": "have the agent cli take a look at my test coverage and fill in the gaps",
+    "should_trigger": true
+  },
+  {
+    "query": "run this through cursor agent - it's a complex refactoring task that needs agentic execution",
+    "should_trigger": true
+  },
+  {
+    "query": "use agent to implement this whole feature end-to-end — i want it done autonomously",
+    "should_trigger": true
+  },
+  {
+    "query": "ask cursor's AI to write the boilerplate for this new microservice",
+    "should_trigger": true
+  },
+  {
+    "query": "delegate this to the agent binary and let it handle the implementation — it's a big refactor",
+    "should_trigger": true
+  },
+  {
+    "query": "cursor agent, implement the pagination logic for this REST API with offset and cursor-based modes",
+    "should_trigger": true
+  },
+  {
+    "query": "use codex for this refactor — i want gpt to handle it",
+    "should_trigger": false
+  },
+  {
+    "query": "ask gemini to help me optimize this SQL query",
+    "should_trigger": false
+  },
+  {
+    "query": "run unit tests for my project and show me which ones fail",
+    "should_trigger": false
+  },
+  {
+    "query": "use gpt to review my code before i merge this PR",
+    "should_trigger": false
+  },
+  {
+    "query": "ask claude to explain this architecture decision",
+    "should_trigger": false
+  },
+  {
+    "query": "generate a boilerplate React component for a data table",
+    "should_trigger": false
+  },
+  {
+    "query": "use openai to check my code for security vulnerabilities",
+    "should_trigger": false
+  },
+  {
+    "query": "implement this feature for me",
+    "should_trigger": false
+  },
+  {
+    "query": "ask the AI to help me debug this segfault in my C++ code",
+    "should_trigger": false
+  },
+  {
+    "query": "use google's model for this analysis of my database schema",
+    "should_trigger": false
+  }
+]
