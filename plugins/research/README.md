@@ -16,6 +16,18 @@ Install the plugin:
 /plugin install research@ai-workflow-plugins
 ```
 
+### Codex CLI / Gemini CLI
+
+From the repository root:
+
+```bash
+scripts/install.sh --target codex --plugin research
+```
+
+```bash
+scripts/install.sh --target gemini --plugin research
+```
+
 ## Skills
 
 | Skill | Slash command | Description |

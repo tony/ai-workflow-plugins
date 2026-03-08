@@ -65,6 +65,54 @@ Then install any plugin:
 /plugin install research@ai-workflow-plugins
 ```
 
+## Multi-System Support
+
+Most plugins provide portable skills alongside Claude Code commands. Skills use the
+SKILL.md format, which works natively across Claude Code, Codex CLI, and Gemini CLI.
+
+| Feature | Claude Code | Codex CLI | Gemini CLI |
+|---------|------------|-----------|------------|
+| commit | /commit (command) | skill | skill |
+| changelog | /changelog (command) | skill | skill |
+| rebase | /rebase (command) | skill | skill |
+| pr | /pr (command) | skill | skill |
+| review-pr | /review-pr (command) | skill | skill |
+| merge-commit | /merge-commit (command) | skill | skill |
+| tdd | /tdd:fix (command) | skill | skill |
+| research | skill | skill | skill |
+| loom | /loom:* (commands) | -- | -- |
+| model-cli | skills | -- | -- |
+
+### Installing for Codex CLI or Gemini CLI
+
+Run the install script to copy portable skills to the target system's skill directory:
+
+```bash
+scripts/install.sh --target all
+```
+
+Install for a specific platform:
+
+```bash
+scripts/install.sh --target codex
+```
+
+```bash
+scripts/install.sh --target gemini
+```
+
+Install a single plugin's skills:
+
+```bash
+scripts/install.sh --target codex --plugin commit
+```
+
+Preview what would be installed:
+
+```bash
+scripts/install.sh --target all --dry-run
+```
+
 ## Design Philosophy
 
 Every plugin in this repository is **language-agnostic**. Commands do not hardcode
