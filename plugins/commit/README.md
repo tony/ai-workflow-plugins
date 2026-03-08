@@ -16,6 +16,25 @@ Install the plugin:
 /plugin install commit@ai-workflow-plugins
 ```
 
+### Codex CLI / Gemini CLI
+
+From the repository root:
+
+```bash
+scripts/install.sh --target codex --plugin commit
+```
+
+```bash
+scripts/install.sh --target gemini --plugin commit
+```
+
+## Components
+
+| Type | Name | Description |
+|------|------|-------------|
+| Command | `/commit` | Claude Code slash command |
+| Skill | `commit` | Portable skill for Codex CLI and Gemini CLI |
+
 ## Command
 
 | Command | Description |

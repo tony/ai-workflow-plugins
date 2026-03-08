@@ -16,6 +16,25 @@ Install the plugin:
 /plugin install rebase@ai-workflow-plugins
 ```
 
+### Codex CLI / Gemini CLI
+
+From the repository root:
+
+```bash
+scripts/install.sh --target codex --plugin rebase
+```
+
+```bash
+scripts/install.sh --target gemini --plugin rebase
+```
+
+## Components
+
+| Type | Name | Description |
+|------|------|-------------|
+| Command | `/rebase` | Claude Code slash command |
+| Skill | `rebase` | Portable skill for Codex CLI and Gemini CLI |
+
 ## Command
 
 | Command | Description |

@@ -16,6 +16,25 @@ Install the plugin:
 /plugin install changelog@ai-workflow-plugins
 ```
 
+### Codex CLI / Gemini CLI
+
+From the repository root:
+
+```bash
+scripts/install.sh --target codex --plugin changelog
+```
+
+```bash
+scripts/install.sh --target gemini --plugin changelog
+```
+
+## Components
+
+| Type | Name | Description |
+|------|------|-------------|
+| Command | `/changelog` | Claude Code slash command |
+| Skill | `changelog` | Portable skill for Codex CLI and Gemini CLI |
+
 ## Command
 
 | Command | Description |

@@ -16,6 +16,25 @@ Install the plugin:
 /plugin install tdd@ai-workflow-plugins
 ```
 
+### Codex CLI / Gemini CLI
+
+From the repository root:
+
+```bash
+scripts/install.sh --target codex --plugin tdd
+```
+
+```bash
+scripts/install.sh --target gemini --plugin tdd
+```
+
+## Components
+
+| Type | Name | Description |
+|------|------|-------------|
+| Command | `/tdd:fix` | Claude Code slash command |
+| Skill | `fix` | Portable skill for Codex CLI and Gemini CLI |
+
 ## Command
 
 | Command | Description |

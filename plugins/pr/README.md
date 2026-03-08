@@ -16,6 +16,29 @@ Install the plugin:
 /plugin install pr@ai-workflow-plugins
 ```
 
+### Codex CLI / Gemini CLI
+
+From the repository root:
+
+```bash
+scripts/install.sh --target codex --plugin pr
+```
+
+```bash
+scripts/install.sh --target gemini --plugin pr
+```
+
+## Components
+
+| Type | Name | Description |
+|------|------|-------------|
+| Command | `/pr` | Claude Code slash command for PR description |
+| Command | `/pr:merge-commit` | Claude Code slash command for merge commit message |
+| Command | `/pr:review` | Claude Code slash command for PR review |
+| Skill | `pr` | Portable PR description skill |
+| Skill | `merge-commit` | Portable merge commit message skill |
+| Skill | `review-pr` | Portable PR review skill |
+
 ## Commands
 
 | Command | Description |
