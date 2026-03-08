@@ -254,6 +254,29 @@ at runtime rather than assuming a particular ecosystem. When listing examples of
 or frameworks, present them as illustrative examples (e.g., in tables or lists), never
 as hardcoded instructions.
 
+### Multi-System Portable Skills
+
+Portable plugins provide both a Claude Code command (`commands/*.md`) and a
+SKILL.md (`skills/*/SKILL.md`). The command gives Claude Code users slash-command
+UX. The skill is the universal format consumed by Codex CLI, Gemini CLI, and
+other tools that support the SKILL.md standard.
+
+**Portable skill frontmatter** uses only `name` + `description` -- the two fields
+recognized by all systems. Claude-specific fields (`allowed-tools`,
+`argument-hint`) stay in the commands.
+
+**Portable skill body** follows these rules:
+- No `$ARGUMENTS` -- use natural language ("If the user provided a hint...")
+- No `` `!command` `` dynamic execution -- use fenced `bash` code blocks
+- No Claude-specific tool names in body text (Bash, Read, Grep, etc.)
+- Describe actions generically ("search the codebase", "read the file")
+
+**Non-portable plugins** (loom, model-cli) remain Claude Code-only and do not
+need corresponding SKILL.md files.
+
+**Install script**: `scripts/install.sh` copies portable skills to
+`~/.codex/skills/` or `~/.gemini/skills/`. Run with `--dry-run` to preview.
+
 ### Orchestration Plan Convention
 
 Skills with analysis-then-execute phases should include a portable
