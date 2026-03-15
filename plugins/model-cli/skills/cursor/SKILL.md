@@ -1,5 +1,5 @@
 ---
-name: Cursor Agent CLI
+name: cursor
 description: >
   Delegate a task to Cursor's agent CLI. Use this skill when the user explicitly
   asks to use Cursor or the agent CLI for a task, or when you determine that

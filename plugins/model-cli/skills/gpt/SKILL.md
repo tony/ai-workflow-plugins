@@ -1,5 +1,5 @@
 ---
-name: GPT CLI
+name: gpt
 description: >
   Use when running a prompt through OpenAI GPT directly. An alternative invocation
   point for /model-cli:codex — both use the same backend (codex binary or agent

@@ -1,5 +1,5 @@
 ---
-name: Gemini CLI
+name: gemini
 description: >
   Delegate a task to Google's Gemini via the gemini CLI. Use this skill when the user
   explicitly asks to use Gemini or Google's model for a task, or when you determine
