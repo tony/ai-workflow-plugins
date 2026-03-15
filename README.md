@@ -20,6 +20,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [model-cli](plugins/model-cli/) | Development | Run prompts through individual AI CLIs — codex/GPT, gemini, and cursor/agent with fallback support |
 | [pr](plugins/pr/) | Development | Generate and review gold-standard pull request descriptions with structured headings, tables, and test plans |
 | [research](plugins/research/) | Learning | Clone and study your project's dependencies at the exact versions you use — source repos with version-pinned git worktrees |
+| [tailwind](plugins/tailwind/) | Design | Detect and fix inconsistent spacing in Tailwind CSS layouts — container fragmentation, margin/gap mixing, padding asymmetry, and more |
 
 ## Installation
 
@@ -63,6 +64,10 @@ Then install any plugin:
 
 ```console
 /plugin install research@ai-workflow-plugins
+```
+
+```console
+/plugin install tailwind@ai-workflow-plugins
 ```
 
 ## Design Philosophy

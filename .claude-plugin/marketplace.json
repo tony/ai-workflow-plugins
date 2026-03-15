@@ -113,6 +113,19 @@
       "category": "learning",
       "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/research",
       "license": "MIT"
+    },
+    {
+      "name": "tailwind",
+      "description": "Detect and fix inconsistent spacing in Tailwind CSS layouts — container fragmentation, margin/gap mixing, padding asymmetry, and more",
+      "version": "0.0.1",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/tailwind",
+      "category": "design",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/tailwind",
+      "license": "MIT"
     }
   ]
 }
