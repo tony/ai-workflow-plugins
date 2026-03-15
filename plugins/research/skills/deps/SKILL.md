@@ -1,5 +1,5 @@
 ---
-name: Study Dependencies
+name: study-deps
 description: >
   Clone and study your project's dependencies at the exact versions you use.
   Scans manifest files (package.json, pyproject.toml, Cargo.toml, go.mod, etc.),

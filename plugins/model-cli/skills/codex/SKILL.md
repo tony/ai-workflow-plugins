@@ -1,5 +1,5 @@
 ---
-name: Codex CLI
+name: codex
 description: >
   Delegate a task to OpenAI's GPT via the Codex CLI. Use this skill when the user
   explicitly asks to use Codex, GPT, or OpenAI for a task, or when you determine
