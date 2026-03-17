@@ -103,6 +103,14 @@ Use tables when they improve scannability:
 | Sync/async API pairs | `Sync \| Async` |
 | Before/after comparisons | `Before \| After` |
 
+#### Line wrapping
+
+**Do NOT hard-wrap PR body text.** Unlike commit messages, PR descriptions
+are rendered as Markdown on GitHub — long lines reflow into paragraphs.
+Hard-wrapping at 72 characters creates jarring mid-sentence line breaks
+in the rendered view. Write prose and bullet text as single long lines;
+let the editor/renderer handle display wrapping.
+
 #### Code blocks
 
 - One command per code block
