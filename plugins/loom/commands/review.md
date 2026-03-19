@@ -113,7 +113,7 @@ Write to `$SESSION_DIR/context-packet.md` *(the actual file write happens after 
 
 **Usage in model prompts**:
 - For the **Claude Task agent**: reference the file path (`$SESSION_DIR/context-packet.md`) — the agent reads it directly
-- For **external CLIs** (Gemini, GPT): inline the context packet content in their prompt, since they cannot read local files
+- For **Gemini and GPT sub-agents**: include the context packet content in the agent prompt, which the sub-agent then passes to the external CLI
 
 For `review`, prioritize conventions summary (review should enforce these), changed files (full diff stats), and key snippets of modified code. Known unknowns should note any areas of the diff that are hard to review without more context.
 
@@ -398,72 +398,77 @@ Launch a Task agent with `subagent_type: "general-purpose"` to perform Claude's 
 >
 > Assign a confidence score (0-100) to each issue. Only report issues with confidence >= 70.
 
-### Gemini Review (if available)
+### Gemini Review (sub-agent)
 
-Use the resolved backend from Phase 2. The review prompt is the same regardless of backend.
+Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the Gemini model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the pass number, and the review focus with additional instructions:
 
-**Review prompt** (used by both backends):
 > <review context from $ARGUMENTS, or default: Review the changes on this branch for bugs, security issues, and convention violations.>
 >
 > ---
 > Additional instructions: Run git diff origin/<trunk>...HEAD to see the changes. Read AGENTS.md or CLAUDE.md for project conventions. For each issue, report: severity (Critical/Important/Suggestion), file and line, description, and recommendation. Focus on bugs, logic errors, security issues, and convention violations.
 
-**Native (`gemini` CLI)**:
+The agent must:
 
-```bash
-<timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
-```
+1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
+2. Run the resolved Gemini command with output redirection:
 
-**Fallback (`agent` CLI)**:
+   **Native (`gemini` CLI)**:
+   ```bash
+   <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+   ```
 
-```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
-```
+   **Fallback (`agent` CLI)**:
+   ```bash
+   <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+   ```
 
-### GPT Review (if available)
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
+4. Return: exit code, elapsed time, retry count, output file path
 
-Use the resolved backend from Phase 2. The review prompt is the same regardless of backend.
+### GPT Review (sub-agent)
 
-**Review prompt** (used by both backends):
+Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the GPT model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the pass number, and the review focus with additional instructions:
+
 > <review context from $ARGUMENTS, or default: Review the changes on this branch for bugs, security issues, and convention violations.>
 >
 > ---
 > Additional instructions: Run git diff origin/<trunk>...HEAD to see the changes. Read AGENTS.md or CLAUDE.md for project conventions. For each issue, report: severity (Critical/Important/Suggestion), file and line, description, and recommendation. Focus on bugs, logic errors, security issues, and convention violations.
 
-**Native (`codex` CLI)**:
+The agent must:
 
-```bash
-<timeout_cmd> <timeout_seconds> codex exec \
-    -c model_reasoning_effort=medium \
-    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
-```
+1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
+2. Run the resolved GPT command with output redirection:
 
-**Fallback (`agent` CLI)**:
+   **Native (`codex` CLI)**:
+   ```bash
+   <timeout_cmd> <timeout_seconds> codex exec \
+       -c model_reasoning_effort=medium \
+       "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+   ```
 
-```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
-```
+   **Fallback (`agent` CLI)**:
+   ```bash
+   <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+   ```
+
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
+4. Return: exit code, elapsed time, retry count, output file path
 
 ### Artifact Capture
 
 After each model completes, persist its output to the session directory:
 
 - **Claude**: Write the Task agent's response to `$SESSION_DIR/pass-0001/outputs/claude.md`
-- **Gemini**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gemini.md`
-- **GPT**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gpt.md`
+- **Gemini**: Written by the Gemini sub-agent to `$SESSION_DIR/pass-0001/outputs/gemini.md`
+- **GPT**: Written by the GPT sub-agent to `$SESSION_DIR/pass-0001/outputs/gpt.md`
 
 ### Execution Strategy
 
-- Launch the Claude Task agent and the Gemini/GPT Bash commands in parallel where possible.
-- Use whichever backend was resolved in Phase 2 for each slot.
-- After each model returns, write its output to `$SESSION_DIR/pass-0001/outputs/<model>.md`.
-- For each external CLI invocation:
-  1. **Record**: exit code, stderr (from `$SESSION_DIR/pass-{N}/stderr/<model>.txt`), elapsed time
-  2. **Classify failure**: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
-  3. **Retry**: max 1 retry per model per pass with the same backend
-  4. **Agent fallback**: if retry fails AND native CLI was used (not already using `agent`) AND `agent` is available, re-run using the agent fallback command for that model (1 attempt, same timeout). Capture stderr to the same `$SESSION_DIR/pass-{N}/stderr/<model>.txt` (append, don't overwrite)
-  5. **After all retries exhausted**: mark model as unavailable for this pass, include failure details from both backends in report
-  6. **Continue**: never block entire workflow on single model failure
+- Launch all model agents in the same turn to execute simultaneously. If parallel dispatch is unavailable, launch sequentially — the synthesis phase handles partial results.
+- Each sub-agent handles its own retry and fallback protocol internally (see steps 3-4 in each agent's instructions above).
+- After all agents return, verify output files exist in `$SESSION_DIR/pass-NNNN/outputs/`.
+- If a sub-agent reports failure after exhausting retries, mark that model as unavailable for this pass and include failure details in the report.
+- Never block the entire workflow on a single model failure.
 
 ---
 

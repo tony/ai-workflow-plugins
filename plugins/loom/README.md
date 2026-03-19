@@ -60,14 +60,35 @@ All commands share four quality protocols that decorrelate model outputs and imp
 
 **fix-review** processes findings from a review, applying each as an atomic commit with test coverage. Multi-pass does not apply to fix-review since it is already iterative.
 
-## Orchestration Plan Mode
+## Plan Mode
 
-The **review** and **fix-review** commands include an Orchestration Plan phase
-that runs before execution begins. The host tool enters its native plan mode,
-creates a strategy for the task, and presents it for user approval before
-proceeding.
+Three commands use plan mode, but in two distinct patterns:
 
-This works portably across AI coding tools:
+### Temporary plan mode (review, fix-review)
+
+The **review** and **fix-review** commands enter plan mode to create an
+orchestration strategy, present it for user approval, then **exit plan mode**
+before executing. This is the "plan then execute" pattern.
+
+**review** plans: branch summary, review focus areas, relevant conventions,
+known concerns, and model prompt strategy.
+
+**fix-review** plans: findings inventory, validity pre-assessment, fix
+ordering, test strategy per finding, risk assessment, and expected commit
+sequence.
+
+### Persistent plan mode (plan)
+
+The **plan** command enters plan mode at the start and **stays in plan mode
+throughout** — the Claude plan file IS the deliverable. Sub-agents (spawned
+with `mode: "default"`) handle all non-readonly operations: git commands,
+session directory setup, external CLI execution, and artifact persistence.
+The main agent orchestrates from plan mode using Read, Grep, Glob, and the
+Task tool (all permitted in plan mode).
+
+### Portable plan mode activation
+
+This works across AI coding tools:
 
 | Tool | Enter plan mode | Exit plan mode |
 |------|----------------|----------------|
@@ -79,12 +100,24 @@ This works portably across AI coding tools:
 If plan mode is unavailable, the commands still work — the phase structure
 guides analysis before execution.
 
-**review** plans: branch summary, review focus areas, relevant conventions,
-known concerns, and model prompt strategy.
+## Sub-Agent Architecture
 
-**fix-review** plans: findings inventory, validity pre-assessment, fix
-ordering, test strategy per finding, risk assessment, and expected commit
-sequence.
+All loom commands use the Task tool to delegate work to sub-agents. Each model execution runs in its own sub-agent,
+enabling true parallel dispatch when the host supports it.
+
+| Role | Agent type | Mode | Purpose |
+|------|-----------|------|---------|
+| Claude model | `general-purpose` | default | Reads codebase, produces response |
+| Gemini model | `general-purpose` | default | Runs `gemini`/`agent` CLI via Bash |
+| GPT model | `general-purpose` | default | Runs `codex`/`agent` CLI via Bash |
+| Critic | `general-purpose` | default | Challenges synthesized result |
+| Context gather | `general-purpose` | default | Runs git commands (plan mode only) |
+| Session setup | `general-purpose` | default | Creates session dir, detects models (plan mode only) |
+
+Sub-agents run with `mode: "default"` so they can use Bash, Write, and Edit
+even when the parent agent is in plan mode. Each sub-agent receives all
+needed context in its prompt since sub-agents don't share the parent's
+conversation state.
 
 ## Multi-Pass Refinement
 

@@ -77,7 +77,7 @@ Write to `$SESSION_DIR/context-packet.md` *(the actual file write happens after 
 
 **Usage in model prompts**:
 - For the **Claude Task agent**: reference the file path (`$SESSION_DIR/context-packet.md`) — the agent reads it directly
-- For **external CLIs** (Gemini, GPT): inline the context packet content in their prompt, since they cannot read local files
+- For **Gemini and GPT sub-agents**: include the context packet content in the agent prompt, which the sub-agent then passes to the external CLI
 
 For `architecture`, include conventions summary (existing CLAUDE.md/AGENTS.md content), existing component inventory (skills, agents, hooks, MCP servers), and known unknowns about the architecture goal.
 
@@ -407,64 +407,78 @@ Launch a Task agent with `subagent_type: "general-purpose"` to generate artifact
 >
 > Each artifact should be a separate file in the appropriate location. Follow all project conventions from AGENTS.md/CLAUDE.md.
 
-### Gemini Implementation (worktree)
+### Gemini Implementation (sub-agent)
 
-**Implementation prompt** (same for both backends):
+Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the Gemini model in its worktree. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the pass number, the worktree path (`$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini`), and the task description with context.
+
 > <architecture prompt from prompt.md>
 >
 > ---
 > Additional instructions: Follow AGENTS.md/CLAUDE.md conventions. Each artifact should be a separate file.
 
-**Native (`gemini` CLI)** — run in the worktree directory:
-```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
-```
+The agent must:
 
-**Fallback (`agent` CLI)**:
-```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
-```
+1. Read the prompt from `$SESSION_DIR/pass-NNNN/prompt.md`
+2. Run the resolved Gemini command in the worktree directory:
 
-### GPT Implementation (worktree)
+   **Native (`gemini` CLI)**:
+   ```bash
+   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   ```
 
-**Implementation prompt** (same for both backends):
+   **Fallback (`agent` CLI)**:
+   ```bash
+   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   ```
+
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
+4. Return: exit code, elapsed time, retry count, output file path
+
+### GPT Implementation (sub-agent)
+
+Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the GPT model in its worktree. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the pass number, the worktree path (`$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt`), and the task description with context.
+
 > <architecture prompt from prompt.md>
 >
 > ---
 > Additional instructions: Follow AGENTS.md/CLAUDE.md conventions. Each artifact should be a separate file.
 
-**Native (`codex` CLI)** — run in the worktree directory:
-```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> codex exec \
-    --yolo \
-    -c model_reasoning_effort=medium \
-    "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
-```
+The agent must:
 
-**Fallback (`agent` CLI)**:
-```bash
-(cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
-```
+1. Read the prompt from `$SESSION_DIR/pass-NNNN/prompt.md`
+2. Run the resolved GPT command in the worktree directory:
+
+   **Native (`codex` CLI)**:
+   ```bash
+   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> codex exec \
+       --yolo \
+       -c model_reasoning_effort=medium \
+       "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+   ```
+
+   **Fallback (`agent` CLI)**:
+   ```bash
+   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+   ```
+
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
+4. Return: exit code, elapsed time, retry count, output file path
 
 ### Artifact Capture
 
 After each model completes, persist its output to the session directory:
 
 - **Claude**: Write the Task agent's response to `$SESSION_DIR/pass-0001/outputs/claude.md`
-- **Gemini**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gemini.md`
-- **GPT**: Already captured by stdout redirect to `$SESSION_DIR/pass-0001/outputs/gpt.md`
+- **Gemini**: Written by the Gemini sub-agent to `$SESSION_DIR/pass-0001/outputs/gemini.md`
+- **GPT**: Written by the GPT sub-agent to `$SESSION_DIR/pass-0001/outputs/gpt.md`
 
 ### Execution Strategy
 
-- Launch all models in parallel.
-- After each model returns, write its output to `$SESSION_DIR/pass-0001/outputs/<model>.md`.
-- For each external CLI invocation:
-  1. **Record**: exit code, stderr (from `$SESSION_DIR/pass-{N}/stderr/<model>.txt`), elapsed time
-  2. **Classify failure**: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
-  3. **Retry**: max 1 retry per model per pass with the same backend
-  4. **Agent fallback**: if retry fails AND native CLI was used (not already using `agent`) AND `agent` is available, re-run using the agent fallback command for that model (1 attempt, same timeout). Capture stderr to the same `$SESSION_DIR/pass-{N}/stderr/<model>.txt` (append, don't overwrite)
-  5. **After all retries exhausted**: mark model as unavailable for this pass, include failure details from both backends in report
-  6. **Continue**: never block entire workflow on single model failure
+- Launch all model agents in the same turn to execute simultaneously. If parallel dispatch is unavailable, launch sequentially — the synthesis phase handles partial results.
+- Each sub-agent handles its own retry and fallback protocol internally (see steps 3-4 in each agent's instructions above).
+- After all agents return, verify output files exist in `$SESSION_DIR/pass-NNNN/outputs/`.
+- If a sub-agent reports failure after exhausting retries, mark that model as unavailable for this pass and include failure details in the report.
+- Never block the entire workflow on a single model failure.
 
 ---
 
