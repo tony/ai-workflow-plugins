@@ -1,7 +1,5 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ai-workflow-plugins",
-  "description": "Language-agnostic workflow plugins for Claude Code — cross-model AI collaboration, rebase automation, changelog generation, and TDD workflows",
   "metadata": {
     "description": "Language-agnostic workflow plugins for Claude Code — cross-model AI collaboration, rebase automation, changelog generation, and TDD workflows"
   },
