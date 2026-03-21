@@ -189,7 +189,6 @@ class MarketplaceManifest(pydantic.BaseModel):
     --------
     >>> manifest = MarketplaceManifest(
     ...     name="test-marketplace",
-    ...     description="Test",
     ...     metadata=MarketplaceMetadata(description="Test"),
     ...     owner=Author(name="Test"),
     ...     plugins=[],
@@ -199,7 +198,7 @@ class MarketplaceManifest(pydantic.BaseModel):
     """
 
     name: str
-    description: str
+    description: str | None = None
     metadata: MarketplaceMetadata
     owner: Author
     plugins: list[PluginEntry]
