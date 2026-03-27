@@ -731,7 +731,7 @@ Produce a woven version starting from the winner, incorporating runner-up streng
 
 ### Step 4: Distribute (skip for final pass)
 
-If this is NOT the final pass, distribute the woven version back to ALL models. Create the next pass directory, construct the distribution prompt (same structure as Phase 5 Step 4 but referencing the current pass's woven version), dispatch all models in parallel.
+If this is NOT the final pass, distribute the woven version back to ALL models. Create the next pass directory and construct the distribution prompt using the standard refinement wording from `refine.md` (not the brainstorm-origin wording from Phase 5 Step 4 — by pass 2+, models are iterating on a refined artifact, not brainstorm originals). Dispatch all models in parallel.
 
 Write prompt to `$SESSION_DIR/refine/pass-NEXT/prompt.md`. Write outputs to `$SESSION_DIR/refine/pass-NEXT/outputs/<model>.md`.
 

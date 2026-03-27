@@ -158,7 +158,7 @@ Control pass count, timeout, and execution mode with explicit flags:
 | `--judge=host\|round-robin` | judge mode | `host` | `/loom:refine draft --judge=host` |
 | `--preamble=...` | text | built-in | `/loom:brainstorm idea --preamble='focus on perf'` |
 
-Mode presets set default passes and timeout when not explicitly overridden: `fast` (1 pass, half timeout), `balanced` (1 pass, default timeout), `deep` (2 passes, 1.5× timeout).
+Mode presets vary by command. For the original commands (ask, plan, prompt, execute, architecture, review): `fast` (1 pass, 0.5× timeout), `balanced` (1 pass, 1× timeout), `deep` (2 passes, 1.5× timeout). For brainstorm: presets control variants and timeout (deep = 2 variants). For refine: presets control passes and timeout (balanced = 2 passes, deep = 3 passes). For brainstorm-and-refine: presets control variants, passes, and timeout (deep = 2 variants, 3 passes).
 
 Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s), architecture (1200s).
 
