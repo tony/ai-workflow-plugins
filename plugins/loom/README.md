@@ -382,7 +382,13 @@ Each session directory contains an `events.jsonl` file with one JSON object per 
 ```
 
 ```json
-{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"models_completed":["claude","gemini","gpt"],"judged_by":"claude"}
+{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"models_completed":["claude","gemini","gpt"]}
+```
+
+Refine and brainstorm-and-refine commands include additional fields in `pass_complete`:
+
+```json
+{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"winner":"claude","winner_score":35,"woven":true,"judged_by":"claude"}
 ```
 
 ```json
