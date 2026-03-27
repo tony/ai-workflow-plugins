@@ -633,6 +633,11 @@ Compute the total score for each original (sum of four dimensions, max 40).
 ## Rationale
 
 <Why this original was the best. What specific qualities made it stand out.>
+
+## Runner-Up Analysis
+
+### <label>
+- <specific strength this original has that the winner lacks>
 ```
 
 #### External Judge Protocol (Gemini or GPT judges)
