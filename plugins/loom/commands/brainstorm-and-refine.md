@@ -97,6 +97,8 @@ Legacy triggers are scanned on the first and last line only (to avoid false posi
 
 Values above 3 for `--variants` are capped at 3 with a note to the user. Values above 5 for `--passes` are capped at 5.
 
+**`--judge` flag**: `--judge=host` (default) uses the host agent (Claude) as judge for all refinement passes. `--judge=round-robin` rotates judging across available models: Pass 1 → Claude, Pass 2 → Gemini, Pass 3 → GPT, Pass 4 → Claude, etc. The rotation includes only models that are available (detected in Step 3). If only one model is available, round-robin degrades to host mode. External model judges produce scores and pick winners; the host agent always weaves. See the External Judge Protocol in Phase 5 Step 1 for details.
+
 **Config flags** (used in Step 2):
 - `variant_count` = parsed from `--variants`, mode preset, or null
 - `pass_count` = parsed from `--passes`, mode preset, or legacy trigger. Null if not provided.
@@ -301,6 +303,7 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "branch": "<current branch>",
   "ref": "<short SHA>",
   "models": ["claude", "..."],
+  "judge_mode": "<host or round-robin>",
   "variants_per_model": <N>,
   "pass_count": <M>,
   "completed_passes": 0,
@@ -585,7 +588,11 @@ Update `session.json` via atomic replace: set `phase` to `"refine"`, `updated_at
 
 ### Step 1: Judge the Brainstorm Originals
 
-The host agent (Claude) reads all selected brainstorm originals and produces an assessment.
+**Determine this pass's judge.** If `judge_mode` is `"host"`, Claude judges. If `"round-robin"`, build a rotation array from available models starting with Claude: `[claude, gemini, gpt]` (skipping any model not detected in Phase 2 Step 3). The judge for pass N is `rotation[(N - 1) % len(rotation)]`. Since Claude is always index 0, Pass 1 is always judged by Claude — this is intentional because brainstorm originals have varied structure where Claude's flexible parsing is most valuable.
+
+#### Host Judge Protocol (Claude judges)
+
+When the judge is Claude (host), the host agent reads all selected brainstorm originals and produces an assessment.
 
 **Read selected outputs** from `$SESSION_DIR/brainstorm/outputs/`. Only include the originals the user selected in the transition gate.
 
@@ -607,6 +614,8 @@ Compute the total score for each original (sum of four dimensions, max 40).
 ```markdown
 # Judge's Assessment — Pass 1 (from brainstorm originals)
 
+**Judged by**: Claude (host)
+
 ## Scores
 
 | Dimension | <label-1> | <label-2> | ... |
@@ -625,6 +634,19 @@ Compute the total score for each original (sum of four dimensions, max 40).
 
 <Why this original was the best. What specific qualities made it stand out.>
 ```
+
+#### External Judge Protocol (Gemini or GPT judges)
+
+When the judge for a pass is an external model (pass 2+ in round-robin mode), follow the External Judge Protocol defined in `/loom:refine` Phase 4 Step 1. The protocol is identical:
+
+1. Construct judge prompt with scoring rubric, expected output format, and all model outputs inline
+2. Write prompt to `$SESSION_DIR/refine/pass-NNNN/judge-prompt.md`
+3. Dispatch to the judge model via CLI (same mechanism as participation dispatch)
+4. Parse the response (scores table, winner, rationale, runner-up analysis)
+5. Validate and fall back to host judging if parsing fails
+6. Write `judge.md` with `**Judged by**: <model> (round-robin pass N)` header, or `**Judged by**: Claude (fallback from <model> — <reason>)` if fallback was triggered
+
+The host agent always weaves regardless of who judged. When the external judge's Runner-Up Analysis is thin, the host supplements with its own observations.
 
 ### Step 2: Analyze Runners-Up
 
@@ -704,7 +726,7 @@ After pass 1 completes (judge + weave):
 - Append a `pass_complete` event to `events.jsonl`:
 
 ```json
-{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":1,"winner":"<label>","winner_score":XX,"woven":true,"source":"brainstorm_originals"}
+{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":1,"winner":"<label>","winner_score":XX,"woven":true,"source":"brainstorm_originals","judged_by":"<judge-model>"}
 ```
 
 ---
@@ -717,9 +739,11 @@ For each pass from 2 to `pass_count`, follow the judge-weave-distribute cycle:
 
 ### Step 1: Judge
 
-The host agent reads ALL model outputs from `$SESSION_DIR/refine/pass-NNNN/outputs/`. Extract the three sections (Critique, Improved Version, Rationale) from each.
+**Determine this pass's judge** using the same rotation as Phase 5 Step 1: `judge = rotation[(pass_number - 1) % len(rotation)]`. For pass 2+ in round-robin mode, the judge may be an external model.
 
-Score each improved version on the same four dimensions (Quality, Originality, Completeness, Coherence), 0-10 each. Pick the winner. Write assessment to `$SESSION_DIR/refine/pass-NNNN/judge.md`.
+If the judge is Claude (host), read ALL model outputs from `$SESSION_DIR/refine/pass-NNNN/outputs/`, extract the three sections (Critique, Improved Version, Rationale), score on four dimensions, pick the winner, and write assessment to `$SESSION_DIR/refine/pass-NNNN/judge.md` with `**Judged by**: Claude (host)` header.
+
+If the judge is an external model, follow the External Judge Protocol from Phase 5 Step 1: construct judge prompt with all model outputs inline, dispatch via CLI, parse response, validate, fall back to host if parsing fails. Write to `$SESSION_DIR/refine/pass-NNNN/judge.md` with `**Judged by**: <model> (round-robin pass N)` header.
 
 ### Step 2: Analyze Runners-Up
 
@@ -752,7 +776,7 @@ After each pass completes:
 - Append a `pass_complete` event to `events.jsonl`:
 
 ```json
-{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":N,"winner":"<model>","winner_score":XX,"woven":true}
+{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":N,"winner":"<model>","winner_score":XX,"woven":true,"judged_by":"<judge-model>"}
 ```
 
 ---
@@ -849,7 +873,7 @@ ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/brainstorm-and-refine/
 - When `--variants=1`, omit the variant label from brainstorm output headers (just "Claude", not "Claude — Variant 1").
 - The woven version MUST go back to ALL models for each subsequent refinement pass — do not let the judge refine alone.
 - Each model's refinement output MUST clearly separate Critique, Improved Version, and Rationale sections. If a model's output does not follow this structure, parse it best-effort and note the formatting issue in the judge's assessment.
-- `--judge=round-robin` is accepted but ignored in v1 — the host agent always judges. If the user sets this flag, acknowledge it and note that round-robin judging is not yet implemented.
+- `--judge=round-robin` rotates judging across available models. The rotation order is Claude → Gemini → GPT (skipping unavailable models). External model judges produce scores and pick winners via the External Judge Protocol; the host agent always weaves. If an external judge's output cannot be parsed, the host judges that pass as fallback. Record the actual judge and any fallback in `judge.md` and `events.jsonl`.
 - The transition gate between brainstorm and refine MUST always be presented. Never auto-proceed without user confirmation.
 - Always verify model claims against the actual codebase before incorporating into the woven version.
 - Always cite specific files and line numbers when possible.

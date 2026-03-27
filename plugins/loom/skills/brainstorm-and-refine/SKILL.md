@@ -7,7 +7,7 @@ description: >-
   "brainstorm and refine", "generate ideas then improve", "explore options
   then synthesize", or "brainstorm then polish"
 user-invocable: true
-argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...]"
+argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...]"
 ---
 
 # Loom Brainstorm & Refine
@@ -26,6 +26,7 @@ The full pipeline: generate independent originals from each model, then iterativ
 - Transition gate: You choose which originals enter refinement
 - Phase 2 (Refine): Iterative judge-weave-distribute cycle over `--passes=N`
 - Full rationale chain from brainstorm through every refinement pass
+- `--judge=host|round-robin`: Host judges every pass, or rotate judging across models
 
 ## The Pipeline
 
