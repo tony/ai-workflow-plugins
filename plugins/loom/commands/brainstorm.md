@@ -75,19 +75,19 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
 | `--preamble=...` | text | built-in | Override variant preamble for all variants |
 
-**Mode presets** set default timeout when not explicitly overridden:
+**Mode presets** set default variants and timeout when not explicitly overridden:
 
-| Mode | Timeout multiplier |
-|------|--------------------|
-| `fast` | 0.5× default |
-| `balanced` | 1× default |
-| `deep` | 1.5× default |
+| Mode | Variants | Timeout multiplier |
+|------|----------|--------------------|
+| `fast` | 1 | 0.5× default |
+| `balanced` | 1 | 1× default |
+| `deep` | 2 | 1.5× default |
 
 Values above 3 for `--variants` are capped at 3 with a note to the user.
 
 **Config flags** (used in Step 2):
-- `variant_count` = parsed variant count from `--variants`. Null if not provided.
-- `timeout_value` = parsed timeout from `--timeout`, mode preset. Null if not provided.
+- `variant_count` = parsed variant count from `--variants`, mode preset, or null.
+- `timeout_value` = parsed timeout from `--timeout`, mode preset, or null.
 - `preamble_override` = parsed preamble text from `--preamble`. Null if not provided.
 
 ### Step 2: Interactive Configuration
