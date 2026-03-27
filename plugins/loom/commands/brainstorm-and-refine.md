@@ -590,6 +590,8 @@ Update `session.json` via atomic replace: set `phase` to `"refine"`, `updated_at
 
 **Determine this pass's judge.** If `judge_mode` is `"host"`, Claude judges. If `"round-robin"`, build a rotation array from available models starting with Claude: `[claude, gemini, gpt]` (skipping any model not detected in Phase 2 Step 3). The judge for pass N is `rotation[(N - 1) % len(rotation)]`. Since Claude is always index 0, Pass 1 is always judged by Claude — this is intentional because brainstorm originals have varied structure where Claude's flexible parsing is most valuable.
 
+**Self-judging note**: In round-robin mode, the judge model is also a participant whose output is being judged. The host agent should cross-check the external judge's winner selection against its own reading of the outputs during the weave step. If the external judge selected its own output as winner and the host's assessment disagrees, the host may override the winner selection for weaving purposes. Record any override in `judge.md` with a note: `**Override**: Host overrode external judge's self-selection of <model> — <reason>.`
+
 #### Host Judge Protocol (Claude judges)
 
 When the judge is Claude (host), the host agent reads all selected brainstorm originals and produces an assessment.

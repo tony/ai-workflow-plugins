@@ -465,6 +465,8 @@ This phase runs after every pass (including pass 1). For the final pass, skip th
 
 **Determine this pass's judge.** If `judge_mode` is `"host"`, Claude judges every pass. If `"round-robin"`, build a rotation array from available models starting with Claude: `[claude, gemini, gpt]` (skipping any model not detected in Phase 2 Step 3). The judge for pass N is `rotation[(N - 1) % len(rotation)]`.
 
+**Self-judging note**: In round-robin mode, the judge model is also a participant whose output is being judged. The host agent should cross-check the external judge's winner selection against its own reading of the outputs during the weave step. If the external judge selected its own output as winner and the host's assessment disagrees, the host may override the winner selection for weaving purposes. Record any override in `judge.md` with a note: `**Override**: Host overrode external judge's self-selection of <model> — <reason>.`
+
 #### Host Judge Protocol (Claude judges)
 
 When the judge is Claude (host), the host agent reads ALL model outputs from the current pass and produces a structured assessment.
