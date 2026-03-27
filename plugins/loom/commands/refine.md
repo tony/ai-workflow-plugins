@@ -301,6 +301,7 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "branch": "<current branch>",
   "ref": "<short SHA>",
   "models": ["claude", "..."],
+  "pass_count": <N>,
   "completed_passes": 0,
   "prompt_summary": "<first 120 chars of artifact>",
   "created_at": "<ISO 8601 UTC>",
@@ -313,7 +314,7 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
 Append one event line to `$SESSION_DIR/events.jsonl`:
 
 ```json
-{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"refine","models":["claude","..."]}
+{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"refine","models":["claude","..."],"pass_count":<N>}
 ```
 
 #### Step 8: Write `metadata.md`
