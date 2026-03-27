@@ -27,10 +27,23 @@ Install the plugin:
 | `/loom:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
 | `/loom:review` | Run code review with all models, produce consensus-weighted report |
 | `/loom:fix-review` | Fix review findings as atomic commits with test coverage |
+| `/loom:brainstorm` | Generate independent original ideas from each model, with optional multiple variants |
+| `/loom:refine` | Iteratively improve an artifact through multi-model critique and weaving |
+| `/loom:brainstorm-and-refine` | Full pipeline: brainstorm originals, then iteratively judge, weave, and refine |
+
+## Skills
+
+Skills provide auto-discovery — they trigger when the user's intent matches the skill description.
+
+| Skill | Triggers on |
+|-------|-------------|
+| `loom:brainstorm` | "brainstorm", "give me ideas", "multiple approaches", "explore alternatives" |
+| `loom:refine` | "refine this", "improve this", "make this better", "iterate on this" |
+| `loom:brainstorm-and-refine` | "brainstorm and refine", "generate ideas then improve", "explore then synthesize" |
 
 ## How It Works
 
-The six orchestration commands (ask, plan, prompt, execute, architecture, review) follow a consistent multi-phase workflow. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
+The orchestration commands follow consistent multi-phase workflows. The original six (ask, plan, prompt, execute, architecture, review) use **targeted conflict resolution** for multi-pass — subsequent passes only address unresolved conflicts. The new three (brainstorm, refine, brainstorm-and-refine) use **expansive weaving** — each pass is a full judge-pick-best-incorporate-strengths-address-weaknesses cycle. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
 
 1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
 2. **Detect models** — Check for `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available, fall back to the `agent` CLI with `--model` flags.
@@ -44,8 +57,9 @@ All commands share four quality protocols that decorrelate model outputs and imp
 
 - **Context packets** — a structured bundle (conventions, repo state, key snippets) included verbatim in every model prompt so all models work from the same information
 - **Role differentiation** — each model receives a distinct evaluation lens (Maintainer, Skeptic, Builder) to reduce shared blind spots
-- **Blind judging** — model outputs are randomly labeled (A/B/C) during scoring to prevent brand bias
-- **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence
+- **Blind judging** — model outputs are randomly labeled (A/B/C) during scoring to prevent brand bias (ask/plan/prompt/execute/architecture/review)
+- **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence (ask/plan/prompt/execute/architecture/review)
+- **Judge-weave-distribute** — pick the best, incorporate strengths from runners-up, redistribute for another round (refine/brainstorm-and-refine)
 
 ### Read-Only Commands
 
@@ -59,6 +73,14 @@ All commands share four quality protocols that decorrelate model outputs and imp
 - **architecture** cherry-picks the best conventions, skills, agents, and scaffolding per file
 
 **fix-review** processes findings from a review, applying each as an atomic commit with test coverage. Multi-pass does not apply to fix-review since it is already iterative.
+
+### Brainstorm & Refine Commands
+
+**brainstorm** generates independent originals from each model with no synthesis. Use `--variants=N` (1-3) to get multiple originals per model, each with a distinct creative-direction preamble (conventional, creative, contrarian). Override preambles with `--preamble='...'`.
+
+**refine** takes a single artifact (inline text or file path) and iteratively improves it. Each pass: all models critique and improve → judge picks the best → identifies strengths in runners-up → weaves a revised version → distributes back to all models. Uses `--passes=N` (1-5, default 2).
+
+**brainstorm-and-refine** is the full pipeline: brainstorm originals, present them, let the user choose which enter refinement, then run the refine cycle. A transition gate always asks the user before proceeding.
 
 ## Plan Mode
 
@@ -129,9 +151,12 @@ Control pass count, timeout, and execution mode with explicit flags:
 
 | Flag | Values | Default | Example |
 |------|--------|---------|---------|
-| `--passes=N` | 1–5 | 1 | `/loom:plan add auth --passes=2` |
+| `--passes=N` | 1–5 | 1 (refine: 2) | `/loom:plan add auth --passes=2` |
 | `--timeout=N\|none` | seconds or `none` | command-specific | `/loom:ask question --timeout=300` |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/loom:execute task --mode=deep` |
+| `--variants=N` | 1–3 | 1 | `/loom:brainstorm idea --variants=2` |
+| `--judge=host\|round-robin` | judge mode | `host` | `/loom:refine draft --judge=host` |
+| `--preamble=...` | text | built-in | `/loom:brainstorm idea --preamble='focus on perf'` |
 
 Mode presets set default passes and timeout when not explicitly overridden: `fast` (1 pass, half timeout), `balanced` (1 pass, default timeout), `deep` (2 passes, 1.5× timeout).
 
@@ -213,8 +238,40 @@ $AI_AIP_ROOT/
             │   └── ...
             ├── prompt/
             │   └── ...
-            └── architecture/
-                └── ...
+            ├── architecture/
+            │   └── ...
+            ├── brainstorm/
+            │   ├── latest -> <SESSION_ID>
+            │   └── <SESSION_ID>/
+            │       ├── session.json
+            │       ├── events.jsonl
+            │       ├── metadata.md
+            │       ├── context-packet.md
+            │       ├── prompt.md
+            │       ├── outputs/
+            │       │   ├── claude-v1.md
+            │       │   ├── gemini-v1.md
+            │       │   └── gpt-v1.md
+            │       └── stderr/
+            ├── refine/
+            │   ├── latest -> <SESSION_ID>
+            │   └── <SESSION_ID>/
+            │       ├── session.json
+            │       ├── events.jsonl
+            │       ├── original.md
+            │       ├── pass-0001/
+            │       │   ├── outputs/
+            │       │   ├── judge.md
+            │       │   └── woven.md
+            │       └── final.md
+            └── brainstorm-and-refine/
+                ├── latest -> <SESSION_ID>
+                └── <SESSION_ID>/
+                    ├── brainstorm/
+                    │   └── outputs/
+                    └── refine/
+                        ├── pass-0001/
+                        └── final.md
 ```
 
 Write commands (execute, prompt, architecture) add per-pass diff, quality gate, and file snapshot artifacts:

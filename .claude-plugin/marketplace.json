@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "loom",
-      "description": "Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, architect, review, and synthesize the best of all models",
+      "description": "Weave prompts across Claude, Gemini, and GPT in parallel — brainstorm, refine, plan, execute, architect, review, and synthesize the best of all models",
       "version": "0.0.1",
       "author": {
         "name": "Tony Narlock",
