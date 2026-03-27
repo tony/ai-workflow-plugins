@@ -548,9 +548,28 @@ If the user selects "Let me pick specific ones", present a follow-up `AskUserQue
 - header: "Originals"
 - options: One option per successful model variant (e.g., "Claude — Variant 1", "Gemini — Variant 2")
 
-If the user selects "None", finalize the session and skip to the Rules section.
+If the user selects "None", finalize the session immediately:
 
-Append a `transition` event to `events.jsonl`:
+1. Update `session.json` via atomic replace: set `status` to `"completed"`, `phase` to `"brainstorm_only"`, `updated_at` to now.
+2. Append events to `events.jsonl`:
+
+```json
+{"event":"brainstorm_to_refine","timestamp":"<ISO 8601 UTC>","selected_originals":[],"total_available":<N>}
+```
+
+```json
+{"event":"session_complete","timestamp":"<ISO 8601 UTC>","command":"brainstorm-and-refine","brainstorm_originals":<N>,"selected_for_refine":0,"completed_passes":0,"converged":false}
+```
+
+3. Update `latest` symlink:
+
+```bash
+ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/brainstorm-and-refine/latest"
+```
+
+Then stop — do not proceed to Phase 5 or beyond.
+
+If the user selects originals (either "All" or specific ones), append a `transition` event to `events.jsonl`:
 
 ```json
 {"event":"brainstorm_to_refine","timestamp":"<ISO 8601 UTC>","selected_originals":["claude-v1","gemini-v2","..."],"total_available":<N>}
