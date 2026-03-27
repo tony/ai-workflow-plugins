@@ -331,12 +331,20 @@ When `--preamble` is provided, it replaces the built-in preamble text for ALL va
 
 ### Prompt Preparation
 
-Write ONE combined `$SESSION_DIR/prompt.md` using the Write tool. This file contains:
-- The base user prompt (with flags stripped)
-- The variant preambles (all variants listed, showing what each model x variant combination receives)
-- A reference to the context packet
+For each variant, write a separate prompt file containing the fully rendered prompt for that variant. This ensures shell-safe CLI invocation via `$(cat ...)` and persists each variant's exact prompt as a session artifact.
 
-Each model x variant combination receives: the variant preamble + the user prompt + the context packet.
+For each variant N (1 through `variant_count`), write `$SESSION_DIR/prompts/variant-<N>.md` containing:
+- The variant preamble for variant N
+- The base user prompt (with flags stripped)
+- The context packet content
+
+Create the prompts directory:
+
+```bash
+mkdir -p "$SESSION_DIR/prompts"
+```
+
+Also write `$SESSION_DIR/prompt.md` as a summary file listing: the base prompt, all variant preambles, and the context packet reference. This serves as a human-readable index of what was sent.
 
 ### Claude Variants (Task agents)
 
@@ -369,17 +377,17 @@ For each Gemini variant (1 through `variant_count`), launch a separate Task agen
 
 The agent must:
 
-1. Read the prompt from `$SESSION_DIR/prompt.md`
+1. Read the variant prompt from `$SESSION_DIR/prompts/variant-<N>.md`
 2. Run the resolved Gemini command with output redirection:
 
    **Native (`gemini` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "<variant_preamble + prompt + context_packet>" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/stderr/gemini-v<N>.txt"
+   <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/stderr/gemini-v<N>.txt"
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "<variant_preamble + prompt + context_packet>" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/stderr/gemini-v<N>.txt"
+   <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/stderr/gemini-v<N>.txt"
    ```
 
 3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
@@ -398,19 +406,19 @@ For each GPT variant (1 through `variant_count`), launch a separate Task agent (
 
 The agent must:
 
-1. Read the prompt from `$SESSION_DIR/prompt.md`
+1. Read the variant prompt from `$SESSION_DIR/prompts/variant-<N>.md`
 2. Run the resolved GPT command with output redirection:
 
    **Native (`codex` CLI)**:
    ```bash
    <timeout_cmd> <timeout_seconds> codex exec \
        -c model_reasoning_effort=medium \
-       "<variant_preamble + prompt + context_packet>" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/stderr/gpt-v<N>.txt"
+       "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/stderr/gpt-v<N>.txt"
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "<variant_preamble + prompt + context_packet>" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/stderr/gpt-v<N>.txt"
+   <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/stderr/gpt-v<N>.txt"
    ```
 
 3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
