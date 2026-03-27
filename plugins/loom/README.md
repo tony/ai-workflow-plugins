@@ -291,6 +291,11 @@ $AI_AIP_ROOT/
                     │   └── outputs/
                     └── refine/
                         ├── pass-0001/
+                        │   ├── outputs/
+                        │   ├── judge.md
+                        │   ├── judge-prompt.md    # only when external model judges
+                        │   ├── judge-raw.md       # only when external model judges
+                        │   └── woven.md
                         └── final.md
 ```
 
