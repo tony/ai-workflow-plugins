@@ -510,6 +510,11 @@ Adjust table columns to include only participating models for this pass (e.g., `
 ## Rationale
 
 <Why this version was the best. What specific qualities made it stand out.>
+
+## Runner-Up Analysis
+
+### <model>
+- <specific strength this model has that the winner lacks>
 ```
 
 #### External Judge Protocol (Gemini or GPT judges)
@@ -598,7 +603,7 @@ Use the same fallback and retry protocol as participation dispatch (see Phase 3)
 3. **Rationale**: Extract the `## Rationale` section content.
 4. **Runner-Up Analysis**: Extract the `## Runner-Up Analysis` section. Parse per-model strengths.
 
-**Step D: Validate and fallback.** If parsing fails — no valid scores table, no identifiable winner, winner is not a participating model, or the CLI command failed entirely — **fall back to the Host Judge Protocol** for this pass. Record the fallback.
+**Step D: Validate and fallback.** If parsing fails — no valid scores table, no identifiable winner, winner is not a participating model, or the CLI command failed entirely — **fall back to the Host Judge Protocol** for this pass. Record the fallback. A missing or unparseable Runner-Up Analysis does NOT trigger full fallback; the host populates it in Step 2.
 
 **Step E: Write `judge.md`.** Write the parsed assessment to `$SESSION_DIR/pass-NNNN/judge.md` in the same format as the Host Judge Protocol, with the header:
 
@@ -608,6 +613,8 @@ Use the same fallback and retry protocol as participation dispatch (see Phase 3)
 When the external judge's Runner-Up Analysis is thin or missing specific strengths, the host agent supplements with its own observations during the weave step.
 
 ### Step 2: Analyze Runners-Up
+
+When an external judge provided Runner-Up Analysis in `judge.md`, use it as the starting point and supplement if thin or missing specific strengths. When the host judged, produce the analysis from scratch.
 
 For each non-winning model's improved version, identify **specific strengths** it has that the winner lacks. Be concrete:
 
