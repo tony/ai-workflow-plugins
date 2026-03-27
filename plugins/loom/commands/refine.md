@@ -89,7 +89,7 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `balanced` | 2 | 1× default |
 | `deep` | 3 | 1.5× default |
 
-**`--judge` flag**: `--judge=host` uses the host agent (Claude) as judge for all passes. `--judge=round-robin` is accepted but **ignored in v1** — the host agent always judges. This is a future extensibility point; note to the user if they explicitly set `round-robin` that it has no effect in the current version.
+**`--judge` flag**: `--judge=host` (default) uses the host agent (Claude) as judge for all passes. `--judge=round-robin` rotates judging across available models: Pass 1 → Claude, Pass 2 → Gemini, Pass 3 → GPT, Pass 4 → Claude, etc. The rotation includes only models that are available (detected in Step 3). If only one model is available, round-robin degrades to host mode. External model judges produce scores and pick winners; the host agent always weaves.
 
 **Backward compatibility**: Legacy trigger words are silently recognized as aliases:
 - `multipass` (case-insensitive) → `--passes=2`
@@ -104,6 +104,7 @@ Values above 5 for `--passes` are capped at 5 with a note to the user.
 **Config flags** (used in Step 2):
 - `pass_count` = parsed pass count from `--passes`, mode preset, or legacy trigger. Null if not provided.
 - `timeout_value` = parsed timeout from `--timeout`, mode preset, or legacy trigger. Null if not provided.
+- `judge_mode` = parsed from `--judge` or `"host"` default.
 
 ### Step 2: Interactive Configuration
 
@@ -301,6 +302,7 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "branch": "<current branch>",
   "ref": "<short SHA>",
   "models": ["claude", "..."],
+  "judge_mode": "<host or round-robin>",
   "pass_count": <N>,
   "completed_passes": 0,
   "prompt_summary": "<first 120 chars of artifact>",
@@ -461,7 +463,11 @@ This phase runs after every pass (including pass 1). For the final pass, skip th
 
 ### Step 1: Judge
 
-The host agent (Claude) reads ALL model outputs from the current pass and produces a structured assessment.
+**Determine this pass's judge.** If `judge_mode` is `"host"`, Claude judges every pass. If `"round-robin"`, build a rotation array from available models starting with Claude: `[claude, gemini, gpt]` (skipping any model not detected in Phase 2 Step 3). The judge for pass N is `rotation[(N - 1) % len(rotation)]`.
+
+#### Host Judge Protocol (Claude judges)
+
+When the judge is Claude (host), the host agent reads ALL model outputs from the current pass and produces a structured assessment.
 
 **Read all outputs**: Read each file from `$SESSION_DIR/pass-NNNN/outputs/<model>.md`. Extract the three sections (Critique, Improved Version, Rationale) from each.
 
@@ -483,6 +489,8 @@ Compute the total score for each model (sum of four dimensions, max 40).
 ```markdown
 # Judge's Assessment — Pass NNNN
 
+**Judged by**: Claude (host)
+
 ## Scores
 
 | Dimension | Claude | Gemini | GPT |
@@ -501,6 +509,103 @@ Compute the total score for each model (sum of four dimensions, max 40).
 
 <Why this version was the best. What specific qualities made it stand out.>
 ```
+
+#### External Judge Protocol (Gemini or GPT judges)
+
+When the judge is an external model, dispatch a judging prompt to that model via CLI.
+
+**Step A: Construct judge prompt.** Build a prompt containing:
+
+1. The scoring rubric (4 dimensions with descriptions, same table as above)
+2. The expected output format (markdown scores table, Winner section, Rationale section, Runner-Up Analysis section with specific strengths per non-winning model)
+3. ALL model outputs from this pass, included **inline** — external models cannot read session files
+4. Instruction: "You are judging these outputs. Score each on four dimensions (0-10), pick the winner, explain your rationale, and identify specific strengths in each non-winning version that the winner lacks."
+
+The judge prompt structure:
+
+> You are the judge for this refinement pass. You have received improved versions of an artifact from multiple AI models. Your job is to evaluate them fairly and pick the best one.
+>
+> **Scoring rubric** — score each version 0-10 on these dimensions:
+>
+> | Dimension | Description |
+> |-----------|-------------|
+> | Quality | Writing quality, clarity, precision, technical accuracy |
+> | Originality | Novel improvements, creative solutions, fresh perspectives |
+> | Completeness | Covers all aspects, nothing important missing |
+> | Coherence | Internal consistency, logical flow, well-structured |
+>
+> **Output format** — produce your assessment in this exact format:
+>
+> ```
+> ## Scores
+>
+> | Dimension | Claude | Gemini | GPT |
+> |-----------|--------|--------|-----|
+> | Quality (0-10) | X | X | X |
+> | Originality (0-10) | X | X | X |
+> | Completeness (0-10) | X | X | X |
+> | Coherence (0-10) | X | X | X |
+> | **Total** | XX | XX | XX |
+>
+> ## Winner
+>
+> **<model name>** with a score of XX/40.
+>
+> ## Rationale
+>
+> <Why this version was the best.>
+>
+> ## Runner-Up Analysis
+>
+> ### <model name>
+> - <specific strength this model has that the winner lacks>
+>
+> ### <model name>
+> - <specific strength this model has that the winner lacks>
+> ```
+>
+> ---
+>
+> **Model outputs to judge:**
+>
+> ### Claude's Output
+> <full claude output>
+>
+> ### Gemini's Output
+> <full gemini output>
+>
+> ### GPT's Output
+> <full gpt output>
+
+**Step B: Write and dispatch judge prompt.** Write the prompt to `$SESSION_DIR/pass-NNNN/judge-prompt.md`. Dispatch to the judge model using the same CLI mechanism as participation:
+
+**Gemini as judge** (native CLI):
+```bash
+<timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-gemini.txt"
+```
+
+**GPT as judge** (native CLI):
+```bash
+<timeout_cmd> <timeout_seconds> codex exec -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-gpt.txt"
+```
+
+Use the same fallback and retry protocol as participation dispatch (see Phase 3). If the native CLI fails, fall back to `agent --model <model>`.
+
+**Step C: Parse external judge output.** Read `$SESSION_DIR/pass-NNNN/judge-raw.md` and extract:
+
+1. **Scores table**: Find the markdown table with dimension scores. Validate each score is an integer 0-10 and totals match the sum of dimensions.
+2. **Winner**: Find the `## Winner` section. Validate the named model is a participating model.
+3. **Rationale**: Extract the `## Rationale` section content.
+4. **Runner-Up Analysis**: Extract the `## Runner-Up Analysis` section. Parse per-model strengths.
+
+**Step D: Validate and fallback.** If parsing fails — no valid scores table, no identifiable winner, winner is not a participating model, or the CLI command failed entirely — **fall back to the Host Judge Protocol** for this pass. Record the fallback.
+
+**Step E: Write `judge.md`.** Write the parsed assessment to `$SESSION_DIR/pass-NNNN/judge.md` in the same format as the Host Judge Protocol, with the header:
+
+- Normal: `**Judged by**: <model> (round-robin pass N)`
+- Fallback: `**Judged by**: Claude (fallback from <model> — <reason>)`
+
+When the external judge's Runner-Up Analysis is thin or missing specific strengths, the host agent supplements with its own observations during the weave step.
 
 ### Step 2: Analyze Runners-Up
 
@@ -584,7 +689,7 @@ After each pass completes (judge + weave):
 - Append a `pass_complete` event to `events.jsonl`:
 
 ```json
-{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":N,"winner":"<model>","winner_score":XX,"woven":true}
+{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":N,"winner":"<model>","winner_score":XX,"woven":true,"judged_by":"<judge-model>"}
 ```
 
 ### Full Cycle
@@ -671,7 +776,7 @@ ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/refine/latest"
 - Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository.
 - The woven version MUST go back to ALL models for each subsequent pass — do not let the judge refine alone. The judge picks the winner and weaves, but all models must critique and improve the woven result in the next pass.
 - Each model's output MUST clearly separate Critique, Improved Version, and Rationale sections. If a model's output does not follow this structure, parse it best-effort and note the formatting issue in the judge's assessment.
-- `--judge=round-robin` is accepted but ignored in v1 — the host agent always judges. If the user sets this flag, acknowledge it and note that round-robin judging is not yet implemented.
+- `--judge=round-robin` rotates judging across available models. The rotation order is Claude → Gemini → GPT (skipping unavailable models). External model judges produce scores and pick winners via the External Judge Protocol; the host agent always weaves. If an external judge's output cannot be parsed, the host judges that pass as fallback. Record the actual judge and any fallback in `judge.md` and `events.jsonl`.
 - Always verify model claims against the actual codebase before incorporating into the woven version.
 - Always cite specific files and line numbers when possible in critiques.
 - If models contradict each other, check the code and incorporate the correct version.
