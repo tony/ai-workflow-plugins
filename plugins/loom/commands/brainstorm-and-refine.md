@@ -720,7 +720,7 @@ Write prompt to `$SESSION_DIR/refine/pass-NEXT/prompt.md`. Write outputs to `$SE
 
 After completing the judge and weave steps for a pass (N >= 2), check for convergence:
 
-**Condition 1**: The woven version's total score from this pass is less than or equal to the prior pass's winner score.
+**Condition 1**: The current pass's winner score is less than or equal to the prior pass's winner score. Read `$SESSION_DIR/refine/pass-000<N-1>/judge.md` to retrieve the prior pass's winning score for comparison.
 
 **Condition 2**: No new strengths were identified from runners-up in this pass.
 

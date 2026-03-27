@@ -570,7 +570,7 @@ Write this prompt to `$SESSION_DIR/pass-NEXT/prompt.md`.
 
 After completing the judge and weave steps for a pass (N >= 2), check for convergence:
 
-**Condition 1**: The woven version's total score from this pass is less than or equal to the prior pass's winner score.
+**Condition 1**: The current pass's winner score is less than or equal to the prior pass's winner score. Read `$SESSION_DIR/pass-000<N-1>/judge.md` to retrieve the prior pass's winning score for comparison.
 
 **Condition 2**: No new strengths were identified from runners-up in this pass (all runners-up produced versions that are strictly worse than the winner across all dimensions, with no unique techniques or passages worth incorporating).
 
