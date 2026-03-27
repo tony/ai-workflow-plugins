@@ -493,13 +493,15 @@ Compute the total score for each model (sum of four dimensions, max 40).
 
 ## Scores
 
-| Dimension | Claude | Gemini | GPT |
-|-----------|--------|--------|-----|
-| Quality (0-10) | X | X | X |
-| Originality (0-10) | X | X | X |
-| Completeness (0-10) | X | X | X |
-| Coherence (0-10) | X | X | X |
-| **Total** | XX | XX | XX |
+| Dimension | <model-1> | <model-2> | ... |
+|-----------|-----------|-----------|-----|
+| Quality (0-10) | X | X | ... |
+| Originality (0-10) | X | X | ... |
+| Completeness (0-10) | X | X | ... |
+| Coherence (0-10) | X | X | ... |
+| **Total** | XX | XX | ... |
+
+Adjust table columns to include only participating models for this pass (e.g., `| Claude | Gemini |` when only two models are available).
 
 ## Winner
 
@@ -536,16 +538,18 @@ The judge prompt structure:
 >
 > **Output format** — produce your assessment in this exact format:
 >
+> The table columns and model output sections below are illustrative. Adjust them to include only the models that produced outputs for this pass.
+>
 > ```
 > ## Scores
 >
-> | Dimension | Claude | Gemini | GPT |
-> |-----------|--------|--------|-----|
-> | Quality (0-10) | X | X | X |
-> | Originality (0-10) | X | X | X |
-> | Completeness (0-10) | X | X | X |
-> | Coherence (0-10) | X | X | X |
-> | **Total** | XX | XX | XX |
+> | Dimension | <model-1> | <model-2> | ... |
+> |-----------|-----------|-----------|-----|
+> | Quality (0-10) | X | X | ... |
+> | Originality (0-10) | X | X | ... |
+> | Completeness (0-10) | X | X | ... |
+> | Coherence (0-10) | X | X | ... |
+> | **Total** | XX | XX | ... |
 >
 > ## Winner
 >
@@ -568,14 +572,10 @@ The judge prompt structure:
 >
 > **Model outputs to judge:**
 >
-> ### Claude's Output
-> <full claude output>
+> For each participating model, include a section:
 >
-> ### Gemini's Output
-> <full gemini output>
->
-> ### GPT's Output
-> <full gpt output>
+> ### <Model Name>'s Output
+> <full model output>
 
 **Step B: Write and dispatch judge prompt.** Write the prompt to `$SESSION_DIR/pass-NNNN/judge-prompt.md`. Dispatch to the judge model using the same CLI mechanism as participation:
 
