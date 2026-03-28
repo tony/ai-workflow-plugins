@@ -27,6 +27,7 @@ Iteratively improve an artifact through multi-model critique and weaving. Each p
 - Each pass: all models critique and improve, judge picks best, weaves in strengths from runners-up
 - Full rationale chain showing evolution across passes
 - Early-stop when no material improvement detected
+- `--judge=host|round-robin`: Host judges every pass, or rotate judging across models
 
 ## The Refinement Cycle
 

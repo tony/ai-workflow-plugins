@@ -442,8 +442,9 @@ Same as existing loom commands:
    through every refinement pass.
 
 4. **Host agent judges by default** — The agent running the skill (typically
-   Claude) judges. `--judge=round-robin` is accepted but ignored in v1 (always
-   uses host). Documented as a future extensibility point.
+   Claude) judges. `--judge=round-robin` rotates judging across available models
+   (Claude → Gemini → GPT). External model judges produce scores and pick
+   winners; the host agent always weaves.
 
 5. **Always-ask transition gate** — In brainstorm-and-refine, the user always
    chooses which originals enter refinement. No auto-proceed.

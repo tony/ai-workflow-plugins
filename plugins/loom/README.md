@@ -155,7 +155,7 @@ Control pass count, timeout, and execution mode with explicit flags:
 | `--timeout=N\|none` | seconds or `none` | command-specific | `/loom:ask question --timeout=300` |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/loom:execute task --mode=deep` |
 | `--variants=N` | 1–3 | 1 | `/loom:brainstorm idea --variants=2` |
-| `--judge=host\|round-robin` | judge mode | `host` | `/loom:refine draft --judge=host` |
+| `--judge=host\|round-robin` | Who judges each refinement pass | `host` | `/loom:refine draft --judge=round-robin` |
 | `--preamble=...` | text | built-in | `/loom:brainstorm idea --preamble='focus on perf'` |
 
 Mode presets vary by command. For the original commands (ask, plan, prompt, execute, architecture, review): `fast` (1 pass, 0.5× timeout), `balanced` (1 pass, 1× timeout), `deep` (2 passes, 1.5× timeout). For brainstorm: presets control variants and timeout (deep = 2 variants). For refine: presets control passes and timeout (balanced = 2 passes, deep = 3 passes). For brainstorm-and-refine: presets control variants, passes, and timeout (deep = 2 variants, 3 passes).
@@ -163,6 +163,24 @@ Mode presets vary by command. For the original commands (ask, plan, prompt, exec
 Default timeouts per command: ask (450s), plan (600s), prompt (600s), review (900s), execute (1200s), architecture (1200s).
 
 Legacy trigger words (`multipass`, `x<N>`, `timeout:<seconds>`) are still recognized as aliases for backward compatibility.
+
+### Judge Modes
+
+The `--judge` flag controls who evaluates model outputs during refinement passes (refine
+and brainstorm-and-refine commands only).
+
+`--judge=host` (default): The host agent (Claude) judges every pass. This is the most
+reliable mode since the host can read session files and parse varied output formats.
+
+`--judge=round-robin`: Judging rotates across available models — Claude, then Gemini,
+then GPT, cycling back. External models receive a structured judge prompt with all
+model outputs inline and produce scores, winner selection, and runner-up analysis.
+The host agent always weaves regardless of who judged. If an external judge's output
+is unparseable, that pass falls back to host judging.
+
+The rotation is built from available models only. If only Claude and Gemini are
+detected, the rotation is Claude → Gemini → Claude → Gemini. Pass 1 always starts
+with Claude (index 0).
 
 ### Interactive Configuration
 
@@ -262,6 +280,8 @@ $AI_AIP_ROOT/
             │       ├── pass-0001/
             │       │   ├── outputs/
             │       │   ├── judge.md
+            │       │   ├── judge-prompt.md    # only when external model judges
+            │       │   ├── judge-raw.md       # only when external model judges
             │       │   └── woven.md
             │       └── final.md
             └── brainstorm-and-refine/
@@ -271,6 +291,11 @@ $AI_AIP_ROOT/
                     │   └── outputs/
                     └── refine/
                         ├── pass-0001/
+                        │   ├── outputs/
+                        │   ├── judge.md
+                        │   ├── judge-prompt.md    # only when external model judges
+                        │   ├── judge-raw.md       # only when external model judges
+                        │   └── woven.md
                         └── final.md
 ```
 
@@ -340,6 +365,7 @@ Each session directory contains a `session.json` that tracks session state. Upda
 | `branch` | Git branch at session start |
 | `ref` | Git commit ref (short SHA) at session start |
 | `models` | Which models participated |
+| `judge_mode` | `"host"` or `"round-robin"` (refine/brainstorm-and-refine only) |
 | `completed_passes` | How many passes finished |
 | `prompt_summary` | First 120 chars of the user's prompt |
 | `created_at` | ISO 8601 UTC timestamp of session start |
@@ -357,6 +383,12 @@ Each session directory contains an `events.jsonl` file with one JSON object per 
 
 ```json
 {"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"models_completed":["claude","gemini","gpt"]}
+```
+
+Refine and brainstorm-and-refine commands include additional fields in `pass_complete`:
+
+```json
+{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"winner":"claude","winner_score":35,"woven":true,"judged_by":"claude"}
 ```
 
 ```json
