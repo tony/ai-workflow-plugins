@@ -390,7 +390,7 @@ The agent must:
    <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/stderr/gemini-v<N>.txt"
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
 4. Return: exit code, elapsed time, retry count, output file path
 
 ### GPT Variants (sub-agents)
@@ -421,7 +421,7 @@ The agent must:
    <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/stderr/gpt-v<N>.txt"
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
 4. Return: exit code, elapsed time, retry count, output file path
 
 ### Artifact Capture
