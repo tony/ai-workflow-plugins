@@ -40,7 +40,7 @@ If `agent` is not found, report unavailable and stop.
 command -v timeout >/dev/null 2>&1 && echo "timeout:available" || { command -v gtimeout >/dev/null 2>&1 && echo "gtimeout:available" || echo "timeout:none"; }
 ```
 
-If no timeout command is available, omit the prefix entirely.
+If no timeout command is available, omit the prefix entirely. When `timeout:none` is specified, also omit `<timeout_cmd>` and `<timeout_seconds>` entirely — run external commands without any timeout prefix.
 
 ## Step 3: Write Prompt
 
@@ -63,7 +63,7 @@ If `mode:plan` was detected, prepend this preamble to the prompt content:
 <timeout_cmd> <timeout_seconds> agent -p -f "$(cat "$TMPFILE")" 2>/tmp/mc-stderr-cursor.txt
 ```
 
-Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>` with the resolved timeout value. If no timeout command is available, omit the prefix entirely.
+Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>` with the resolved timeout value. If no timeout command is available, or if `timeout:none` was specified, omit the prefix entirely.
 
 ## Step 5: Handle Failure
 
