@@ -401,9 +401,9 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to r
 >
 > **Retry and fallback protocol**:
 > 1. Record exit code, stderr, elapsed time
-> 2. Classify failure: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
-> 3. Max 1 retry with the same backend
-> 4. If retry fails AND native CLI was used AND `agent` is available, re-run using the agent fallback command (1 attempt, same timeout). Append stderr to the same file.
+> 2. Classify failure: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; credit-exhausted → skip retry, escalate to agent immediately; crash → not retryable; empty output → retryable once. Detect credit-exhaustion via: `RESOURCE_EXHAUSTED`, `quota exceeded`, `insufficient_quota`, `capacity exhausted`, `usage limit`, or HTTP 429 with "daily limit".
+> 3. Max 1 retry with the same backend (skipped for credit-exhausted)
+> 4. If retry fails (or credit-exhausted) AND native CLI was used AND `agent` is available, re-run using the agent fallback command (1 attempt, same timeout). Append stderr to the same file. If agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT).
 > 5. After all retries exhausted: mark model as unavailable for this pass
 >
 > Return: success/failure status, output file path, any error details.
@@ -442,9 +442,9 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to r
 >
 > **Retry and fallback protocol**:
 > 1. Record exit code, stderr, elapsed time
-> 2. Classify failure: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; crash → not retryable; empty output → retryable once
-> 3. Max 1 retry with the same backend
-> 4. If retry fails AND native CLI was used AND `agent` is available, re-run using the agent fallback command (1 attempt, same timeout). Append stderr to the same file.
+> 2. Classify failure: timeout → retryable with 1.5× timeout; API/rate-limit error → retryable after 10s delay; credit-exhausted → skip retry, escalate to agent immediately; crash → not retryable; empty output → retryable once. Detect credit-exhaustion via: `RESOURCE_EXHAUSTED`, `quota exceeded`, `insufficient_quota`, `capacity exhausted`, `usage limit`, or HTTP 429 with "daily limit".
+> 3. Max 1 retry with the same backend (skipped for credit-exhausted)
+> 4. If retry fails (or credit-exhausted) AND native CLI was used AND `agent` is available, re-run using the agent fallback command (1 attempt, same timeout). Append stderr to the same file. If agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT).
 > 5. After all retries exhausted: mark model as unavailable for this pass
 >
 > Return: success/failure status, output file path, any error details.
