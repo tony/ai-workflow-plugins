@@ -40,6 +40,7 @@ Skills provide auto-discovery — they trigger when the user's intent matches th
 | `loom:brainstorm` | "brainstorm", "give me ideas", "multiple approaches", "explore alternatives" |
 | `loom:refine` | "refine this", "improve this", "make this better", "iterate on this" |
 | `loom:brainstorm-and-refine` | "brainstorm and refine", "generate ideas then improve", "explore then synthesize" |
+| `loom:serene-bliss` | "serene bliss", "DX bliss", "DX serenity", "DX sublimity", "reader happiness" |
 
 ## How It Works
 
