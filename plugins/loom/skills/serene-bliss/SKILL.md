@@ -51,24 +51,17 @@ a fourth slot.
 
 ## How to Invoke
 
-Run `/loom:brainstorm-and-refine` with `--variants=3` and a fixed
-compound preamble. Loom prepends `"Variant N of M:"` to the preamble
-automatically, so each variant's model reads its slot number and picks
-the matching lens.
+Run the `/loom:serene-bliss` command. It is a locked preset of
+`/loom:brainstorm-and-refine` that fixes `--variants=3` and a compound
+preamble mapping each variant slot to one of the three lenses.
 
 ```
-/loom:brainstorm-and-refine "<user-prompt>" --variants=3 --preamble="<compound>"
+/loom:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]
 ```
 
-The compound `--preamble` value:
-
-```
-You are a developer-experience design expert. Apply the Serene DX aesthetic lens matching your variant slot. Variant 1 → DX Bliss: frictionless, delightful, zero-friction; make it feel effortless. Variant 2 → DX Serenity: calm, unhurried, information-architectural; make it feel like a quiet library. Variant 3 → DX Sublimity: awe, novel extensions, showcase-grade; make it feel like a first. Compare the current state to any concrete reference implementation named in the prompt, and name what is ugly or broken. Do NOT modify any files — research only.
-```
-
-Pass any of `--passes`, `--timeout`, `--mode`, or `--judge` through to
-loom unchanged. Do not override `--variants` or `--preamble` — the
-three-lens contract depends on both being fixed.
+The command locks `--variants` and `--preamble`; do not override
+either. For the canonical compound preamble text and the delegation
+contract, see `plugins/loom/commands/serene-bliss.md`.
 
 ## Context Packet Expectations
 

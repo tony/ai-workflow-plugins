@@ -30,6 +30,7 @@ Install the plugin:
 | `/loom:brainstorm` | Generate independent original ideas from each model, with optional multiple variants |
 | `/loom:refine` | Iteratively improve an artifact through multi-model critique and weaving |
 | `/loom:brainstorm-and-refine` | Full pipeline: brainstorm originals, then iteratively judge, weave, and refine |
+| `/loom:serene-bliss` | Brainstorm-and-refine preset with three fixed DX aesthetic lenses: Bliss, Serenity, Sublimity |
 
 ## Skills
 
