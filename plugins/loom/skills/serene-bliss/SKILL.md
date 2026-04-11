@@ -7,9 +7,10 @@ description: >-
   DX Serenity (calm clarity), and DX Sublimity (showcase-grade novelty).
   Triggers on phrases like "serene bliss", "DX bliss", "DX serenity",
   "DX sublimity", "reader happiness", "make this serene", "serene
-  developer experience", or "serene DX". Runs
-  /loom:brainstorm-and-refine with three aesthetic variant lenses and a
-  concrete reference anchor.
+  developer experience", or "serene DX". Runs the /loom:serene-bliss
+  command, which dispatches three lens variants across all available
+  models in parallel and judges each refine pass with a multi-model
+  panel (Claude + Gemini + GPT, peer-only averaging).
 user-invocable: true
 argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
 ---
