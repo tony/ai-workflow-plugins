@@ -267,6 +267,22 @@ Stash uncommitted changes before any model runs. This protects user changes from
 git stash --include-untracked -m "loom-execute: user-changes stash"
 ```
 
+#### Step 4c: Repo Guard — Capture Fingerprint
+
+Capture the clean repository state after stashing. See
+`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+
+```bash
+REPO_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
+```
+
+```bash
+REPO_FINGERPRINT="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+```
+
+Write `$SESSION_DIR/repo-fingerprint.txt` containing the HEAD ref and
+status output. This fingerprint reflects the clean stashed state.
+
 #### Step 5: Write `repo.json` (if missing)
 
 If `$AIP_ROOT/repos/$REPO_DIR/repo.json` does not exist, write it with these contents:
@@ -480,6 +496,8 @@ Unstage after capturing the diff to avoid side effects on the user's index:
 ```bash
 git reset HEAD
 ```
+
+**Repo Guard**: After unstaging, verify the main tree is clean (no leftover tracked changes from the Claude sub-agent). The `git reset HEAD` should leave the tree in its pre-execution state. If `git status --porcelain` shows unexpected changes, log a warning to `$SESSION_DIR/guard-events.jsonl`.
 
 **External models** (worktrees):
 ```bash
@@ -771,6 +789,8 @@ After applying best-of-breed changes:
 
 Run the project's quality gates as defined in AGENTS.md/CLAUDE.md. All gates must pass. If they fail, fix the integration issues and re-run.
 
+**Repo Guard**: After quality gates pass, the synthesized implementation is in the main tree. This is the intended final state. Record it in `$SESSION_DIR/guard-events.jsonl` as a `repo_guard_synthesis_applied` event.
+
 ### Step 5: Cleanup Worktrees
 
 Remove all loom worktrees and branches:
@@ -794,6 +814,8 @@ git branch -D loom/gpt/<timestamp> 2>/dev/null || true
 ### Step 6: Restore Stashed Changes
 
 If user changes were stashed in Phase 2, Step 4b, restore them. Only pop if the named stash exists — otherwise an unrelated older stash would be applied by mistake.
+
+**Repo Guard**: Before restoring the stash, verify that only the synthesized changes are present. Run `git diff --stat HEAD` and confirm the changed files match the synthesis plan. Log the final verification to `events.jsonl`.
 
 ```bash
 STASH_REF="$(git stash list | grep -m1 "loom-execute: user-changes stash" | cut -d: -f1)" && [ -n "$STASH_REF" ] && git stash pop "$STASH_REF" || true
@@ -836,6 +858,7 @@ All project quality gates passed.
 ## Rules
 
 - Always create isolated worktrees — never let models interfere with each other
+- **Repo Guard**: External model CLIs run in isolated worktrees via `(cd "$WORKTREE_PATH" && ...)`. Post-analysis verification ensures the main tree is unchanged during diff capture. Session-end verification confirms only synthesized changes are present before stash restore. See `docs/repo-guard-protocol.md`.
 - Always run quality gates on each implementation before comparing
 - Always present the synthesis plan to the user and wait for confirmation before applying
 - Always clean up worktrees and branches after synthesis

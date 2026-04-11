@@ -89,15 +89,17 @@ reserved flag was seen):
 
 ## Phase 1: Gather Context
 
-Follow Phase 1 of `plugins/loom/commands/brainstorm-and-refine.md`
-(lines 17-30) verbatim — read CLAUDE.md/AGENTS.md for project
+Follow Phase 1 (Gather Context) of
+`plugins/loom/commands/brainstorm-and-refine.md` verbatim — read
+CLAUDE.md/AGENTS.md for project
 conventions, detect the trunk branch, capture the prompt from
 `$ARGUMENTS`. No serene-bliss-specific changes.
 
 ## Phase 1b: Build Context Packet
 
-Follow Phase 1b of `plugins/loom/commands/brainstorm-and-refine.md`
-(lines 33-65) verbatim — assemble the structured context bundle that
+Follow Phase 1b (Build Context Packet) of
+`plugins/loom/commands/brainstorm-and-refine.md` verbatim — assemble
+the structured context bundle that
 all models will receive.
 
 For serene-DX work specifically, the host SHOULD ensure the context
@@ -109,8 +111,9 @@ this is load-bearing.
 
 ## Phase 2: Configure and Detect Models
 
-Follow Phase 2 of `plugins/loom/commands/brainstorm-and-refine.md`
-(lines 67-336) — flag parsing, mode/timeout/passes resolution, model
+Follow Phase 2 (Configuration and Model Detection) of
+`plugins/loom/commands/brainstorm-and-refine.md` — flag parsing,
+mode/timeout/passes resolution, model
 detection (Claude, Gemini, GPT), session directory setup — with these
 **serene-bliss overrides** applied after the standard parsing:
 
@@ -143,7 +146,8 @@ After model detection completes, count the available models:
   > "Warning: only Claude detected — panel is unavailable. Falling
   > back to host judging for all passes."
   All judging will use the Host Judge Protocol from
-  `plugins/loom/commands/brainstorm-and-refine.md` (lines 595-643).
+  `plugins/loom/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+  Host Judge Protocol).
 
 Record the resolved `judge_mode` and panel member set in
 `$SESSION_DIR/metadata.md`.
@@ -206,8 +210,11 @@ with `subagent_type: "general-purpose"`:
 > project context.
 >
 > Provide a clear, well-structured response. Cite specific files and
-> line numbers where relevant. Do NOT modify any files — this is
-> research only.
+> line numbers where relevant. CRITICAL: Do NOT write, edit, create, or
+> delete any files in the repository. Do NOT use Write, Edit, or Bash
+> commands that modify repository files. All session artifacts are
+> written to `$SESSION_DIR`, which is outside the repository. This is a
+> READ-ONLY research task.
 
 Each Claude variant agent writes its output to
 `$SESSION_DIR/brainstorm/outputs/claude-v<N>.md`.
@@ -217,52 +224,108 @@ Each Claude variant agent writes its output to
 For each Gemini variant N (1 through 3), launch a separate Task agent
 (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the
 Gemini model. Include in the agent prompt: the resolved backend
-command and timeout from Phase 2, the `$SESSION_DIR` path, the variant
+command and timeout from Phase 2, the `$SESSION_DIR` path, the
+`$REPO_TOPLEVEL` path and `$REPO_FINGERPRINT` value, the variant
 number, and the prompt with the compound preamble.
 
 The agent must:
 
 1. Read the variant prompt from
    `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
-2. Run the resolved Gemini command with output redirection:
+2. Run the resolved Gemini command with output redirection.
+   **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate
+   rogue writes from the repository (see `docs/repo-guard-protocol.md`
+   Layer 1).
 
    **Native (`gemini` CLI)**:
 
    ```bash
-   <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
 
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
-3. On failure: classify (timeout → retry with 1.5x timeout; rate-limit
+3. **Repo Guard** post-CLI verification: immediately after the CLI
+   returns, check the repository state. If dirty, revert and log the
+   violation:
+
+   ```bash
+   CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+   ```
+
+   If `$CURRENT_STATUS` differs from `$REPO_FINGERPRINT`:
+
+   ```bash
+   git -C "$REPO_TOPLEVEL" checkout -- . 2>/dev/null || true
+   ```
+
+   ```bash
+   git -C "$REPO_TOPLEVEL" clean -fd 2>/dev/null || true
+   ```
+
+   ```bash
+   printf '{"event":"repo_guard_violation","timestamp":"%s","model":"gemini","reverted":true}\n' \
+     "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+     >>"$SESSION_DIR/guard-events.jsonl"
+   ```
+
+4. On failure: classify (timeout → retry with 1.5x timeout; rate-limit
    → retry after 10s; credit-exhausted → skip retry, escalate to agent
    CLI immediately; crash → not retryable; empty → retry once), retry
    max once with same backend, then fall back to agent CLI if native
    was used; if agent is also credit-exhausted or unavailable, use
    lesser model (gemini-3-flash-preview).
-4. Return: exit code, elapsed time, retry count, output file path.
+5. Return: exit code, elapsed time, retry count, output file path.
 
 ### GPT Variants (sub-agents)
 
 For each GPT variant N (1 through 3), launch a separate Task agent
 (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the
 GPT model. Same dispatch shape as Gemini, with these command
-replacements:
+replacements. Include `$REPO_TOPLEVEL` and `$REPO_FINGERPRINT` in the
+agent prompt for post-CLI verification.
+
+**Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate
+rogue writes from the repository (see `docs/repo-guard-protocol.md`
+Layer 1).
 
 **Native (`codex` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> codex exec -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt"
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
 ```
 
 **Fallback (`agent` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt"
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
+```
+
+**Repo Guard** post-CLI verification: immediately after the CLI
+returns, check the repository state. If dirty, revert and log:
+
+```bash
+CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+```
+
+If `$CURRENT_STATUS` differs from `$REPO_FINGERPRINT`:
+
+```bash
+git -C "$REPO_TOPLEVEL" checkout -- . 2>/dev/null || true
+```
+
+```bash
+git -C "$REPO_TOPLEVEL" clean -fd 2>/dev/null || true
+```
+
+```bash
+printf '{"event":"repo_guard_violation","timestamp":"%s","model":"gpt","reverted":true}\n' \
+  "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+  >>"$SESSION_DIR/guard-events.jsonl"
 ```
 
 Same retry/fallback classification as Gemini. Lesser model fallback:
@@ -289,8 +352,9 @@ gpt-5.4-mini via agent.
 
 ## Phase 4: Present Originals and Transition Gate
 
-Follow Phase 4 of `plugins/loom/commands/brainstorm-and-refine.md`
-(lines 469-583) verbatim. Present all successful brainstorm originals
+Follow Phase 4 (Present Brainstorm Results and Transition Gate) of
+`plugins/loom/commands/brainstorm-and-refine.md` verbatim. Present all
+successful brainstorm originals
 to the user, ask which ones enter refinement via `AskUserQuestion`,
 update `session.json` to `phase: "refine"`, and proceed.
 
@@ -342,6 +406,15 @@ Launch one judge per available model **in the same turn**:
   protocol as Phase 3 GPT variants. Writes to
   `$SESSION_DIR/refine/pass-0001/judges/gpt.md`.
 
+**Repo Guard**: Gemini and GPT judge CLIs must use the same
+`(cd "$SESSION_DIR" && ...)` wrapping as Phase 3 variant dispatches
+(see `docs/repo-guard-protocol.md` Layer 1). After each judge CLI
+returns, run the post-CLI repo state verification — capture
+`CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"`,
+and if `$CURRENT_STATUS` differs from `$REPO_FINGERPRINT`, revert
+and log the violation to `$SESSION_DIR/guard-events.jsonl` with the
+judge's model name.
+
 Each judge file uses the standard judge assessment format (scores
 table, winner, rationale, runner-up analysis) with this header:
 
@@ -353,7 +426,8 @@ table, winner, rationale, runner-up analysis) with this header:
 If only 2 models are available (degraded panel), launch 2 judges and
 proceed. If only Claude is available (panel infeasible), skip Phase 5
 Steps 1-4 entirely and use the **Host Judge Protocol** from
-`plugins/loom/commands/brainstorm-and-refine.md` (lines 595-643).
+`plugins/loom/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+Host Judge Protocol).
 
 ### Step 3: Parse judge responses
 
@@ -369,7 +443,8 @@ For each judge that completed dispatch:
 
 **Full-panel failure fallback**: if 0 judges succeed (all parse or
 dispatch failed), fall back to the **Host Judge Protocol** from
-`plugins/loom/commands/brainstorm-and-refine.md` (lines 595-643). Run
+`plugins/loom/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+Host Judge Protocol). Run
 that protocol now and produce a single `judge.md` file. Mark the
 resulting `panel.md` (Step 4) as
 `**Judged by**: Claude (fallback — all panel judges failed)` and
@@ -456,17 +531,18 @@ Write the merged assessment to
 
 ### Step 5: Weave
 
-Follow Phase 5 Steps 2-3 of
-`plugins/loom/commands/brainstorm-and-refine.md` (lines 658-675)
-verbatim, with one substitution: read `panel.md` (this command's
+Follow Phase 5 Steps 2-3 (Analyze Runners-Up and Weave) of
+`plugins/loom/commands/brainstorm-and-refine.md` verbatim, with one
+substitution: read `panel.md` (this command's
 merged assessment) instead of `judge.md`. The host (Claude) constructs
 the woven version incorporating the winner plus runner-up strengths
 and writes it to `$SESSION_DIR/refine/pass-0001/woven.md`.
 
 ### Step 6: Distribute (if pass_count > 1)
 
-Follow Phase 5 Step 4 of `brainstorm-and-refine.md` (lines 677-727)
-verbatim. Send the woven version back to all 3 models for the next
+Follow Phase 5 Step 4 (Distribute for Pass 2) of
+`brainstorm-and-refine.md` verbatim. Send the woven version back to
+all 3 models for the next
 pass's critique.
 
 ---
@@ -486,8 +562,8 @@ For each subsequent pass `N`:
 - Merge step = peer-only averaging as in Phase 5 Step 4.
 - Output paths use `pass-NNNN` (zero-padded) consistently.
 
-**Early-stop detection** mirrors
-`plugins/loom/commands/brainstorm-and-refine.md` (lines 769-777): if
+**Early-stop detection** mirrors Phase 6 Step 5 (Early-Stop
+Detection) of `plugins/loom/commands/brainstorm-and-refine.md`: if
 the woven version of pass `N` is substantially identical to the woven
 version of pass `N-1`, stop early and skip to Phase 7.
 
@@ -498,10 +574,15 @@ prepare for.
 
 ## Phase 7: Present Final Result
 
-Follow Phase 7 of `plugins/loom/commands/brainstorm-and-refine.md`
-(lines 791-873) verbatim. Present the final woven version, the full
+Follow Phase 7 (Present Final Result) of
+`plugins/loom/commands/brainstorm-and-refine.md` verbatim. Present the
+final woven version, the full
 rationale chain across all passes, and the session directory path for
 post-session inspection.
+
+**Repo Guard**: The session-end verification from brainstorm-and-refine
+Phase 7 applies here — repo state is checked against the pre-session
+fingerprint before marking the session as completed.
 
 In the presentation summary, include one additional line specific to
 serene-bliss:

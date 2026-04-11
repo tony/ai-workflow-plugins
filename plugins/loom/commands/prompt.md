@@ -263,6 +263,22 @@ mkdir -p -m 700 "$SESSION_DIR/pass-0001/diffs" "$SESSION_DIR/pass-0001/files"
 git stash --include-untracked -m "loom-prompt: user-changes stash"
 ```
 
+#### Step 4c: Repo Guard — Capture Fingerprint
+
+Capture the clean repository state after stashing. See
+`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+
+```bash
+REPO_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
+```
+
+```bash
+REPO_FINGERPRINT="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+```
+
+Write `$SESSION_DIR/repo-fingerprint.txt` containing the HEAD ref and
+status output. This fingerprint reflects the clean stashed state.
+
 #### Step 5: Write `repo.json` (if missing)
 
 If `$AIP_ROOT/repos/$REPO_DIR/repo.json` does not exist, write it with these contents:
@@ -478,6 +494,8 @@ Unstage after capturing the diff to avoid side effects on the user's index:
 ```bash
 git reset HEAD
 ```
+
+**Repo Guard**: After unstaging, verify the main tree is clean (no leftover tracked changes from the Claude sub-agent). The `git reset HEAD` should leave the tree in its pre-execution state. If `git status --porcelain` shows unexpected changes, log a warning to `$SESSION_DIR/guard-events.jsonl`.
 
 **External models** (worktrees):
 ```bash
@@ -778,6 +796,7 @@ git branch -D loom/gpt/<timestamp> 2>/dev/null || true
 - Always run quality gates on each implementation before comparing
 - Always present the comparison to the user and let them choose (or accept recommendation)
 - Always clean up worktrees and branches after adoption
+- **Repo Guard**: External model CLIs run in isolated worktrees via `(cd "$WORKTREE_PATH" && ...)`. Post-analysis verification ensures the main tree is unchanged during diff capture. Session-end verification confirms only synthesized changes are present before stash restore. See `docs/repo-guard-protocol.md`.
 - If only Claude is available, skip worktree creation and just implement directly
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from Phase 2 Step 4. If no timeout command is available, omit the prefix entirely. Adjust higher or lower based on observed completion times.
 - Capture stderr from external tools (via `$SESSION_DIR/pass-{N}/stderr/<model>.txt`) to report failures clearly
