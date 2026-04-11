@@ -292,6 +292,26 @@ Write to `$SESSION_DIR/metadata.md` containing:
 
 Store `$SESSION_DIR` for use in all subsequent phases.
 
+#### Step 8b: Repo Guard — Capture Fingerprint
+
+Capture the repository state before any model runs. See
+`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+
+```bash
+REPO_TOPLEVEL="$(git rev-parse --show-toplevel)"
+```
+
+```bash
+REPO_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
+```
+
+```bash
+REPO_FINGERPRINT="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+```
+
+Write `$SESSION_DIR/repo-fingerprint.txt` containing the HEAD ref and
+status output. Store `$REPO_TOPLEVEL` for use in all subsequent phases.
+
 #### Step 9: Write Context Packet
 
 Write the Context Packet built in Phase 1b to `$SESSION_DIR/context-packet.md`.
@@ -325,63 +345,73 @@ Launch a Task agent with `subagent_type: "general-purpose"` to answer the questi
 >
 > Question: <user's question>
 >
-> Provide a clear, well-structured answer. Cite specific files and line numbers where relevant. Do NOT modify any files — this is research only.
+> Provide a clear, well-structured answer. Cite specific files and line numbers where relevant. CRITICAL: Do NOT write, edit, create, or delete any files in the repository. Do NOT use Write, Edit, or Bash commands that modify repository files. All session artifacts are written to `$SESSION_DIR`, which is outside the repository. This is a READ-ONLY research task.
 
 ### Gemini Answer (sub-agent)
 
-Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the Gemini model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the pass number, and the question with additional instructions:
+Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the Gemini model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the `$REPO_TOPLEVEL` path and `$REPO_FINGERPRINT` value for repo guard verification, the pass number, and the question with additional instructions:
 
 > <user's question>
 >
 > ---
-> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Do NOT modify any files. Provide a clear answer citing specific files where relevant.
+> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Provide a clear answer citing specific files where relevant.
+> CRITICAL: Do NOT write, edit, create, or delete any files. Do NOT use any file-writing or file-modification tools. This is a READ-ONLY research task. All output must go to stdout. Any file modifications will be automatically detected and reverted.
 
 The agent must:
 
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
-2. Run the resolved Gemini command with output redirection:
+2. Run the resolved Gemini command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes:
 
    **Native (`gemini` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
-4. Return: exit code, elapsed time, retry count, output file path
+3. **Repo Guard**: Post-CLI verification. Capture `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"` and compare against `$REPO_FINGERPRINT`. If `"$CURRENT_STATUS" != "$REPO_FINGERPRINT"`, revert with `git -C "$REPO_TOPLEVEL" checkout -- .` and `git -C "$REPO_TOPLEVEL" clean -fd`. Log the violation by appending a JSON line to `$SESSION_DIR/guard-events.jsonl`:
+   ```json
+   {"event":"repo_guard_violation","model":"gemini","timestamp":"<ISO 8601 UTC>","reverted":true}
+   ```
+4. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
+5. Return: exit code, elapsed time, retry count, output file path
 
 ### GPT Answer (sub-agent)
 
-Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the GPT model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the pass number, and the question with additional instructions:
+Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the GPT model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the `$REPO_TOPLEVEL` path and `$REPO_FINGERPRINT` value for repo guard verification, the pass number, and the question with additional instructions:
 
 > <user's question>
 >
 > ---
-> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Do NOT modify any files. Provide a clear answer citing specific files where relevant.
+> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Provide a clear answer citing specific files where relevant.
+> CRITICAL: Do NOT write, edit, create, or delete any files. Do NOT use any file-writing or file-modification tools. This is a READ-ONLY research task. All output must go to stdout. Any file modifications will be automatically detected and reverted.
 
 The agent must:
 
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
-2. Run the resolved GPT command with output redirection:
+2. Run the resolved GPT command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes:
 
    **Native (`codex` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> codex exec \
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec \
        -c model_reasoning_effort=medium \
-       "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+       "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
-4. Return: exit code, elapsed time, retry count, output file path
+3. **Repo Guard**: Post-CLI verification. Capture `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"` and compare against `$REPO_FINGERPRINT`. If `"$CURRENT_STATUS" != "$REPO_FINGERPRINT"`, revert with `git -C "$REPO_TOPLEVEL" checkout -- .` and `git -C "$REPO_TOPLEVEL" clean -fd`. Log the violation by appending a JSON line to `$SESSION_DIR/guard-events.jsonl`:
+   ```json
+   {"event":"repo_guard_violation","model":"gpt","timestamp":"<ISO 8601 UTC>","reverted":true}
+   ```
+4. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
+5. Return: exit code, elapsed time, retry count, output file path
 
 ### Artifact Capture
 
@@ -528,6 +558,7 @@ Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md`. Incorporate v
 
 After presenting the answer, persist the synthesis:
 
+- **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation. Append a `repo_guard_final` event to `events.jsonl`.
 - Write the synthesized answer to `$SESSION_DIR/pass-0001/synthesis.md`
 - Update `session.json` via atomic replace: set `completed_passes` to `1`, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
 
@@ -584,7 +615,7 @@ Present the final-pass synthesis, adding a **Refinement Notes** section describi
 
 ## Rules
 
-- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run from `$SESSION_DIR` (not the repo root), post-CLI verification reverts rogue writes, and session-end verification catches anything that slipped through.
 - Always verify model claims against the actual codebase before including in the synthesis
 - Always cite specific files and line numbers when possible
 - If models contradict each other, check the code and state which is correct

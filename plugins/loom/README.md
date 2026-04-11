@@ -63,9 +63,38 @@ All commands share four quality protocols that decorrelate model outputs and imp
 - **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence (ask/plan/prompt/execute/architecture/review)
 - **Judge-weave-distribute** — pick the best, incorporate strengths from runners-up, redistribute for another round (refine/brainstorm-and-refine)
 
+### Repo Guard Protocol
+
+All loom commands enforce a 5-layer guard that prevents sessions from
+modifying repository files. See `docs/repo-guard-protocol.md` for
+the full specification.
+
+| Layer | Defense | Scope |
+|-------|---------|-------|
+| 1 | CLI working directory isolation (`cd "$SESSION_DIR"`) | Read-only commands |
+| 2 | Pre-session repo fingerprint (HEAD + `git status`) | All commands |
+| 3 | Post-CLI repo state verification + auto-revert | All commands |
+| 4 | Prompt hardening ("CRITICAL: Do NOT write files") | All commands |
+| 5 | Session-end verification against fingerprint | All commands |
+
+**Read-only commands** run external CLIs from `$SESSION_DIR` instead of
+the repo root — rogue writes land in the session directory, not the
+repository. **Write commands** run external CLIs in isolated worktrees
+and verify the main tree is unchanged after diff capture. All commands
+verify the repo is unchanged at session end.
+
+The guard was introduced because external CLIs (especially Gemini with
+`-y` auto-approve) have known issues with unexpectedly modifying
+project files. The protocol provides defense-in-depth: working
+directory isolation prevents most rogue writes, post-CLI verification
+catches writes to absolute paths, and session-end verification is the
+final safety net.
+
 ### Read-Only Commands
 
-**ask**, **plan**, and **review** do not modify files. They gather multiple perspectives and synthesize a single best result.
+**ask**, **plan**, **brainstorm**, **refine**, **brainstorm-and-refine**,
+**serene-bliss**, and **review** do not modify files. They gather multiple
+perspectives and synthesize a single best result.
 
 ### Write Commands
 
@@ -238,6 +267,8 @@ $AI_AIP_ROOT/
             │       ├── session.json
             │       ├── events.jsonl
             │       ├── metadata.md
+            │       ├── repo-fingerprint.txt
+            │       ├── guard-events.jsonl
             │       ├── pass-0001/
             │       │   ├── prompt.md
             │       │   ├── synthesis.md

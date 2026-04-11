@@ -307,6 +307,26 @@ Write to `$SESSION_DIR/metadata.md` containing:
 
 Store `$SESSION_DIR` for use in all subsequent phases.
 
+#### Step 8b: Repo Guard — Capture Fingerprint
+
+Capture the repository state before any model runs. See
+`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+
+```bash
+REPO_TOPLEVEL="$(git rev-parse --show-toplevel)"
+```
+
+```bash
+REPO_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
+```
+
+```bash
+REPO_FINGERPRINT="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+```
+
+Write `$SESSION_DIR/repo-fingerprint.txt` containing the HEAD ref and
+status output. Store `$REPO_TOPLEVEL` for use in all subsequent phases.
+
 #### Step 9: Write Context Packet
 
 Write the Context Packet built in Phase 1b to `$SESSION_DIR/context-packet.md`.
@@ -360,69 +380,95 @@ For each Claude variant (1 through `variant_count`), launch a separate Task agen
 >
 > Read the context packet at `$SESSION_DIR/context-packet.md` for project context.
 >
-> Provide a clear, well-structured response. Cite specific files and line numbers where relevant. Do NOT modify any files — this is research only.
+> Provide a clear, well-structured response. Cite specific files and line numbers where relevant. CRITICAL: Do NOT write, edit, create, or delete any files in the repository. Do NOT use Write, Edit, or Bash commands that modify repository files. All session artifacts are written to `$SESSION_DIR`, which is outside the repository. This is a READ-ONLY research task.
 
 Each Claude variant agent writes its output to `$SESSION_DIR/outputs/claude-v<N>.md`.
 
 ### Gemini Variants (sub-agents)
 
-For each Gemini variant (1 through `variant_count`), launch a separate Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the Gemini model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the variant number, and the prompt with variant preamble and additional instructions:
+For each Gemini variant (1 through `variant_count`), launch a separate Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the Gemini model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the variant number, the `$REPO_TOPLEVEL` path and `$REPO_FINGERPRINT` value for repo guard verification, and the prompt with variant preamble and additional instructions:
 
 > [Variant preamble for this variant number]
 >
 > <user's prompt>
 >
 > ---
-> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Do NOT modify any files. Provide a clear, original response citing specific files where relevant.
+> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Provide a clear, original response citing specific files where relevant.
+>
+> CRITICAL: Do NOT write, edit, create, or delete any files. Do NOT use any file-writing or file-modification tools. This is a READ-ONLY research task. All output must go to stdout. Any file modifications will be automatically detected and reverted.
 
 The agent must:
 
 1. Read the variant prompt from `$SESSION_DIR/prompts/variant-<N>.md`
-2. Run the resolved Gemini command with output redirection:
+2. Run the resolved Gemini command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes from the repository (see `docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`gemini` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/stderr/gemini-v<N>.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/stderr/gemini-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/stderr/gemini-v<N>.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/stderr/gemini-v<N>.txt")
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
-4. Return: exit code, elapsed time, retry count, output file path
+3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
+
+   ```bash
+   CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+   if [ "$CURRENT_STATUS" != "$REPO_FINGERPRINT" ]; then
+     git -C "$REPO_TOPLEVEL" checkout -- . 2>/dev/null || true
+     git -C "$REPO_TOPLEVEL" clean -fd 2>/dev/null || true
+     printf '{"event":"repo_guard_violation","timestamp":"%s","model":"gemini","reverted":true}\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >>"$SESSION_DIR/guard-events.jsonl"
+   fi
+   ```
+
+4. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
+5. Return: exit code, elapsed time, retry count, output file path
 
 ### GPT Variants (sub-agents)
 
-For each GPT variant (1 through `variant_count`), launch a separate Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the GPT model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the variant number, and the prompt with variant preamble and additional instructions:
+For each GPT variant (1 through `variant_count`), launch a separate Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the GPT model. Include in the agent prompt: the resolved backend command and timeout from Phase 2, the `$SESSION_DIR` path, the variant number, the `$REPO_TOPLEVEL` path and `$REPO_FINGERPRINT` value for repo guard verification, and the prompt with variant preamble and additional instructions:
 
 > [Variant preamble for this variant number]
 >
 > <user's prompt>
 >
 > ---
-> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Do NOT modify any files. Provide a clear, original response citing specific files where relevant.
+> Additional instructions: Read relevant files and AGENTS.md/CLAUDE.md for project conventions. Provide a clear, original response citing specific files where relevant.
+>
+> CRITICAL: Do NOT write, edit, create, or delete any files. Do NOT use any file-writing or file-modification tools. This is a READ-ONLY research task. All output must go to stdout. Any file modifications will be automatically detected and reverted.
 
 The agent must:
 
 1. Read the variant prompt from `$SESSION_DIR/prompts/variant-<N>.md`
-2. Run the resolved GPT command with output redirection:
+2. Run the resolved GPT command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes from the repository (see `docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`codex` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> codex exec \
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec \
        -c model_reasoning_effort=medium \
-       "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/stderr/gpt-v<N>.txt"
+       "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/stderr/gpt-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/stderr/gpt-v<N>.txt"
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/stderr/gpt-v<N>.txt")
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
-4. Return: exit code, elapsed time, retry count, output file path
+3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
+
+   ```bash
+   CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
+   if [ "$CURRENT_STATUS" != "$REPO_FINGERPRINT" ]; then
+     git -C "$REPO_TOPLEVEL" checkout -- . 2>/dev/null || true
+     git -C "$REPO_TOPLEVEL" clean -fd 2>/dev/null || true
+     printf '{"event":"repo_guard_violation","timestamp":"%s","model":"gpt","reverted":true}\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >>"$SESSION_DIR/guard-events.jsonl"
+   fi
+   ```
+
+4. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gemini-3-flash-preview for Gemini; gpt-5.4-mini via agent for GPT)
+5. Return: exit code, elapsed time, retry count, output file path
 
 ### Artifact Capture
 
@@ -535,6 +581,8 @@ If a model variant failed or was unavailable, include a note in place of its res
 
 After presenting the results:
 
+- **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation. Append a `repo_guard_final` event to `events.jsonl`.
+
 - Update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now.
 - Append a `session_complete` event to `events.jsonl`:
 
@@ -552,7 +600,7 @@ ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/brainstorm/latest"
 
 ## Rules
 
-- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run from `$SESSION_DIR` (not the repo root), post-CLI verification reverts rogue writes, and session-end verification catches anything that slipped through.
 - Each variant MUST receive a separate, independent prompt invocation to prevent anchoring. Never combine multiple variants in a single model call.
 - When `--variants=1`, omit the variant label from output headers (just "Claude", not "Claude — Variant 1").
 - Always cite specific files and line numbers when possible.
