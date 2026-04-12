@@ -453,6 +453,51 @@ If neither `timeout` nor `gtimeout` is found, commands run without a time limit.
 
 If no external CLIs are available, commands fall back to Claude-only mode with a note about the limitation.
 
+### Gemini reasoning depth
+
+Loom invokes `gemini -m gemini-3-pro-preview` rather than
+`gemini-3.1-pro-preview`. This is deliberate: in the installed `gemini-cli`
+bundle, only `gemini-3-pro-preview` extends the built-in `chat-base-3` alias
+that sets `thinkingLevel: HIGH`. The `3.1` variant exists but has no alias
+linking it to HIGH thinking, so one-shot `-p` invocations produce noticeably
+shallower output.
+
+No user configuration is required — the model ID alone forces HIGH thinking
+via the built-in alias chain.
+
+**Diagnostic**: to confirm loom is hitting a Gemini 3 model (and not silently
+downgrading to 2.5 Pro due to missing preview access):
+
+```console
+gemini -m gemini-3-pro-preview -y -p "Report your exact model ID and thinking level."
+```
+
+**Optional: pin to 3.1 with HIGH thinking.** If you prefer the newer
+`gemini-3.1-pro-preview` model, add a custom alias to `~/.gemini/settings.json`
+and change the loom commands locally to use it. This is opt-in; loom will never
+write to your `~/.gemini/` directory:
+
+```json
+{
+  "modelConfigs": {
+    "customAliases": {
+      "gemini-3.1-pro-high": {
+        "extends": "chat-base-3",
+        "modelConfig": {
+          "model": "gemini-3.1-pro-preview",
+          "generateContentConfig": {
+            "thinkingConfig": {
+              "thinkingLevel": "HIGH",
+              "includeThoughts": true
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 ## Shell Resilience
 
 All commands use `command -v` (POSIX-portable) instead of `which` for CLI detection. Prompts are written to the session directory (`$SESSION_DIR/pass-NNNN/prompt.md`) to avoid shell metacharacter injection while also persisting artifacts. stderr is captured per-pass (`$SESSION_DIR/pass-NNNN/stderr/<model>.txt`) for failure diagnostics. A structured retry protocol classifies failures (timeout, rate-limit, crash, empty output) and retries retryable failures once before marking a model unavailable.

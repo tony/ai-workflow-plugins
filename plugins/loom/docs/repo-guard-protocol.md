@@ -18,7 +18,7 @@ prompt input and output paths use absolute paths, so this is transparent.
 serene-bliss, ask, plan, review):
 
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gemini.md" 2>"$SESSION_DIR/.../stderr.txt")
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gemini.md" 2>"$SESSION_DIR/.../stderr.txt")
 ```
 
 **Write commands** (execute, prompt, architecture) already wrap external CLIs
