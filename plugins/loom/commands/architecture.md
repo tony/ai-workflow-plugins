@@ -166,7 +166,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 | Slot | Priority 1 (native) | Native model | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|--------------|-----------------------------|-----------  |
 | **Claude** | Always available (this agent) | — | — | — |
-| **Gemini** | `gemini` binary | `gemini-3.1-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
+| **Gemini** | `gemini` binary | `gemini-3-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | **GPT** | `codex` binary | (default) | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
 
 **Resolution logic** for each external slot:
@@ -439,7 +439,7 @@ The agent must:
 
    **Native (`gemini` CLI)**:
    ```bash
-   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-loom-gemini" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
    **Fallback (`agent` CLI)**:

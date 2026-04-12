@@ -194,7 +194,7 @@ After interactive configuration, launch a single setup Task agent (`subagent_typ
 > | Slot | Priority 1 (native) | Native model | Priority 2 (agent fallback) | Agent model |
 > |------|---------------------|--------------|-----------------------------|-----------  |
 > | **Claude** | Always available (this agent) | — | — | — |
-> | **Gemini** | `gemini` binary | `gemini-3.1-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
+> | **Gemini** | `gemini` binary | `gemini-3-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 > | **GPT** | `codex` binary | (default) | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
 >
 > Resolution logic for each external slot:
@@ -407,7 +407,7 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to r
 >
 > **Native (`gemini` CLI)**:
 > ```bash
-> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
 > ```
 >
 > **Fallback (`agent` CLI)**:

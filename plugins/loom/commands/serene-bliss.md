@@ -179,6 +179,7 @@ number:
 For each variant N in {1, 2, 3}, write
 `$SESSION_DIR/brainstorm/prompts/variant-<N>.md` containing:
 
+- **Reasoning directive** (first line): `Think through the problem step-by-step and consider multiple angles before producing your final response.`
 - `Variant N of 3: <Compound Preamble>` (shell-safe single paragraph)
 - The base user prompt (with reserved flags stripped)
 - The context packet content
@@ -240,7 +241,7 @@ The agent must:
    **Native (`gemini` CLI)**:
 
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:

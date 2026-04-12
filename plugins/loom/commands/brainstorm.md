@@ -138,7 +138,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 | Slot | Priority 1 (native) | Native model | Priority 2 (agent fallback) | Agent model |
 |------|---------------------|--------------|-----------------------------|-----------  |
 | **Claude** | Always available (this agent) | — | — | — |
-| **Gemini** | `gemini` binary | `gemini-3.1-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
+| **Gemini** | `gemini` binary | `gemini-3-pro-preview` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | **GPT** | `codex` binary | (default) | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
 
 **Resolution logic** for each external slot:
@@ -354,6 +354,7 @@ When `--preamble` is provided, it replaces the built-in preamble text for ALL va
 For each variant, write a separate prompt file containing the fully rendered prompt for that variant. This ensures shell-safe CLI invocation via `$(cat ...)` and persists each variant's exact prompt as a session artifact.
 
 For each variant N (1 through `variant_count`), write `$SESSION_DIR/prompts/variant-<N>.md` containing:
+- **Reasoning directive** (first line): `Think through the problem step-by-step and consider multiple angles before producing your final response.`
 - The variant preamble for variant N
 - The base user prompt (with flags stripped)
 - The context packet content
@@ -404,7 +405,7 @@ The agent must:
 
    **Native (`gemini` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/prompts/variant-<N>.md")" >"$SESSION_DIR/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/stderr/gemini-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
