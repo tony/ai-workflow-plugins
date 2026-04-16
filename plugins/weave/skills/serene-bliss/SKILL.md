@@ -7,7 +7,7 @@ description: >-
   DX Serenity (calm clarity), and DX Sublimity (showcase-grade novelty).
   Triggers on phrases like "serene bliss", "DX bliss", "DX serenity",
   "DX sublimity", "reader happiness", "make this serene", "serene
-  developer experience", or "serene DX". Runs the /loom:serene-bliss
+  developer experience", or "serene DX". Runs the /weave:serene-bliss
   command, which dispatches three lens variants across all available
   models in parallel and judges each refine pass with a multi-model
   panel (Claude + Gemini + GPT, peer-only averaging).
@@ -15,10 +15,10 @@ user-invocable: true
 argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
 ---
 
-# Loom Serene Bliss
+# Weave Serene Bliss
 
 A three-lens aesthetic brainstorm-and-refine pipeline for DX, documentation,
-and developer-tooling UX work. Each of the three loom variant slots carries
+and developer-tooling UX work. Each of the three weave variant slots carries
 a different serene-DX lens, so a single invocation yields three
 independent aesthetic takes before the refine phase picks and polishes the
 strongest.
@@ -52,21 +52,21 @@ a fourth slot.
 
 ## How to Invoke
 
-Run the `/loom:serene-bliss` command. It is a locked preset of
-`/loom:brainstorm-and-refine` that fixes `--variants=3` and a compound
+Run the `/weave:serene-bliss` command. It is a locked preset of
+`/weave:brainstorm-and-refine` that fixes `--variants=3` and a compound
 preamble mapping each variant slot to one of the three lenses.
 
 ```
-/loom:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]
+/weave:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]
 ```
 
 The command locks `--variants` and `--preamble`; do not override
 either. For the canonical compound preamble text and the delegation
-contract, see `plugins/loom/commands/serene-bliss.md`.
+contract, see `plugins/weave/commands/serene-bliss.md`.
 
 ## Context Packet Expectations
 
-Loom builds a standard context packet for every invocation. For
+Weave builds a standard context packet for every invocation. For
 serene-DX work, make sure the host surfaces these fields before
 invoking, so each lens has something concrete to react to:
 
@@ -101,4 +101,4 @@ invoking, so each lens has something concrete to react to:
   lens-differentiation that makes the brainstorm phase useful.
 - **Using this for implementation tasks.** Serene-bliss is a
   design-research pattern. For actual code changes, run
-  `/loom:execute` or `/loom:prompt` instead.
+  `/weave:execute` or `/weave:prompt` instead.

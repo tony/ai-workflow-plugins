@@ -10,7 +10,7 @@ user-invocable: true
 argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...]"
 ---
 
-# Loom Brainstorm
+# Weave Brainstorm
 
 Generate independent original responses from Claude, Gemini, and GPT in parallel. Each model produces its own unique take — no synthesis, no judging, just raw creative output.
 
@@ -19,7 +19,7 @@ Generate independent original responses from Claude, Gemini, and GPT in parallel
 - You need multiple independent perspectives on a problem
 - You want to explore creative alternatives before committing
 - You want to see how different AI models approach the same prompt
-- You need a pool of originals to feed into `/loom:refine` or `/loom:brainstorm-and-refine`
+- You need a pool of originals to feed into `/weave:refine` or `/weave:brainstorm-and-refine`
 
 ## Key Features
 
@@ -30,4 +30,4 @@ Generate independent original responses from Claude, Gemini, and GPT in parallel
 
 ## How to Invoke
 
-Run the `/loom:brainstorm` command with your prompt. The command handles context gathering, model detection, parallel dispatch, and artifact persistence.
+Run the `/weave:brainstorm` command with your prompt. The command handles context gathering, model detection, parallel dispatch, and artifact persistence.

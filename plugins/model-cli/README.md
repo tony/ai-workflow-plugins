@@ -89,11 +89,11 @@ Example:
 
 The `mode:plan` trigger works with all four skills (codex, gpt, gemini, cursor).
 
-## Comparison with loom
+## Comparison with weave
 
-The **loom** plugin runs all models in parallel and synthesizes results. The **model-cli** plugin runs a single model at a time — useful when you want to target a specific model without the overhead of parallel orchestration.
+The **weave** plugin runs all models in parallel and synthesizes results. The **model-cli** plugin runs a single model at a time — useful when you want to target a specific model without the overhead of parallel orchestration.
 
-| Feature | loom | model-cli |
+| Feature | weave | model-cli |
 |---------|------|-----------|
 | Parallel execution | All models at once | Single model |
 | Synthesis | Best-of-all merge | Direct output |

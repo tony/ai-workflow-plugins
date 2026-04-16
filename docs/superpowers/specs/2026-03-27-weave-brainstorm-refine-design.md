@@ -1,8 +1,8 @@
-# Loom Brainstorm & Refine — Design Spec
+# Weave Brainstorm & Refine — Design Spec
 
 ## Context
 
-The existing loom plugin provides multi-model orchestration (Claude, Gemini, GPT)
+The existing weave plugin provides multi-model orchestration (Claude, Gemini, GPT)
 for tasks like asking questions, planning, executing, and reviewing code. All
 existing commands use a **targeted conflict resolution** approach for multi-pass
 refinement — subsequent passes only address unresolved conflicts, critic findings,
@@ -15,7 +15,7 @@ output genuinely improves with each pass rather than just resolving disputes.
 
 ## Components
 
-Three new loom components, each implemented as a command + skill wrapper pair:
+Three new weave components, each implemented as a command + skill wrapper pair:
 
 | Component | Command | Skill | Purpose |
 |-----------|---------|-------|---------|
@@ -23,13 +23,13 @@ Three new loom components, each implemented as a command + skill wrapper pair:
 | refine | `commands/refine.md` | `skills/refine/SKILL.md` | Iterative improvement of a single artifact |
 | brainstorm-and-refine | `commands/brainstorm-and-refine.md` | `skills/brainstorm-and-refine/SKILL.md` | Full pipeline: generate then refine |
 
-All commands follow the existing loom plugin conventions: context packets, model
+All commands follow the existing weave plugin conventions: context packets, model
 detection with `agent` CLI fallback, session artifact persistence to `$AI_AIP_ROOT`,
 timeout handling, and retry/fallback protocols.
 
 ---
 
-## 1. `loom:brainstorm`
+## 1. `weave:brainstorm`
 
 ### Purpose
 
@@ -136,7 +136,7 @@ $SESSION_DIR/
 
 ---
 
-## 2. `loom:refine`
+## 2. `weave:refine`
 
 ### Purpose
 
@@ -277,7 +277,7 @@ $SESSION_DIR/
 
 ---
 
-## 3. `loom:brainstorm-and-refine`
+## 3. `weave:brainstorm-and-refine`
 
 ### Purpose
 
@@ -417,7 +417,7 @@ command -v fd >/dev/null 2>&1 && echo "fd:available" || echo "fd:missing"
 
 ### Model Detection
 
-Same as existing loom commands:
+Same as existing weave commands:
 
 | Slot | Native CLI | Agent fallback |
 |------|-----------|----------------|
@@ -435,7 +435,7 @@ Same as existing loom commands:
 
 2. **Expansive weaving vs targeted conflict resolution** — Each refine pass is
    a FULL re-evaluation cycle, not a narrow conflict-only pass. This is the
-   core differentiator from existing loom multi-pass.
+   core differentiator from existing weave multi-pass.
 
 3. **All models re-improve each pass** — The woven result goes back to all
    models, not just the judge. This preserves multi-perspective diversity
@@ -458,7 +458,7 @@ Same as existing loom commands:
 ## 7. Files to Create
 
 ```
-plugins/loom/
+plugins/weave/
   commands/
     brainstorm.md              # new
     refine.md                  # new
@@ -473,23 +473,23 @@ plugins/loom/
 ```
 
 Update:
-- `plugins/loom/.claude-plugin/plugin.json` — update description if needed
-- `plugins/loom/README.md` — add documentation for new commands/skills
-- `.claude-plugin/marketplace.json` — verify loom plugin entry still accurate
+- `plugins/weave/.claude-plugin/plugin.json` — update description if needed
+- `plugins/weave/README.md` — add documentation for new commands/skills
+- `.claude-plugin/marketplace.json` — verify weave plugin entry still accurate
 
 ---
 
 ## 8. Verification
 
-1. **Skill discovery**: Install the plugin, verify `/loom:brainstorm`,
-   `/loom:refine`, `/loom:brainstorm-and-refine` appear in command list
+1. **Skill discovery**: Install the plugin, verify `/weave:brainstorm`,
+   `/weave:refine`, `/weave:brainstorm-and-refine` appear in command list
    and skills are auto-triggered by matching descriptions.
 
-2. **Brainstorm**: Run `/loom:brainstorm "design a CLI flag parser"
+2. **Brainstorm**: Run `/weave:brainstorm "design a CLI flag parser"
    --variants=2`. Verify 6 independent responses (3 models x 2 variants),
    each with distinct creative direction, all persisted to session dir.
 
-3. **Refine**: Run `/loom:refine "My draft paragraph about X" --passes=2`.
+3. **Refine**: Run `/weave:refine "My draft paragraph about X" --passes=2`.
    Verify pass 1 produces independent critiques, pass 2 shows judge
    assessment with winner/strengths/weaknesses, woven result improves.
 

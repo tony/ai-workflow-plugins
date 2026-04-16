@@ -10,7 +10,7 @@ user-invocable: true
 argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...]"
 ---
 
-# Loom Brainstorm & Refine
+# Weave Brainstorm & Refine
 
 The full pipeline: generate independent originals from each model, then iteratively refine them through judge-weave-incorporate cycles.
 
@@ -37,4 +37,4 @@ The full pipeline: generate independent originals from each model, then iterativ
 
 ## How to Invoke
 
-Run the `/loom:brainstorm-and-refine` command with your prompt. The command handles both phases, the transition gate, and artifact persistence.
+Run the `/weave:brainstorm-and-refine` command with your prompt. The command handles both phases, the transition gate, and artifact persistence.

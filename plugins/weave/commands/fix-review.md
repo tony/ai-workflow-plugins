@@ -1,11 +1,11 @@
 ---
-description: Fix loom review findings — validate, add test coverage, fix, and commit each as atomic changes
+description: Fix weave review findings — validate, add test coverage, fix, and commit each as atomic changes
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion", "EnterPlanMode", "ExitPlanMode"]
 ---
 
 # Fix Review Findings
 
-Process loom code review findings from the conversation context. Validate each finding independently against the actual codebase and project conventions, add test coverage where applicable, apply fixes as separate atomic commits, and ensure all quality gates pass before each commit.
+Process weave code review findings from the conversation context. Validate each finding independently against the actual codebase and project conventions, add test coverage where applicable, apply fixes as separate atomic commits, and ensure all quality gates pass before each commit.
 
 Multi-pass (`multipass`, `x2`, etc.) is not applicable to this command — it is already iterative by nature. Trigger words are ignored if present.
 
@@ -61,11 +61,11 @@ Follow the approved orchestration plan for finding order and priority.
 If no orchestration plan was created (plan mode unavailable), proceed
 with the default priority ordering below.
 
-**Goal**: Extract structured findings from the loom review report in the conversation.
+**Goal**: Extract structured findings from the weave review report in the conversation.
 
 **Actions**:
 
-1. **Locate the review report** in the conversation context (output from `/loom:review` or similar)
+1. **Locate the review report** in the conversation context (output from `/weave:review` or similar)
 
 2. **Extract each finding** into a numbered list with:
    - **Consensus level**: how many reviewers flagged it (3, 2, or 1)
@@ -177,7 +177,7 @@ Stage only the files changed for this specific finding:
 git add <specific-files>
 ```
 
-Use the project's commit message format from AGENTS.md/CLAUDE.md. Include a reference to the loom review finding.
+Use the project's commit message format from AGENTS.md/CLAUDE.md. Include a reference to the weave review finding.
 
 ### Step 6: Verify Clean State
 

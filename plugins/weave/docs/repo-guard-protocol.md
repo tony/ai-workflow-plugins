@@ -1,9 +1,9 @@
 # Repo Guard Protocol
 
-Prevents loom sessions from modifying repository files. All phases — main
+Prevents weave sessions from modifying repository files. All phases — main
 agents, sub-agents, judges — must keep mutations within `$SESSION_DIR` (for
 read-only commands) or worktrees (for write commands). This protocol applies
-to every loom command except `fix-review` (which intentionally modifies the
+to every weave command except `fix-review` (which intentionally modifies the
 repository).
 
 ---

@@ -1,4 +1,4 @@
-# loom
+# weave
 
 Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
 
@@ -13,24 +13,24 @@ Add the marketplace:
 Install the plugin:
 
 ```console
-/plugin install loom@ai-workflow-plugins
+/plugin install weave@ai-workflow-plugins
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `/loom:ask` | Ask all models a question, synthesize the best answer |
-| `/loom:plan` | Get implementation plans from all models, synthesize the best plan |
-| `/loom:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
-| `/loom:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
-| `/loom:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
-| `/loom:review` | Run code review with all models, produce consensus-weighted report |
-| `/loom:fix-review` | Fix review findings as atomic commits with test coverage |
-| `/loom:brainstorm` | Generate independent original ideas from each model, with optional multiple variants |
-| `/loom:refine` | Iteratively improve an artifact through multi-model critique and weaving |
-| `/loom:brainstorm-and-refine` | Full pipeline: brainstorm originals, then iteratively judge, weave, and refine |
-| `/loom:serene-bliss` | Three-lens DX brainstorm-and-refine (Bliss, Serenity, Sublimity) with multi-model panel judging |
+| `/weave:ask` | Ask all models a question, synthesize the best answer |
+| `/weave:plan` | Get implementation plans from all models, synthesize the best plan |
+| `/weave:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
+| `/weave:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
+| `/weave:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
+| `/weave:review` | Run code review with all models, produce consensus-weighted report |
+| `/weave:fix-review` | Fix review findings as atomic commits with test coverage |
+| `/weave:brainstorm` | Generate independent original ideas from each model, with optional multiple variants |
+| `/weave:refine` | Iteratively improve an artifact through multi-model critique and weaving |
+| `/weave:brainstorm-and-refine` | Full pipeline: brainstorm originals, then iteratively judge, weave, and refine |
+| `/weave:serene-bliss` | Three-lens DX brainstorm-and-refine (Bliss, Serenity, Sublimity) with multi-model panel judging |
 
 ## Skills
 
@@ -38,10 +38,10 @@ Skills provide auto-discovery — they trigger when the user's intent matches th
 
 | Skill | Triggers on |
 |-------|-------------|
-| `loom:brainstorm` | "brainstorm", "give me ideas", "multiple approaches", "explore alternatives" |
-| `loom:refine` | "refine this", "improve this", "make this better", "iterate on this" |
-| `loom:brainstorm-and-refine` | "brainstorm and refine", "generate ideas then improve", "explore then synthesize" |
-| `loom:serene-bliss` | "serene bliss", "DX bliss", "DX serenity", "DX sublimity", "reader happiness" |
+| `weave:brainstorm` | "brainstorm", "give me ideas", "multiple approaches", "explore alternatives" |
+| `weave:refine` | "refine this", "improve this", "make this better", "iterate on this" |
+| `weave:brainstorm-and-refine` | "brainstorm and refine", "generate ideas then improve", "explore then synthesize" |
+| `weave:serene-bliss` | "serene bliss", "DX bliss", "DX serenity", "DX sublimity", "reader happiness" |
 
 ## How It Works
 
@@ -65,7 +65,7 @@ All commands share four quality protocols that decorrelate model outputs and imp
 
 ### Repo Guard Protocol
 
-All loom commands enforce a 5-layer guard that prevents sessions from
+All weave commands enforce a 5-layer guard that prevents sessions from
 modifying repository files. See `docs/repo-guard-protocol.md` for
 the full specification.
 
@@ -155,7 +155,7 @@ guides analysis before execution.
 
 ## Sub-Agent Architecture
 
-All loom commands use the Task tool to delegate work to sub-agents. Each model execution runs in its own sub-agent,
+All weave commands use the Task tool to delegate work to sub-agents. Each model execution runs in its own sub-agent,
 enabling true parallel dispatch when the host supports it.
 
 | Role | Agent type | Mode | Purpose |
@@ -182,12 +182,12 @@ Control pass count, timeout, and execution mode with explicit flags:
 
 | Flag | Values | Default | Example |
 |------|--------|---------|---------|
-| `--passes=N` | 1–5 | 1 (refine: 2) | `/loom:plan add auth --passes=2` |
-| `--timeout=N\|none` | seconds or `none` | command-specific | `/loom:ask question --timeout=300` |
-| `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/loom:execute task --mode=deep` |
-| `--variants=N` | 1–3 | 1 | `/loom:brainstorm idea --variants=2` |
-| `--judge=host\|round-robin` | Who judges each refinement pass | `host` | `/loom:refine draft --judge=round-robin` |
-| `--preamble=...` | text | built-in | `/loom:brainstorm idea --preamble='focus on perf'` |
+| `--passes=N` | 1–5 | 1 (refine: 2) | `/weave:plan add auth --passes=2` |
+| `--timeout=N\|none` | seconds or `none` | command-specific | `/weave:ask question --timeout=300` |
+| `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/weave:execute task --mode=deep` |
+| `--variants=N` | 1–3 | 1 | `/weave:brainstorm idea --variants=2` |
+| `--judge=host\|round-robin` | Who judges each refinement pass | `host` | `/weave:refine draft --judge=round-robin` |
+| `--preamble=...` | text | built-in | `/weave:brainstorm idea --preamble='focus on perf'` |
 
 Mode presets vary by command. For the original commands (ask, plan, prompt, execute, architecture, review): `fast` (1 pass, 0.5× timeout), `balanced` (1 pass, 1× timeout), `deep` (2 passes, 1.5× timeout). For brainstorm: presets control variants and timeout (deep = 2 variants). For refine: presets control passes and timeout (balanced = 2 passes, deep = 3 passes). For brainstorm-and-refine: presets control variants, passes, and timeout (deep = 2 variants, 3 passes).
 
@@ -432,7 +432,7 @@ To list sessions, scan `session.json` files under `$AI_AIP_ROOT/repos/<slug>--<h
 
 ## Prerequisites
 
-At minimum, Claude (this agent) is always available. For loom functionality, install one or more external CLIs:
+At minimum, Claude (this agent) is always available. For weave functionality, install one or more external CLIs:
 
 | CLI | Model | Install |
 |-----|-------|---------|
@@ -455,7 +455,7 @@ If no external CLIs are available, commands fall back to Claude-only mode with a
 
 ### Gemini reasoning depth
 
-Loom invokes `gemini -m gemini-3-pro-preview` rather than
+Weave invokes `gemini -m gemini-3-pro-preview` rather than
 `gemini-3.1-pro-preview`. This is deliberate: in the installed `gemini-cli`
 bundle, only `gemini-3-pro-preview` extends the built-in `chat-base-3` alias
 that sets `thinkingLevel: HIGH`. The `3.1` variant exists but has no alias
@@ -465,7 +465,7 @@ shallower output.
 No user configuration is required — the model ID alone forces HIGH thinking
 via the built-in alias chain.
 
-**Diagnostic**: to confirm loom is hitting a Gemini 3 model (and not silently
+**Diagnostic**: to confirm weave is hitting a Gemini 3 model (and not silently
 downgrading to 2.5 Pro due to missing preview access):
 
 ```console
@@ -474,7 +474,7 @@ gemini -m gemini-3-pro-preview -y -p "Report your exact model ID and thinking le
 
 **Optional: pin to 3.1 with HIGH thinking.** If you prefer the newer
 `gemini-3.1-pro-preview` model, add a custom alias to `~/.gemini/settings.json`
-and change the loom commands locally to use it. This is opt-in; loom will never
+and change the weave commands locally to use it. This is opt-in; weave will never
 write to your `~/.gemini/` directory:
 
 ```json

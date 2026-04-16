@@ -1,10 +1,10 @@
 ---
-description: Loom code review — runs Claude, Gemini, and GPT reviews in parallel, then synthesizes findings
+description: Weave code review — runs Claude, Gemini, and GPT reviews in parallel, then synthesizes findings
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion", "EnterPlanMode", "ExitPlanMode"]
 argument-hint: "[focus area] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
 ---
 
-# Loom Code Review
+# Weave Code Review
 
 Run code review using up to three AI models (Claude, Gemini, GPT) in parallel, then synthesize their findings into a unified report with evidence-backed adjudication. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, synthesis results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 
@@ -634,7 +634,7 @@ After verification, group findings that refer to the same issue (same file, simi
 ### Present the Report
 
 ```markdown
-# Loom Code Review Report
+# Weave Code Review Report
 
 **Branch**: <branch-name>
 **Compared against**: origin/<trunk>
