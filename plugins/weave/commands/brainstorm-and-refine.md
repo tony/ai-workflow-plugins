@@ -1,10 +1,10 @@
 ---
-description: Loom brainstorm & refine — generate independent original ideas from Claude, Gemini, and GPT, then iteratively judge, weave, and refine them into the best possible result
+description: Weave brainstorm & refine — generate independent original ideas from Claude, Gemini, and GPT, then iteratively judge, weave, and refine them into the best possible result
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...]"
 ---
 
-# Loom Brainstorm & Refine
+# Weave Brainstorm & Refine
 
 The full pipeline: generate independent originals from multiple AI models (Claude, Gemini, GPT), then iteratively refine them through a judge-weave-distribute cycle. Phase 1 brainstorms diverse responses with optional multiple variants per model. Phase 2 takes the best originals through iterative refinement where each pass picks the best, incorporates strengths from runners-up, and distributes the woven result back for another round.
 
@@ -711,7 +711,7 @@ Compute the total score for each original (sum of four dimensions, max 40).
 
 #### External Judge Protocol (Gemini or GPT judges)
 
-When the judge for a pass is an external model (pass 2+ in round-robin mode), follow the External Judge Protocol defined in `/loom:refine` Phase 4 Step 1. The protocol is identical:
+When the judge for a pass is an external model (pass 2+ in round-robin mode), follow the External Judge Protocol defined in `/weave:refine` Phase 4 Step 1. The protocol is identical:
 
 1. Construct judge prompt with scoring rubric, expected output format, and all model outputs inline
 2. Write prompt to `$SESSION_DIR/refine/pass-NNNN/judge-prompt.md`

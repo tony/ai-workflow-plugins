@@ -49,7 +49,7 @@ from _private_path import PrivatePath  # pyright: ignore[reportImplicitRelativeI
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_NAME = "ai-workflow-plugins"
 GITHUB_SOURCE = "tony/ai-workflow-plugins"
-PLUGINS = ["commit", "loom", "rebase", "changelog", "tdd", "model-cli", "research"]
+PLUGINS = ["commit", "weave", "rebase", "changelog", "tdd", "model-cli", "research"]
 
 app = typer.Typer(help="E2E plugin lifecycle tests for ai-workflow-plugins.")
 console = rich.console.Console()
@@ -295,18 +295,18 @@ def _test_static_marketplace_json() -> list[TestCase]:
     return tests
 
 
-def _test_static_loom_timeouts() -> list[TestCase]:
-    """Verify loom command timeout multipliers are consistent (0.5x/1.5x)."""
+def _test_static_weave_timeouts() -> list[TestCase]:
+    """Verify weave command timeout multipliers are consistent (0.5x/1.5x)."""
     tests: list[TestCase] = []
-    loom_commands_dir = REPO_ROOT / "plugins" / "loom" / "commands"
-    if not loom_commands_dir.is_dir():
+    weave_commands_dir = REPO_ROOT / "plugins" / "weave" / "commands"
+    if not weave_commands_dir.is_dir():
         return tests
 
     timeout_pattern = re.compile(
         r'"Default \((\d+)s\)".*\n.*"Quick — (\d+)s".*\n.*"Long — (\d+)s"',
     )
 
-    for cmd_file in sorted(loom_commands_dir.glob("*.md")):
+    for cmd_file in sorted(weave_commands_dir.glob("*.md")):
 
         def _check_timeouts(p: Path = cmd_file) -> None:
             text = p.read_text(encoding="utf-8")
@@ -327,21 +327,21 @@ def _test_static_loom_timeouts() -> list[TestCase]:
                 f"{rel}: Long={long_}s but expected {expected_long}s (1.5x {default}s)",
             )
 
-        tests.append((f"loom timeouts: {cmd_file.name}", _check_timeouts))
+        tests.append((f"weave timeouts: {cmd_file.name}", _check_timeouts))
 
     return tests
 
 
-def _test_static_loom_stderr_redirects() -> list[TestCase]:
+def _test_static_weave_stderr_redirects() -> list[TestCase]:
     """Verify fallback agent CLI uses append (2>>) not overwrite (2>)."""
     tests: list[TestCase] = []
-    loom_commands_dir = REPO_ROOT / "plugins" / "loom" / "commands"
-    if not loom_commands_dir.is_dir():
+    weave_commands_dir = REPO_ROOT / "plugins" / "weave" / "commands"
+    if not weave_commands_dir.is_dir():
         return tests
 
     def _check_redirects() -> None:
         bad_files: list[str] = []
-        for cmd_file in sorted(loom_commands_dir.glob("*.md")):
+        for cmd_file in sorted(weave_commands_dir.glob("*.md")):
             text = cmd_file.read_text(encoding="utf-8")
             for line in text.splitlines():
                 if "agent " in line and '2>"$SESSION_DIR' in line:
@@ -352,7 +352,7 @@ def _test_static_loom_stderr_redirects() -> list[TestCase]:
             f"Agent fallbacks using 2> instead of 2>>: {', '.join(bad_files)}",
         )
 
-    tests.append(("loom stderr redirects", _check_redirects))
+    tests.append(("weave stderr redirects", _check_redirects))
     return tests
 
 
@@ -566,8 +566,8 @@ def main(
     static_tests.extend(_test_static_plugin_structure())
     static_tests.extend(_test_static_agent_skill_frontmatter())
     static_tests.extend(_test_static_marketplace_json())
-    static_tests.extend(_test_static_loom_timeouts())
-    static_tests.extend(_test_static_loom_stderr_redirects())
+    static_tests.extend(_test_static_weave_timeouts())
+    static_tests.extend(_test_static_weave_stderr_redirects())
     static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
     static_total = len(static_tests)
 

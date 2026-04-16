@@ -1,10 +1,10 @@
 ---
-description: Loom brainstorm — generate independent original ideas from Claude, Gemini, and GPT in parallel, with optional multiple variants per model
+description: Weave brainstorm — generate independent original ideas from Claude, Gemini, and GPT in parallel, with optional multiple variants per model
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...]"
 ---
 
-# Loom Brainstorm
+# Weave Brainstorm
 
 Generate independent original responses from multiple AI models (Claude, Gemini, GPT) in parallel, with optional multiple variants per model. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, variant results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 

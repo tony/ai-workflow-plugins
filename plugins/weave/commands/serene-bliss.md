@@ -1,10 +1,10 @@
 ---
-description: Loom serene bliss — three-lens DX brainstorm-and-refine with multi-model panel judging
+description: Weave serene bliss — three-lens DX brainstorm-and-refine with multi-model panel judging
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
 ---
 
-# Loom Serene Bliss
+# Weave Serene Bliss
 
 A first-class three-lens brainstorm-and-refine command for
 developer-experience, documentation, and tooling-UX design work. Three
@@ -14,9 +14,9 @@ all available models in parallel. Each refine pass is judged by a
 **multi-model panel** (Claude + Gemini + GPT in parallel), with verdicts
 merged via **peer-only averaging** to neutralize self-favoritism.
 
-This is the only loom command that uses panel judging. For host or
+This is the only weave command that uses panel judging. For host or
 round-robin judging on user-defined variants, use
-`/loom:brainstorm-and-refine` instead.
+`/weave:brainstorm-and-refine` instead.
 
 This is a **project-read-only** command. Session artifacts land under
 `$AI_AIP_ROOT`, outside your repository.
@@ -44,14 +44,14 @@ collapses into Serenity; there is no fourth slot.
 
 The compound preamble injected into each variant is a single paragraph
 (no embedded newlines) for shell-quoting safety. This file is the
-canonical location — the `loom:serene-bliss` skill references this
+canonical location — the `weave:serene-bliss` skill references this
 block rather than duplicating it.
 
 ```
 You are a developer-experience design expert. Apply the Serene DX aesthetic lens matching your variant slot. Variant 1 → DX Bliss: frictionless, delightful, zero-friction; make it feel effortless. Variant 2 → DX Serenity: calm, unhurried, information-architectural; make it feel like a quiet library. Variant 3 → DX Sublimity: awe, novel extensions, showcase-grade; make it feel like a first. Compare the current state to any concrete reference implementation named in the prompt, and name what is ugly or broken. Do NOT modify any files — research only.
 ```
 
-Loom prepends `"Variant N of M:"` to this string automatically for each
+Weave prepends `"Variant N of M:"` to this string automatically for each
 variant, so the compound preamble's slot directives route each model to
 the correct lens via its variant number.
 
@@ -70,13 +70,13 @@ line at session start and strip them:
   contract depends on it.
 - `--preamble=*` — serene-bliss locks the compound preamble above.
 - `--judge=*` — serene-bliss locks `--judge=panel`; users who want
-  host or round-robin should run `/loom:brainstorm-and-refine`.
+  host or round-robin should run `/weave:brainstorm-and-refine`.
 
 Warning line format (printed once, at the start of execution if any
 reserved flag was seen):
 
 > "Note: `--variants`, `--preamble`, and/or `--judge` were ignored —
-> serene-bliss locks all three. Run `/loom:brainstorm-and-refine`
+> serene-bliss locks all three. Run `/weave:brainstorm-and-refine`
 > directly for full control."
 
 **Passthrough flags** — apply unchanged:
@@ -90,7 +90,7 @@ reserved flag was seen):
 ## Phase 1: Gather Context
 
 Follow Phase 1 (Gather Context) of
-`plugins/loom/commands/brainstorm-and-refine.md` verbatim — read
+`plugins/weave/commands/brainstorm-and-refine.md` verbatim — read
 CLAUDE.md/AGENTS.md for project
 conventions, detect the trunk branch, capture the prompt from
 `$ARGUMENTS`. No serene-bliss-specific changes.
@@ -98,7 +98,7 @@ conventions, detect the trunk branch, capture the prompt from
 ## Phase 1b: Build Context Packet
 
 Follow Phase 1b (Build Context Packet) of
-`plugins/loom/commands/brainstorm-and-refine.md` verbatim — assemble
+`plugins/weave/commands/brainstorm-and-refine.md` verbatim — assemble
 the structured context bundle that
 all models will receive.
 
@@ -112,7 +112,7 @@ this is load-bearing.
 ## Phase 2: Configure and Detect Models
 
 Follow Phase 2 (Configuration and Model Detection) of
-`plugins/loom/commands/brainstorm-and-refine.md` — flag parsing,
+`plugins/weave/commands/brainstorm-and-refine.md` — flag parsing,
 mode/timeout/passes resolution, model
 detection (Claude, Gemini, GPT), session directory setup — with these
 **serene-bliss overrides** applied after the standard parsing:
@@ -146,7 +146,7 @@ After model detection completes, count the available models:
   > "Warning: only Claude detected — panel is unavailable. Falling
   > back to host judging for all passes."
   All judging will use the Host Judge Protocol from
-  `plugins/loom/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+  `plugins/weave/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
   Host Judge Protocol).
 
 Record the resolved `judge_mode` and panel member set in
@@ -164,7 +164,7 @@ each model producing all three lens variants in parallel.
 The variant preambles are FIXED for serene-bliss — the variant preamble
 table from brainstorm.md/brainstorm-and-refine.md does NOT apply.
 Instead, every variant receives the **same** compound preamble (above),
-prefixed by loom's standard "Variant N of M:" marker. The compound
+prefixed by weave's standard "Variant N of M:" marker. The compound
 preamble's slot directives route each variant to its lens by variant
 number:
 
@@ -354,7 +354,7 @@ gpt-5.4-mini via agent.
 ## Phase 4: Present Originals and Transition Gate
 
 Follow Phase 4 (Present Brainstorm Results and Transition Gate) of
-`plugins/loom/commands/brainstorm-and-refine.md` verbatim. Present all
+`plugins/weave/commands/brainstorm-and-refine.md` verbatim. Present all
 successful brainstorm originals
 to the user, ask which ones enter refinement via `AskUserQuestion`,
 update `session.json` to `phase: "refine"`, and proceed.
@@ -373,7 +373,7 @@ verdicts are merged via peer-only averaging.
 ### Step 1: Build the shared judge prompt
 
 The panel judges share a single prompt. Build it identically to the
-External Judge Protocol from `plugins/loom/commands/refine.md` (lines
+External Judge Protocol from `plugins/weave/commands/refine.md` (lines
 522-616) — scoring rubric (4 dimensions × 0-10), expected output format
 (scores table, winner, rationale, runner-up analysis), and ALL
 selected originals included inline (external models cannot read
@@ -427,7 +427,7 @@ table, winner, rationale, runner-up analysis) with this header:
 If only 2 models are available (degraded panel), launch 2 judges and
 proceed. If only Claude is available (panel infeasible), skip Phase 5
 Steps 1-4 entirely and use the **Host Judge Protocol** from
-`plugins/loom/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+`plugins/weave/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
 Host Judge Protocol).
 
 ### Step 3: Parse judge responses
@@ -444,7 +444,7 @@ For each judge that completed dispatch:
 
 **Full-panel failure fallback**: if 0 judges succeed (all parse or
 dispatch failed), fall back to the **Host Judge Protocol** from
-`plugins/loom/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+`plugins/weave/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
 Host Judge Protocol). Run
 that protocol now and produce a single `judge.md` file. Mark the
 resulting `panel.md` (Step 4) as
@@ -533,7 +533,7 @@ Write the merged assessment to
 ### Step 5: Weave
 
 Follow Phase 5 Steps 2-3 (Analyze Runners-Up and Weave) of
-`plugins/loom/commands/brainstorm-and-refine.md` verbatim, with one
+`plugins/weave/commands/brainstorm-and-refine.md` verbatim, with one
 substitution: read `panel.md` (this command's
 merged assessment) instead of `judge.md`. The host (Claude) constructs
 the woven version incorporating the winner plus runner-up strengths
@@ -564,7 +564,7 @@ For each subsequent pass `N`:
 - Output paths use `pass-NNNN` (zero-padded) consistently.
 
 **Early-stop detection** mirrors Phase 6 Step 5 (Early-Stop
-Detection) of `plugins/loom/commands/brainstorm-and-refine.md`: if
+Detection) of `plugins/weave/commands/brainstorm-and-refine.md`: if
 the woven version of pass `N` is substantially identical to the woven
 version of pass `N-1`, stop early and skip to Phase 7.
 
@@ -576,7 +576,7 @@ prepare for.
 ## Phase 7: Present Final Result
 
 Follow Phase 7 (Present Final Result) of
-`plugins/loom/commands/brainstorm-and-refine.md` verbatim. Present the
+`plugins/weave/commands/brainstorm-and-refine.md` verbatim. Present the
 final woven version, the full
 rationale chain across all passes, and the session directory path for
 post-session inspection.
@@ -595,8 +595,8 @@ serene-bliss:
 
 ## Relationship to the skill
 
-The `loom:serene-bliss` skill at
-`plugins/loom/skills/serene-bliss/SKILL.md` auto-discovers on serene-DX
+The `weave:serene-bliss` skill at
+`plugins/weave/skills/serene-bliss/SKILL.md` auto-discovers on serene-DX
 vocabulary ("serene bliss", "DX bliss", "DX serenity", "DX sublimity",
 "reader happiness", etc.) and routes to this command. The skill owns
 the trigger surface; this command owns the execution contract, the

@@ -9,7 +9,7 @@ user-invocable: true
 argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
 ---
 
-# Loom Refine
+# Weave Refine
 
 Iteratively improve an artifact through multi-model critique and weaving. Each pass is a full judge-pick-best-incorporate-strengths-address-weaknesses cycle.
 
@@ -18,7 +18,7 @@ Iteratively improve an artifact through multi-model critique and weaving. Each p
 - You have a draft that needs improvement
 - You want multiple AI models to critique and enhance an artifact
 - You want iterative refinement where each pass genuinely improves the output
-- You have output from `/loom:brainstorm` that you want to refine further
+- You have output from `/weave:brainstorm` that you want to refine further
 
 ## Key Features
 
@@ -39,4 +39,4 @@ Iteratively improve an artifact through multi-model critique and weaving. Each p
 
 ## How to Invoke
 
-Run the `/loom:refine` command with your text or file path. The command handles context gathering, model detection, the judge-weave-distribute cycle, and artifact persistence.
+Run the `/weave:refine` command with your text or file path. The command handles context gathering, model detection, the judge-weave-distribute cycle, and artifact persistence.

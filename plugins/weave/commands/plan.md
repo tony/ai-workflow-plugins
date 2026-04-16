@@ -1,10 +1,10 @@
 ---
-description: Loom planning — get implementation plans from Claude, Gemini, and GPT, then synthesize the best plan
+description: Weave planning — get implementation plans from Claude, Gemini, and GPT, then synthesize the best plan
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion", "EnterPlanMode"]
 argument-hint: "<task description> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
 ---
 
-# Loom Plan
+# Weave Plan
 
 Get implementation plans from multiple AI models (Claude, Gemini, GPT) in parallel, then synthesize the best plan. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, synthesis results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository. The output is a finalized Claude Code plan ready for execution.
 
@@ -162,7 +162,7 @@ After interactive configuration, launch a single setup Task agent (`subagent_typ
 
 **Prompt for the setup agent**:
 
-> Perform setup for a loom plan session. You have three tasks: detect available models, detect the timeout command, and initialize the session directory.
+> Perform setup for a weave plan session. You have three tasks: detect available models, detect the timeout command, and initialize the session directory.
 >
 > **Input from parent**:
 > - pass_count: <resolved pass count>
@@ -662,7 +662,7 @@ before committing. All gates must pass.
 
 2. Launch a sub-agent (`subagent_type: "general-purpose"`, `mode: "default"`) to persist session artifacts:
 
-   > Persist the loom plan session artifacts:
+   > Persist the weave plan session artifacts:
    >
    > - Write the synthesis to `$SESSION_DIR/pass-0001/synthesis.md` with the following content: <full synthesis text>
    > - Update `session.json` via atomic replace: set `completed_passes` to `1`, `updated_at` to now (ISO 8601 UTC). Write to `session.json.tmp` then `mv session.json.tmp session.json`.

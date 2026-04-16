@@ -1,10 +1,10 @@
 ---
-description: Loom refine — iteratively improve an artifact through multi-model critique and weaving across multiple passes
+description: Weave refine — iteratively improve an artifact through multi-model critique and weaving across multiple passes
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
 ---
 
-# Loom Refine
+# Weave Refine
 
 Iteratively improve an artifact across multiple AI models (Claude, Gemini, GPT) using a judge-weave-distribute cycle. Each pass produces independent critiques and improved versions from all models, then the host agent judges, picks the best, incorporates strengths from runners-up, and distributes the woven result back for the next pass. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, judge assessments, woven results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 

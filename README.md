@@ -13,7 +13,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | Plugin | Category | Description |
 |--------|----------|-------------|
 | [commit](plugins/commit/) | Development | Create git commits following project conventions with format enforcement and safety checks |
-| [loom](plugins/loom/) | Development | Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize |
+| [weave](plugins/weave/) | Development | Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize |
 | [rebase](plugins/rebase/) | Development | Automated rebase onto trunk with conflict prediction, resolution, and quality gate verification |
 | [changelog](plugins/changelog/) | Productivity | Generate categorized changelog entries from branch commits and PR context |
 | [tdd](plugins/tdd/) | Testing | TDD bug-fix workflow — reproduce bugs as failing tests, find root cause, fix, and verify |
@@ -39,7 +39,7 @@ Then install any plugin:
 ```
 
 ```console
-/plugin install loom@ai-workflow-plugins
+/plugin install weave@ai-workflow-plugins
 ```
 
 ```console
