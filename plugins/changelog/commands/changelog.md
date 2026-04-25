@@ -122,23 +122,40 @@ A structured list of entries grouped by section, each with:
 
    **IMPORTANT**: Always use the exact heading names above. In particular, use `### What's new` (not "Features" or "New features") — this matches the project's established convention in recent releases.
 
-3. **Simple entries** — single bullet:
+3. **Simple entries** — single bullet for one-line changes:
    ```markdown
    - Brief description of the change (#123)
    ```
 
-4. **Detailed entries** — sub-heading with description:
+4. **Sub-section entries** — `####` heading + 2-4 lines of product-level prose. Use this for new packages, new flags, new behaviours, or notable changes to existing surface — anything a downstream user needs to learn rather than just notice. The heading names the product change; the prose covers usefulness, integration, and trade-offs:
+
    ```markdown
-   #### cli(sync): Brief description (#123)
+   #### New package: `<name>`
 
-   Explanatory paragraph about what changed and why.
+   One-paragraph description of what the user can do with it, how it
+   integrates with what they already have, and any explicit trade-off
+   or limitation. Drop-in compatibility statements live here. (#123)
 
-   - Bullet point with specific detail
-   - Another detail
+   #### New flag: `--<flag>` for `<command>`
+
+   What the flag enables and the default behaviour without it. Note
+   any non-obvious interaction with existing flags. (#123)
+
+   #### `<package>`: <product-level change>
+
+   For changes to existing packages, lead the heading with the package
+   name, then the user-visible change. Body explains what the user
+   sees differently and why it matters downstream. (#123)
    ```
 
-   Sub-components use parenthetical style matching commit conventions:
-   `cli(sync)`, `config(reader)`, not `cli/sync` or `cli - sync`.
+   Sub-section heading style:
+   - `#### New package: \`<name>\`` for new workspace packages.
+   - `#### New flag: \`--<flag>\`` for new CLI surface.
+   - `#### New <noun>: \`<name>\`` for other additions (config value, directive, hook, etc.).
+   - `#### \`<package>\`: <change>` for behavioural changes to existing packages.
+   - **Avoid** commit-prefix-style headings like `#### cli(sync): ...` — those describe the commit, not the change. Lead with the product surface the user sees.
+
+   Bulleted detail under a sub-section is permitted but rare. If a sub-section needs more than 4 lines or a bullet list, the change probably warrants splitting into multiple entries — one per shipped surface.
 
 5. **PR references**:
    - If PR number is known: `(#512)`
@@ -152,13 +169,22 @@ A structured list of entries grouped by section, each with:
 
 ### Entry writing guidelines
 
-- Write from the user's perspective — what changed for them, not internal implementation details
-- Lead with the *what*, not the *why* (the description paragraph handles *why*)
-- Use present tense for the entry title ("Add support for..." not "Added support for...")
-- Don't repeat the section heading in the entry text
-- Keep bullet entries to 1-2 lines; use the sub-heading format for anything needing more explanation
-- Never include numeric tallies — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). These are brittle and duplicate the diff
-- Never include git refs — SHAs, commit hashes, branch names, tag names, or line numbers. These break when history is rebased or tags move
+- **Product-level perspective.** Lead with what the user GAINS, can now DO, or needs to KNOW — not what code changed internally. A reader skimming the changelog at upgrade time should learn: is there a new affordance, a new default, a behavioural change, or a trade-off they need to plan around?
+- **Discuss usefulness and downstream impact.** When a new package or feature has a non-obvious integration story, mention it: drop-in compatibility (`Drop-in for X`), default activation (`Replaces X in DEFAULT_EXTENSIONS`), auto-derivation (`auto-derives X, Y, Z from a single docs_url`), or accepted-but-ignored config keys with a warning. Two short sentences usually do this; rarely more.
+- **Brevity.** Aim for 2-4 lines per sub-section entry, 1-2 lines per simple bullet. If an entry is growing past that, the underlying change probably wants to be split into multiple entries (one per shipped surface). Long prose buries the impact.
+- **Skip what's not user-visible.** Refactors that don't change behaviour, type-only annotations, internal renames, lint cleanups, CI tweaks, test-infra changes, dev-tooling bumps — none belong in CHANGES. The diff and commit log are the right home for those.
+- Use present tense for entry titles ("Add support for..." not "Added support for...").
+- Don't repeat the section heading in the entry text.
+- Never include numeric tallies — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). These are brittle and duplicate the diff.
+- Never include git refs — SHAs, commit hashes, branch names, tag names, or line numbers. These break when history is rebased or tags move.
+
+### Good vs. bad framing
+
+| Bad — describes the commit | Good — describes the user-visible change |
+|---|---|
+| `gp-opengraph: new workspace package providing OpenGraph and Twitter meta-tag emission for Sphinx. Drop-in replacement for the transitive sphinxext-opengraph dep — same ogp_* configuration surface, minus the matplotlib-based social-card generator (which is accepted but ignored, with a one-line warning pointing at the static-image workflow). Replaces sphinxext.opengraph in DEFAULT_EXTENSIONS.` | `#### New package: \`gp-opengraph\`<br><br>OpenGraph meta-tag emission. Drop-in for \`sphinxext-opengraph\`, matplotlib-free; \`ogp_social_cards\` is accepted but ignored with a warning. Replaces \`sphinxext.opengraph\` in \`DEFAULT_EXTENSIONS\`. (#22)` |
+| `cli(sync): Add structured error reporting to handler` | `#### \`cli sync\`: Errored items now appear in the summary<br><br>The summary block previously showed only successful and failed counts; errored items were silently dropped. Each errored item is now listed with its failure reason. (#512)` |
+| `feat: Add 12 new test cases for parser` | (skip — internal coverage, not user-visible) |
 
 ### Whole-branch perspective
 
@@ -183,15 +209,22 @@ one bug fix entry, not three.
 2. **Proposed entries** in a fenced code block showing the exact markdown:
    ````
    ```markdown
+   ### What's new
+
+   #### New package: `cli-sync`
+
+   Bidirectional config sync between `~/.config/foo` and a remote
+   store. Drop-in for the deprecated `foosync` script. (#512)
+
    ### Bug fixes
 
-   - Fix phantom error when processing edge case input (#512)
+   - Fix phantom error when processing edge case input (#513)
 
-   #### Component: Report errors in summary output (#512)
+   #### `cli sync`: Errored items now appear in the summary
 
-   The handler now detects and reports failures instead of silently
-   succeeding. The summary shows errored items alongside successful
-   and failed counts.
+   The summary block previously showed only successful and failed
+   counts; errored items were silently dropped. Each errored item is
+   now listed with its failure reason. (#514)
    ```
    ````
 
