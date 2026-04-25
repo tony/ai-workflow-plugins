@@ -169,9 +169,17 @@ A structured list of entries grouped by section, each with:
 
 ### Entry writing guidelines
 
-- **Product-level perspective.** Lead with what the user GAINS, can now DO, or needs to KNOW — not what code changed internally. A reader skimming the changelog at upgrade time should learn: is there a new affordance, a new default, a behavioural change, or a trade-off they need to plan around?
+- **Product-level perspective — the "at-a-glance" test.** A reader skimming the changelog at upgrade time should answer *"what is this, why does it matter to me?"* in one breath. If they need to mentally compile a type signature, look up a signal name, or trace internal mechanics to get there, the entry is doing the wrong job. Lead with what the user GAINS, can now DO, or needs to KNOW — anchored to one of the four upgrade-time decisions: should I upgrade now, will my code break, can I drop a workaround / take a new affordance, or was my bug just fixed? Each entry should land on one of those axes in its first sentence.
+- **Keep depth out of the changelog.** The following patterns belong in autodoc, source, and the linked PR — not in CHANGES. Call them out and rewrite when you see them in a draft entry:
+  - **Type signatures** — `float | None`, `Optional[X]`, generic params, return types.
+  - **Signal / syscall / kernel names** — `SIGTERM`, `SIGKILL`, `epoll`, `mmap`, "kernel pipe buffer", "non-blocking fd".
+  - **Internal mechanics** — selectors, busy-loops, race windows, buffer sizes, lock files, the *cause* of a fix rather than its effect on the user.
+  - **Dunder / private method names** — `__str__`, `__init__`, `_internal_helper`.
+  - **Implementation flags or constants** — `_TIMEOUT_GRACE_SECONDS`, internal env vars, feature toggles invisible to consumers.
+
+  Depth lives in autodoc, source, and git history; the PR link in each entry is the doorway for readers who want it. The changelog is a "should I care?" filter, not a manual or a release-notes blog post.
 - **Discuss usefulness and downstream impact.** When a new package or feature has a non-obvious integration story, mention it: drop-in compatibility (`Drop-in for X`), default activation (`Replaces X in DEFAULT_EXTENSIONS`), auto-derivation (`auto-derives X, Y, Z from a single docs_url`), or accepted-but-ignored config keys with a warning. Two short sentences usually do this; rarely more.
-- **Brevity.** Aim for 2-4 lines per sub-section entry, 1-2 lines per simple bullet. If an entry is growing past that, the underlying change probably wants to be split into multiple entries (one per shipped surface). Long prose buries the impact.
+- **Brevity.** Aim for 2-4 lines per sub-section entry, 1-2 lines per simple bullet. If an entry is growing past that, the underlying change probably wants to be split into multiple entries (one per shipped surface). Long prose buries the impact. *If a sentence reads like it was lifted from a docstring or a stack trace, cut it — that information has a better home in the linked PR or in autodoc.*
 - **Skip what's not user-visible.** Refactors that don't change behaviour, type-only annotations, internal renames, lint cleanups, CI tweaks, test-infra changes, dev-tooling bumps — none belong in CHANGES. The diff and commit log are the right home for those.
 - Use present tense for entry titles ("Add support for..." not "Added support for...").
 - Don't repeat the section heading in the entry text.
@@ -180,11 +188,15 @@ A structured list of entries grouped by section, each with:
 
 ### Good vs. bad framing
 
-| Bad — describes the commit | Good — describes the user-visible change |
+| Bad — describes the commit, or leaks implementation | Good — describes the user-visible change |
 |---|---|
 | `gp-opengraph: new workspace package providing OpenGraph and Twitter meta-tag emission for Sphinx. Drop-in replacement for the transitive sphinxext-opengraph dep — same ogp_* configuration surface, minus the matplotlib-based social-card generator (which is accepted but ignored, with a one-line warning pointing at the static-image workflow). Replaces sphinxext.opengraph in DEFAULT_EXTENSIONS.` | `#### New package: \`gp-opengraph\`<br><br>OpenGraph meta-tag emission. Drop-in for \`sphinxext-opengraph\`, matplotlib-free; \`ogp_social_cards\` is accepted but ignored with a warning. Replaces \`sphinxext.opengraph\` in \`DEFAULT_EXTENSIONS\`. (#22)` |
 | `cli(sync): Add structured error reporting to handler` | `#### \`cli sync\`: Errored items now appear in the summary<br><br>The summary block previously showed only successful and failed counts; errored items were silently dropped. Each errored item is now listed with its failure reason. (#512)` |
+| `#### New \`timeout=\` keyword<br><br>\`Foo.run()\` and \`Bar.run()\` accept \`timeout: float \| None = None\`. When the deadline fires the child is \`SIGTERM\`'d (\`SIGKILL\` after a grace) and \`SomeError\` is raised with the deadline duration in its \`__str__\`. (#42)` | `#### New \`timeout=\` keyword<br><br>\`Foo.run()\` and \`Bar.run()\` now accept a \`timeout\`, with improved cleanup of stuck subprocesses when the deadline fires. (#42)` |
+| `#### \`Foo.lookup()\`: read fewer entries<br><br>The previous implementation called \`some-internal --verbose\` whose output enumerates every entry; \`lookup()\` now reads \`some-internal --short\` and falls back to a default value when the optional field is unset, matching upstream behaviour. Subprocess failures still degrade to \`None\`. (#43)` | `#### Improve handling of large datasets<br><br>Lookups against datasets with thousands of entries no longer appear to hang -- the implementation avoids a load-bearing command that walked every entry. (#43)` |
 | `feat: Add 12 new test cases for parser` | (skip — internal coverage, not user-visible) |
+
+**The pattern in the last two rows**: the *bad* version reads like a release-notes blog post or an autodoc summary; the *good* version answers *"what's this, why care?"* and stops. Anyone wanting the implementation detail can follow the PR link and read the diff.
 
 ### Whole-branch perspective
 
