@@ -1,0 +1,3 @@
+{"event":"session_start","timestamp":"2026-05-02T00:00:00Z","command":"brainstorm-and-refine","models":["claude","gemini","gpt"],"variants_per_model":3,"pass_count":3,"user_added_context":true}
+{"event":"brainstorm_to_refine","timestamp":"2026-05-02T00:00:30Z","selected_originals":["claude-v1","gemini-v1","gpt-v1"],"total_available":9}
+{"event":"pass_complete","timestamp":"2026-05-02T00:01:00Z","pass":1,"winner":"claude-v1","winner_score":35}

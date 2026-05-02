@@ -126,6 +126,28 @@ EOF
 - Frontmatter `allowed-tools` should use bare tool names (e.g., `Bash`) rather than
   language-specific patterns (e.g., `Bash(uv run:*)`) so commands work across any project
 
+### Helper Scripts
+
+- Plugins may ship helper scripts under `plugins/<name>/scripts/` (or, for
+  cross-tool-portable skills, `plugins/<name>/skills/<skill>/scripts/`).
+- User-facing hot-path scripts must use Python `>=3.12` standard library only;
+  document a PEP 723 alternative shebang for systems without `>=3.12` natively.
+- Optional richer tools (linters, schema generators, retroactive auditors) may
+  use PEP 723 inline metadata to declare third-party dependencies (`pydantic`,
+  `jsonschema`, `rich`, `typer`); document them as requiring `uv` or `pipx`.
+  Never make a third-party-dep script the only path through a workflow.
+- Scripts must be non-interactive (no TTY prompts), accept inputs via
+  args/env/stdin, write diagnostics to `stderr` with `encoding="utf-8"`, and
+  use exit code `2` only when `--strict` is explicitly invoked (default
+  best-effort exit `0` for automation paths).
+- Honor the language-agnostic principle: every script must be opt-in,
+  isolated, and replaceable. Per "Accessible Code Blocks" below, document
+  scripts with one command per fenced block and explanatory text outside
+  the fence.
+- Python scripts must pass `uv run ruff check`, `uv run ruff format --check`,
+  and `uv run basedpyright` before commit. The CI workflow at
+  `.github/workflows/lint.yml` enforces the same checks on every PR.
+
 ### Plugin Directory Structure
 
 Every plugin directory under `plugins/` must contain `.claude-plugin/plugin.json` and

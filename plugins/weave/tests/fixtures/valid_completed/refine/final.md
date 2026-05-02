@@ -1,0 +1,1 @@
+# Final synthesis (fixture)

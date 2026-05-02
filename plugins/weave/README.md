@@ -505,3 +505,11 @@ All commands use `command -v` (POSIX-portable) instead of `which` for CLI detect
 ## Language-Agnostic Design
 
 All commands discover project-specific tooling by reading AGENTS.md / CLAUDE.md at runtime. Quality gates, test commands, and conventions are never hardcoded — they work with any language or framework.
+
+## Trust model
+
+This plugin ships executable validation code at `plugins/weave/scripts/validate_session.py`. Installing this plugin (via `/plugin install` or marketplace) implicitly authorizes that script to run as part of `/weave:validate`. The script is stdlib-only Python `>=3.12`, runs read-only against session artifacts under `$AI_AIP_ROOT`, and never modifies repository files (verified by the Repo Guard Protocol in `docs/repo-guard-protocol.md`).
+
+The validator is **shape-only** by design: it checks required fields, event ordering, pass-tracking exactness, fingerprint integrity, and the `latest` symlink. It does not evaluate output quality, judging quality, or reasoning quality — a passing validator confirms the session's structure, not its substance.
+
+If you install third-party Agent Skills via `npx skills add` from `skills.sh`, audit their bundled `scripts/` before running. The `skills.sh` leaderboard is install-telemetry popularity, not vetting.
