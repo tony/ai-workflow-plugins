@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "session_id": "valid_in_progress",
+  "command": "brainstorm-and-refine",
+  "status": "in_progress",
+  "phase": "refine",
+  "branch": "main",
+  "ref": "0000000",
+  "models": ["claude", "gemini", "gpt"],
+  "judge_mode": "host",
+  "variants_per_model": 3,
+  "pass_count": 3,
+  "completed_passes": 1,
+  "prompt_summary": "fixture: in-progress mid-refinement session",
+  "created_at": "2026-05-02T00:00:00Z",
+  "updated_at": "2026-05-02T00:01:00Z"
+}
