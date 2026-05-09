@@ -1,7 +1,7 @@
 ---
 description: Weave planning — get implementation plans from Claude, Gemini, and GPT, then synthesize the best plan
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion", "EnterPlanMode"]
-argument-hint: "<task description> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
+argument-hint: "<task description> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Plan
@@ -107,6 +107,9 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--passes=N` | 1–5 | 1 | Number of synthesis passes |
 | `--timeout=N\|none` | seconds or `none` | command-specific | Timeout for external model commands |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
+| `--no-deslop` | flag | off | Skip the final deslop pass on the synthesised plan |
+| `--quiet-deslop` | flag | off | Replace the 8-line deslop summary with one line |
+| `--verbose-deslop` | flag | off | Add tier letter, signature id, confidence per finding |
 
 **Mode presets** set default passes and timeout when not explicitly overridden:
 
@@ -656,15 +659,43 @@ before committing. All gates must pass.
 **Session artifacts**: $SESSION_DIR
 ```
 
-**Step 6: Write to plan file and persist artifacts**
+**Step 6: Deslop, write to plan file, and persist artifacts**
 
-1. Write the synthesized plan content to the **Claude plan file** directly. This is the plan file write, which IS allowed in plan mode — the plan file is the deliverable.
+The plan file is the deliverable, so the deslop pass runs *before* the
+plan-file write — the plan must land clean.
 
-2. Launch a sub-agent (`subagent_type: "general-purpose"`, `mode: "default"`) to persist session artifacts:
+1. **Persist synthesis.md first** via sub-agent
+   (`subagent_type: "general-purpose"`, `mode: "default"`):
 
-   > Persist the weave plan session artifacts:
-   >
-   > - Write the synthesis to `$SESSION_DIR/pass-0001/synthesis.md` with the following content: <full synthesis text>
+   > Write the synthesis to `$SESSION_DIR/pass-0001/synthesis.md` with
+   > the following content: <full synthesis text>
+
+2. **Deslop pass** (final pass only, skip if `--no-deslop`). For
+   `pass_count == 1`, this is the final pass; for `pass_count >= 2`
+   the pass runs at the end of Phase 5's last iteration. Read
+   `${CLAUDE_PLUGIN_ROOT}/references/deslop-pass.md` and apply it with
+   `ARTIFACT_PATH=$SESSION_DIR/pass-0001/synthesis.md`, `SESSION_DIR`,
+   the captured `BASELINE_SHA`, and `DESLOP_MODE` from the flag. The
+   deslop pass mutates `synthesis.md` in place and writes a
+   `synthesis.pre-deslop.md` sibling.
+
+3. **Re-read** `synthesis.md` to obtain the desloped plan content.
+
+4. **Write the desloped plan content to the Claude plan file**
+   directly. This is the plan file write, which IS allowed in plan
+   mode — the plan file is the deliverable.
+
+   The deslop summary block does **not** appear in the plan body. A
+   single-line confirmation is emitted to the chat instead:
+
+   ```
+   Desloped (-84 words, 3 trims). Original: <path-to-synthesis.pre-deslop.md>
+   ```
+
+   The full audit lives at `$SESSION_DIR/deslop-report.md`.
+
+5. **Persist remaining session artifacts** via sub-agent:
+
    > - Update `session.json` via atomic replace: set `completed_passes` to `1`, `updated_at` to now (ISO 8601 UTC). Write to `session.json.tmp` then `mv session.json.tmp session.json`.
    > - Append a `pass_complete` event to `events.jsonl`: `{"event":"pass_complete","timestamp":"<ISO 8601 UTC>","pass":1}`
    > - Before marking the session as complete, capture `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"`. If `$CURRENT_STATUS` differs from `$REPO_FINGERPRINT`, revert with `git -C "$REPO_TOPLEVEL" checkout -- . && git -C "$REPO_TOPLEVEL" clean -fd` and log the violation: `printf '{"event":"repo_guard_violation","timestamp":"%s","model":"session-end","reverted":true}\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >>"$SESSION_DIR/guard-events.jsonl"`.
@@ -721,7 +752,14 @@ For each pass from 2 to `pass_count`:
    > - Update `session.json` via atomic replace: set `completed_passes` to N, `updated_at` to now
    > - Append `pass_complete` event to `events.jsonl`
 
-7. **Update plan file**: Write the latest synthesis to the Claude plan file, adding a **Plan Evolution** section describing what was strengthened, corrected, or added across passes.
+7. **Final-pass deslop**: when this is the final pass (last iteration
+   of the loop, or convergence), run Phase 4 Step 6's deslop sub-step
+   on `$SESSION_DIR/pass-{N}/synthesis.md` before the plan-file write.
+   Gated on `--no-deslop` exactly as in Phase 4.
+
+8. **Update plan file**: Write the desloped synthesis to the Claude
+   plan file, adding a **Plan Evolution** section describing what was
+   strengthened, corrected, or added across passes.
 
 ---
 

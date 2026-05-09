@@ -222,6 +222,40 @@ When flags are provided, the corresponding interactive question is skipped. Othe
 
 In headless mode (`claude -p`), pass count uses the flag value if provided, otherwise defaults to 1. Timeout uses the flag value if provided, otherwise the per-command default.
 
+## Deslop Pass
+
+The prose-producing weave commands (`ask`, `refine`, `brainstorm-and-refine`, `serene-bliss`, `plan`, `review`) run a deslop pass on the final synthesised artifact before it reaches the terminal. Slop signatures (flagship phrases, restated subjects, fragile counts/line numbers, AI footers) are detected against the same Tier A/B/C taxonomy used by `/pr:deslop` and `/slop:scan`, with tone calibration against the last 50 trunk commit messages.
+
+The shared procedural reference is `plugins/weave/references/deslop-pass.md`. The slop registry is **not** duplicated into this plugin — it is resolved at runtime from a sibling plugin:
+
+1. `${CLAUDE_PLUGIN_ROOT}/../pr/references/signatures.yml`
+2. `${CLAUDE_PLUGIN_ROOT}/../slop/references/signatures.yml`
+3. If neither resolves, the deslop pass emits a one-line skip and the synthesis is presented unchanged. Install either the `pr` or `slop` plugin to enable deslop.
+
+### Flags
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--no-deslop` | off | Skip the deslop pass entirely; no sibling, no summary block. |
+| `--quiet-deslop` | off | Replace the 8-line summary block with one line. Tier B confirmations still happen. |
+| `--verbose-deslop` | off | Add tier letter, signature id, and confidence per finding. Caps at 16 lines; overflow goes to `deslop-report.md`. |
+
+### Skipped commands
+
+`brainstorm` is intentionally never desloped — independent diversity is the product. `execute`, `prompt`, `architecture`, and `fix-review` produce code, not prose, and rely on the project's own quality gates.
+
+### Recovery
+
+The original synthesis is preserved next to the desloped artifact as a `<artifact>.pre-deslop.md` sibling. Stable filename — no timestamp — so the user can `diff` with one tab-complete:
+
+```console
+diff $SESSION_DIR/refine/final.pre-deslop.md $SESSION_DIR/refine/final.md
+```
+
+A full audit (registry sha256, applied/declined/advisory findings, word delta) is written to `$SESSION_DIR/deslop-report.md`.
+
+A 30% word-delta hard abort restores the original automatically. A 15% suspect-edit threshold demotes a single oversized trim to advisory and writes the held trim to `<artifact>-deslop-held.md` for inspection.
+
 ## Session Artifacts
 
 All commands persist model outputs, prompts, and synthesis results to a structured directory under `$AI_AIP_ROOT`. This enables post-session inspection, selective reference to prior pass artifacts during multi-pass refinement, and lightweight resume tracking.

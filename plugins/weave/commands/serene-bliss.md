@@ -1,7 +1,7 @@
 ---
 description: Weave serene bliss — three-lens DX brainstorm-and-refine with multi-model panel judging
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
+argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Serene Bliss
@@ -580,6 +580,12 @@ Follow Phase 7 (Present Final Result) of
 final woven version, the full
 rationale chain across all passes, and the session directory path for
 post-session inspection.
+
+**Deslop pass**: brainstorm-and-refine's Phase 7 Step 0 applies here —
+the final pass's `woven.md` is desloped before rendering, with a
+`woven.pre-deslop.md` sibling preserved. The `--no-deslop`,
+`--quiet-deslop`, and `--verbose-deslop` flags are honoured exactly as
+in brainstorm-and-refine.
 
 **Repo Guard**: The session-end verification from brainstorm-and-refine
 Phase 7 applies here — repo state is checked against the pre-session
