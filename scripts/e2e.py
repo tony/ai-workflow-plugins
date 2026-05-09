@@ -49,7 +49,7 @@ from _private_path import PrivatePath  # pyright: ignore[reportImplicitRelativeI
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_NAME = "ai-workflow-plugins"
 GITHUB_SOURCE = "tony/ai-workflow-plugins"
-PLUGINS = ["commit", "weave", "rebase", "changelog", "tdd", "model-cli", "research"]
+PLUGINS = ["commit", "weave", "rebase", "changelog", "tdd", "model-cli", "research", "slop"]
 
 app = typer.Typer(help="E2E plugin lifecycle tests for ai-workflow-plugins.")
 console = rich.console.Console()
