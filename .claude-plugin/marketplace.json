@@ -113,6 +113,19 @@
       "license": "MIT"
     },
     {
+      "name": "slop",
+      "description": "Scan repo tracked files for AI slop, brittle counts, and verbose noise; resolve each finding as an atomic forward-going commit with quality-gate verification",
+      "version": "0.1.0",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/slop",
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/slop",
+      "license": "MIT"
+    },
+    {
       "name": "tailwind",
       "description": "Detect and fix inconsistent spacing in Tailwind CSS layouts — container fragmentation, margin/gap mixing, padding asymmetry, and more",
       "version": "0.0.1",
