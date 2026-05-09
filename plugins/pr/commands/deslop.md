@@ -1,5 +1,4 @@
 ---
-name: deslop
 description: >-
   Use when the user wants to clean AI slop, verbosity, fragile
   hard-coded references (line numbers, test counts, file counts), or
@@ -13,8 +12,6 @@ description: >-
   `--fixup=reword:` for commit-message slop), then optionally runs
   `git rebase -i --autosquash`, running the project's formatter,
   linter, and type-checker on every conflict pause.
-user-invocable: true
-disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<commit-range>] [--apply-patches] [--apply-rebase] [--budget=strict|default|lax] [--targets=diff,messages,both] [--message-only | --diff-only] [--since=<ref>] [--force-rewrite-pushed] [--run-tests] [--no-semantic] [--taxonomy=<path>]"
 ---
@@ -41,8 +38,8 @@ voice on `origin/<trunk>` (not `HEAD`) before being flagged. The
 skill auto-applies only Tier A signals; Tier B is user-confirmed per
 finding; Tier C is advisory only.
 
-`disable-model-invocation: true` is intentional — history-rewriting
-skills should be user-explicit, not router-inferred.
+This is a slash command, not a model-invocable skill — history
+rewrites must be user-explicit, not router-inferred.
 
 ## Core thesis
 
@@ -222,7 +219,7 @@ the final report and continue.
 
 ## Step 3: Discover quality gates (language-agnostic, merge across files)
 
-Read `references/quality-gates.md` for the full procedure. Summary:
+Read `${CLAUDE_PLUGIN_ROOT}/references/quality-gates.md` for the full procedure. Summary:
 
 1. Read **all** of these files that exist (do not stop at the first):
    - `./AGENTS.md`
@@ -280,7 +277,7 @@ tool.
 ## Step 5: Load the signatures registry
 
 Built-in registry path:
-`${CLAUDE_PLUGIN_ROOT}/skills/deslop/references/signatures.yml`. Read
+`${CLAUDE_PLUGIN_ROOT}/references/signatures.yml`. Read
 via the Read tool.
 
 Project override: `.claude/deslop.local.yml` if present in the repo
@@ -426,7 +423,7 @@ Layout:
 │   └── <sha>.txt                (one file per target SHA needing reword)
 ├── reword-map.tsv               (autosquash-subject → target-sha → reword-file)
 ├── .checkpoint/                 (per-step durable markers for apply.sh idempotency)
-└── apply.sh                     (rendered from references/apply-template.sh)
+└── apply.sh                     (rendered from ${CLAUDE_PLUGIN_ROOT}/references/apply-template.sh)
 ```
 
 `0000-PLAN.md` records: registry version, registry source path
@@ -438,8 +435,8 @@ Layout:
 not one fixup per finding. Multiple `.patch` files for the same
 target are visible artifacts (one per finding for reviewability),
 but `apply.sh` applies them all to the working tree before creating
-the single fixup. See `references/apply-template.sh` for the patch
-driver template.
+the single fixup. See `${CLAUDE_PLUGIN_ROOT}/references/apply-template.sh`
+for the patch driver template.
 
 `apply.sh` is the single artifact the user runs. Idempotent via
 durable per-step checkpoints; re-running skips completed steps.
@@ -497,7 +494,7 @@ bash ".git/deslop/${TS_PID}/apply.sh"
 `apply.sh` aggregates per target. For each target SHA, it applies
 all relevant `.patch` files to the working tree, stages explicit
 paths, and creates one fixup commit per target. See
-`references/apply-template.sh` for the full contract.
+`${CLAUDE_PLUGIN_ROOT}/references/apply-template.sh` for the full contract.
 
 **Never `git add -A` or `git add .`** — explicit paths only, per
 `plugins/commit/commands/commit.md:181-191` (rule line 187). This
@@ -510,7 +507,7 @@ For autosquash, run with `rerere` enabled and `staged-editor.sh` as
 `GIT_EDITOR`:
 
 ```bash
-GIT_SEQUENCE_EDITOR=: GIT_EDITOR="${CLAUDE_PLUGIN_ROOT}/skills/deslop/references/staged-editor.sh" DESLOP_TS_PID="${TS_PID}" git -c rerere.enabled=true -c rerere.autoupdate=true rebase -i --autosquash "${BASELINE_SHA}"
+GIT_SEQUENCE_EDITOR=: GIT_EDITOR="${CLAUDE_PLUGIN_ROOT}/references/staged-editor.sh" DESLOP_TS_PID="${TS_PID}" git -c rerere.enabled=true -c rerere.autoupdate=true rebase -i --autosquash "${BASELINE_SHA}"
 ```
 
 `staged-editor.sh` reads `${DESLOP_TS_PID}` from the environment to
@@ -526,7 +523,7 @@ If autosquash exits 0, jump to Step 12.
 
 This loop is borrowed from `plugins/rebase/commands/rebase.md:46-67`
 (Phase 4 of `/rebase`) with three tightenings. See
-`references/conflict-loop.md` for the full discussion.
+`${CLAUDE_PLUGIN_ROOT}/references/conflict-loop.md` for the full discussion.
 
 **Tightening 1 — gates touched-first then full set.** After
 resolving each pause, re-run only the gates relevant to *touched
@@ -739,20 +736,20 @@ directory; introducing the first one warrants its own change.
 
 For detailed catalogs and discovery procedures, consult:
 
-- **`references/signatures.yml`** — versioned slop registry with
+- **`${CLAUDE_PLUGIN_ROOT}/references/signatures.yml`** — versioned slop registry with
   ≥ 20 entries across Tier A/B/C; project-overridable via
   `.claude/deslop.local.yml`.
-- **`references/slop-taxonomy.md`** — Tier A/B/C catalog with FP
+- **`${CLAUDE_PLUGIN_ROOT}/references/slop-taxonomy.md`** — Tier A/B/C catalog with FP
   guards and the consolidated false-positive table.
-- **`references/quality-gates.md`** — discovery procedure
+- **`${CLAUDE_PLUGIN_ROOT}/references/quality-gates.md`** — discovery procedure
   (read-all-files, merge-with-priority, manifest-confirmation).
-- **`references/conflict-loop.md`** — rebase pause handling with
+- **`${CLAUDE_PLUGIN_ROOT}/references/conflict-loop.md`** — rebase pause handling with
   rerere safety and the three tightenings.
-- **`references/apply-template.sh`** — patch driver template that
+- **`${CLAUDE_PLUGIN_ROOT}/references/apply-template.sh`** — patch driver template that
   becomes per-run `apply.sh`. Idempotent via durable
   `.checkpoint/<NNNN>.done` markers; aggregates patches per target
   SHA.
-- **`references/staged-editor.sh`** — `GIT_EDITOR` shim that reads
+- **`${CLAUDE_PLUGIN_ROOT}/references/staged-editor.sh`** — `GIT_EDITOR` shim that reads
   `reword-map.tsv` to copy pre-staged messages during
   `--fixup=reword:` / `--fixup=amend:` autosquash.
 
