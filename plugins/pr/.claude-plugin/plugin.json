@@ -1,7 +1,7 @@
 {
   "name": "pr",
-  "description": "Generate and review gold-standard PR descriptions and merge commit messages with structured headings, tables, and test plans",
-  "version": "0.1.0",
+  "description": "Generate and review gold-standard PR descriptions; detect AI slop, brittle counts, and verbose commit messages on branch commits and resolve via fixup commits and autosquash with quality-gate checks",
+  "version": "0.2.0",
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"

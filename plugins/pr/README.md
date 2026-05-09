@@ -1,6 +1,6 @@
 # pr
 
-Generate and review gold-standard pull request descriptions with structured headings, tables, and test plans.
+Generate and review gold-standard pull request descriptions with structured headings, tables, and test plans. Audit branch commits for AI slop, brittle counts, and verbose messages, then resolve via fixup commits and autosquash with quality-gate checks.
 
 ## Installation
 
@@ -23,6 +23,7 @@ Install the plugin:
 | `/pr` | Generate a gold-standard PR description from branch diff |
 | `/pr:merge-commit` | Generate a gold-standard merge commit message from branch diff |
 | `/pr:review` | Review an existing PR description against gold-standard patterns |
+| `/pr:deslop` | Audit branch commits for AI slop / brittle counts / verbose messages and resolve via fixup commits with optional autosquash |
 
 ## How It Works
 
@@ -46,6 +47,16 @@ Install the plugin:
 2. **Fetch the diff** — get the PR diff to judge proportionality
 3. **Evaluate** — check structure, bold labels, tables, code blocks, test plan, design decisions, verification, before/after, and negative assertions
 4. **Report** — list strengths, list specific improvements with concrete markdown suggestions
+
+### `/pr:deslop` — Audit branch commits for slop and resolve
+
+1. **Detect trunk and lock baseline** — resolve trunk to an absolute SHA, snapshot branch state, refuse on dirty tree / detached HEAD / in-progress rebase / merge commits with `--apply-rebase`
+2. **Refuse pushed branches by default** — require `--force-rewrite-pushed` to rewrite published history
+3. **Discover quality gates** — read `AGENTS.md` / `CLAUDE.md` / `.github/CONTRIBUTING.md` and merge formatter / linter / type-checker / test commands across files
+4. **Calibrate tone against trunk** — read the last 50 commits on `origin/<trunk>` to demote false-positive Tier C signals
+5. **Detect** — hybrid pass: regex first (deterministic), semantic sub-agent on flagged hunks (precise; skip with `--no-semantic`)
+6. **Materialize a patch series** — write numbered patches plus `apply.sh` under `.git/deslop/<ts>-<pid>/` for review before any history rewrite
+7. **Apply with confirmation** — backup branch + checkpointed `apply.sh` for fixup commits; with `--apply-rebase`, run `git rebase -i --autosquash` and run quality gates on touched files at each conflict pause
 
 ## Arguments
 
@@ -71,6 +82,23 @@ Review an existing PR:
 /pr:review #42
 /pr:review https://github.com/owner/repo/pull/42
 ```
+
+Audit branch commits for slop:
+
+```
+/pr:deslop
+/pr:deslop --apply-patches
+/pr:deslop --apply-rebase --run-tests
+/pr:deslop --message-only --budget=strict
+/pr:deslop --force-rewrite-pushed --apply-rebase
+```
+
+The default mode is **audit-only** — patches are written under
+`.git/deslop/<ts>-<pid>/` for review; nothing is applied. Use
+`--apply-patches` to create fixup commits without rebasing, or
+`--apply-rebase` to also run autosquash. See
+`plugins/pr/skills/deslop/SKILL.md` for the full flag reference and
+edge cases.
 
 ## Gold-Standard Patterns
 
