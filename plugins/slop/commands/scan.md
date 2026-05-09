@@ -1,5 +1,4 @@
 ---
-name: scan
 description: >-
   Use when the user wants to scan the current repo for AI slop,
   verbosity, fragile hard-coded references (line numbers, test
@@ -11,8 +10,6 @@ description: >-
   without rewriting history". Does NOT rewrite history; every
   finding lands as a forward-going commit, with the project's
   formatter, linter, and type-checker running before each commit.
-user-invocable: true
-disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[--paths=<glob>] [--apply] [--budget=strict|default|lax] [--with-history=<N>] [--allow-dirty] [--run-tests] [--no-semantic] [--taxonomy=<path>] [--on-fail=skip|stop|ask]"
 ---
@@ -26,13 +23,13 @@ low-value contributions. Optionally scans recent commit history
 forward-going commit, after the project's discovered quality gates
 pass.
 
-This skill **never rewrites history**. It only adds new commits at
+This command **never rewrites history**. It only adds new commits at
 HEAD. It is safe on pushed branches and cannot flatten merge
 topology. For branch-scoped slop cleanup that uses fixup commits
 and `git rebase -i --autosquash`, see the sibling `/pr:deslop`
-skill in `plugins/pr/`.
+command in `plugins/pr/`.
 
-`disable-model-invocation: true` is intentional: this skill modifies
+This is a slash command, not a model-invocable skill: it modifies
 files and creates commits, so it must be user-explicit, not
 router-inferred.
 
@@ -190,7 +187,7 @@ treats those findings as advisory.
 
 ## Step 3: Discover quality gates (language-agnostic, merge across files)
 
-Read `references/quality-gates.md` for the full procedure. Summary:
+Read `${CLAUDE_PLUGIN_ROOT}/references/quality-gates.md` for the full procedure. Summary:
 
 1. Read **all** of these files that exist (do not stop at the first):
    - `./AGENTS.md`
@@ -251,7 +248,7 @@ tool.
 ## Step 5: Load the signatures registry
 
 Built-in registry path:
-`${CLAUDE_PLUGIN_ROOT}/skills/scan/references/signatures.yml`. Read
+`${CLAUDE_PLUGIN_ROOT}/references/signatures.yml`. Read
 via the Read tool.
 
 Project override: `.claude/slop.local.yml` if present in the repo
@@ -410,7 +407,7 @@ result, `--on-fail` mode.
 
 `commits.json` records, per finding: the proposed `chore(slop[…])` /
 `docs(slop[…])` / `refactor(slop[…])` subject and the `why:` /
-`what:` body, generated from `references/commit-template.md` rules.
+`what:` body, generated from `${CLAUDE_PLUGIN_ROOT}/references/commit-template.md` rules.
 The user can review and edit `commits.json` before running with
 `--apply` (the apply loop in Step 10 reads from `commits.json`).
 
@@ -522,7 +519,7 @@ The `--no-edit` is defensive — even though we pass `-F`, this
 guards against a misconfigured `core.editor` opening the message
 file interactively. The commit follows the project's
 `Scope(type[detail])` convention as recorded in `commits.json` (see
-`references/commit-template.md`).
+`${CLAUDE_PLUGIN_ROOT}/references/commit-template.md`).
 
 If a project pre-commit hook (`pre-commit`, `commit-msg`) rejects
 the commit, treat the failure the same as a gate failure: rollback
@@ -649,22 +646,22 @@ suffices.
 
 For detailed catalogs and procedures, consult:
 
-- **`references/signatures.yml`** — versioned slop registry. v1
+- **`${CLAUDE_PLUGIN_ROOT}/references/signatures.yml`** — versioned slop registry. v1
   byte-for-byte duplicate of the deslop registry; lockstep notice
   at the top of the file.
-- **`references/slop-taxonomy.md`** — Tier A/B/C catalog with FP
+- **`${CLAUDE_PLUGIN_ROOT}/references/slop-taxonomy.md`** — Tier A/B/C catalog with FP
   guards.
-- **`references/quality-gates.md`** — discovery procedure
+- **`${CLAUDE_PLUGIN_ROOT}/references/quality-gates.md`** — discovery procedure
   (read-all-files, merge-with-priority).
-- **`references/commit-template.md`** — per-finding commit-message
+- **`${CLAUDE_PLUGIN_ROOT}/references/commit-template.md`** — per-finding commit-message
   templates by signature category, mapping each signature prefix to
   a `Scope(type[detail])` subject and a `why:` / `what:` body shape.
 
 ## Cited repo artifacts
 
-- `plugins/pr/skills/deslop/SKILL.md` — sibling skill for
+- `plugins/pr/commands/deslop.md` — sibling command for
   branch-scoped slop cleanup via fixup commits and autosquash. This
-  skill (`/slop:scan`) and that one share the registry, taxonomy,
+  command (`/slop:scan`) and that one share the registry, taxonomy,
   and quality-gate procedure.
 - `plugins/pr/commands/review-pr.md:55` — "No brittle details"
   rubric; the underlying source for several Tier B signatures.
@@ -682,4 +679,4 @@ For detailed catalogs and procedures, consult:
   this skill honors all of them.
 - `CLAUDE.md` Git Commit Standards — `Scope(type[detail])` subject
   + `why:` / `what:` body shape; templates in
-  `references/commit-template.md` follow this exactly.
+  `${CLAUDE_PLUGIN_ROOT}/references/commit-template.md` follow this exactly.
