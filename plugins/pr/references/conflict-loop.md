@@ -30,15 +30,14 @@ The autosquash invocation enables `rerere` so repeat invocations of
 `/pr:deslop --apply-rebase` replay manual conflict resolutions:
 
 ```bash
-GIT_SEQUENCE_EDITOR=: GIT_EDITOR="${CLAUDE_PLUGIN_ROOT}/skills/deslop/references/staged-editor.sh" DESLOP_TS_PID="${TS}-${PID}" git -c rerere.enabled=true -c rerere.autoupdate=true rebase -i --autosquash "${BASELINE_SHA}"
+GIT_SEQUENCE_EDITOR=: git -c rerere.enabled=true -c rerere.autoupdate=true rebase -i --autosquash "${BASELINE_SHA}"
 ```
 
 `GIT_SEQUENCE_EDITOR=:` accepts the auto-generated todo list
-non-interactively. `GIT_EDITOR` points at `staged-editor.sh`, which
-copies the pre-staged reword message file into the editor's target
-based on `reword-map.tsv` (the only way to associate git's editor
-invocation with a target SHA — git does not expose the SHA via env
-or arg).
+non-interactively. Reword fixups carry their replacement messages
+pre-staged in their bodies (`apply-template.sh` writes them with an
+`amend! <subject>` prefix line); autosquash strips the prefix and
+uses the remainder verbatim — no `GIT_EDITOR` shim required.
 
 ---
 
