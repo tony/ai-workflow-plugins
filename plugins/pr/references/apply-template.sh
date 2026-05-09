@@ -20,8 +20,10 @@
 #     numbered patch files. All `.patch` files for one target SHA are
 #     applied to the working tree before the single `git commit
 #     --fixup=<target-sha>` for that target.
-#   * Reword files are recorded in `reword-map.tsv` for
-#     `staged-editor.sh` to consume during autosquash.
+#   * Reword messages are pre-staged in each fixup commit's body
+#     with an `amend! <subject>` prefix line; autosquash strips the
+#     prefix and uses the remainder as the new commit message.
+#     `reword-map.tsv` records the mapping for audit/provenance only.
 #
 # Stages explicit paths only — never `git add -A` / `git add .` per
 # `plugins/commit/commands/commit.md:181-191` (rule line 187).
@@ -32,7 +34,8 @@
 #        was edited between materialize and apply).
 #   2  — clean-tree precondition failed (working tree dirty).
 #   3  — `git apply` failed for a patch step; checkpoint not written.
-#   4  — `git commit --fixup=<sha>` failed for a fixup step.
+#   4  — fixup commit creation failed (`git commit` rejected, e.g.
+#        by a pre-commit hook).
 #   5  — failed to write reword file or reword-map row.
 #   6  — pre-commit / commit-msg hook rejected a fixup (do not bypass —
 #        the user repairs and re-runs).
@@ -162,16 +165,26 @@ for entry in "$run_dir"/[0-9]*; do
                 exit 5
             fi
 
+            # Pre-stage the new message in the fixup commit body.
+            # Autosquash strips the `amend! <subject>` prefix line and
+            # uses the rest of the body as the new commit message —
+            # no editor invocation, no shim required.
+            msg_tmp=$(mktemp "$run_dir/.amend-msg.XXXXXX")
+            printf 'amend! %s\n\n' "$subject_line" > "$msg_tmp"
+            cat -- "$entry" >> "$msg_tmp"
+
             map_row=$(printf 'amend! %s\t%s\treword/%s.txt' \
                 "$subject_line" "$target_sha" "$target_sha")
             echo "$map_row" >> "$run_dir/reword-map.tsv"
 
-            if ! git commit --allow-empty --no-edit --fixup="reword:$target_sha"; then
-                echo "apply.sh: git commit --fixup=reword:$target_sha failed" >&2
-                echo "  this requires git >= 2.32; check git --version" >&2
+            if ! git commit --allow-empty -F "$msg_tmp"; then
+                rm -f -- "$msg_tmp"
+                echo "apply.sh: git commit reword for $target_sha failed" >&2
+                echo "  if a hook rejected the commit, repair and re-run" >&2
                 exit 4
             fi
 
+            rm -f -- "$msg_tmp"
             mark_done "$step_num"
             ;;
 

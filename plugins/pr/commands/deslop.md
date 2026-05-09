@@ -503,19 +503,20 @@ rule applies to the patch driver too.
 If the user chose "Apply patches now" (middle option), stop here.
 Steps 11–12 only run for "Apply and autosquash".
 
-For autosquash, run with `rerere` enabled and `staged-editor.sh` as
-`GIT_EDITOR`:
+For autosquash, run with `rerere` enabled. The reword fixup commits
+already carry their replacement messages in their bodies (Step 8's
+`apply-template.sh` pre-stages the message with an `amend! <subject>`
+prefix line), so autosquash uses the body verbatim — no editor needs
+to be invoked, and no shim is required:
 
 ```bash
-GIT_SEQUENCE_EDITOR=: GIT_EDITOR="${CLAUDE_PLUGIN_ROOT}/references/staged-editor.sh" DESLOP_TS_PID="${TS_PID}" git -c rerere.enabled=true -c rerere.autoupdate=true rebase -i --autosquash "${BASELINE_SHA}"
+GIT_SEQUENCE_EDITOR=: git -c rerere.enabled=true -c rerere.autoupdate=true rebase -i --autosquash "${BASELINE_SHA}"
 ```
 
-`staged-editor.sh` reads `${DESLOP_TS_PID}` from the environment to
-locate the per-run directory, parses `reword-map.tsv` to associate
-the editor's input file with the right replacement message, and
-writes that content to the editor's target. This indirection is
-required because git invokes `GIT_EDITOR` with only the message-file
-path — the target SHA is not exposed via env or argument.
+`GIT_SEQUENCE_EDITOR=:` accepts the auto-generated todo list
+non-interactively; autosquash strips the `amend! <subject>` prefix
+from each fixup body and uses the remainder as the target's new
+commit message.
 
 If autosquash exits 0, jump to Step 12.
 
@@ -748,10 +749,9 @@ For detailed catalogs and discovery procedures, consult:
 - **`${CLAUDE_PLUGIN_ROOT}/references/apply-template.sh`** — patch driver template that
   becomes per-run `apply.sh`. Idempotent via durable
   `.checkpoint/<NNNN>.done` markers; aggregates patches per target
-  SHA.
-- **`${CLAUDE_PLUGIN_ROOT}/references/staged-editor.sh`** — `GIT_EDITOR` shim that reads
-  `reword-map.tsv` to copy pre-staged messages during
-  `--fixup=reword:` / `--fixup=amend:` autosquash.
+  SHA. Reword fixups are pre-staged with an `amend! <subject>`
+  prefix line in the body so autosquash uses the body verbatim
+  without invoking `GIT_EDITOR`.
 
 ## Cited repo artifacts
 
