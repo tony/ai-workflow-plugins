@@ -1,7 +1,7 @@
 ---
 description: Weave code review — runs Claude, Gemini, and GPT reviews in parallel, then synthesizes findings
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion", "EnterPlanMode", "ExitPlanMode"]
-argument-hint: "[focus area] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
+argument-hint: "[focus area] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Code Review
@@ -130,6 +130,9 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--passes=N` | 1–5 | 1 | Number of synthesis passes |
 | `--timeout=N\|none` | seconds or `none` | command-specific | Timeout for external model commands |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
+| `--no-deslop` | flag | off | Skip the final deslop pass on the synthesised report |
+| `--quiet-deslop` | flag | off | Replace the 8-line deslop summary with one line |
+| `--verbose-deslop` | flag | off | Add tier letter, signature id, confidence per finding |
 
 **Mode presets** set default passes and timeout when not explicitly overridden:
 
@@ -631,6 +634,23 @@ After verification, group findings that refer to the same issue (same file, simi
   - 2 reviewers: promote severity by one level (Suggestion → Important, Important → Critical)
   - 3 reviewers: mark as Critical regardless
 
+### Deslop Pass (final pass only)
+
+This step runs only when the current pass is the final pass — for
+`pass_count == 1`, that is this pass; for `pass_count >= 2`, it runs at
+the end of Phase 5's last iteration. Skip if `--no-deslop` was set.
+
+1. Write the synthesised report to
+   `$SESSION_DIR/pass-NNNN/synthesis.md` *now*, before rendering the
+   Present template.
+2. Read `${CLAUDE_PLUGIN_ROOT}/references/deslop-pass.md` and apply it
+   with `ARTIFACT_PATH=$SESSION_DIR/pass-NNNN/synthesis.md`,
+   `SESSION_DIR`, the captured `BASELINE_SHA`, and `DESLOP_MODE` from
+   the flag.
+3. Re-read `synthesis.md`. Render the Present template using the
+   desloped report. The deslop summary block appears after the
+   Attribution section.
+
 ### Present the Report
 
 ```markdown
@@ -702,11 +722,15 @@ After verification, group findings that refer to the same issue (same file, simi
 **Reviewers participated**: Claude, Gemini, GPT (or subset)
 **Reviewers unavailable/failed**: (if any)
 **Session artifacts**: $SESSION_DIR
+
+<deslop-summary-block — emitted only when the Deslop Pass step ran; placement matches `references/deslop-pass.md` Step 6>
 ```
 
 After presenting the report, persist the synthesis:
 
-- Write the synthesized report to `$SESSION_DIR/pass-0001/synthesis.md`
+- The synthesised report was already written to
+  `$SESSION_DIR/pass-0001/synthesis.md` by the Deslop Pass step. When
+  `--no-deslop` was set, write it now as a fallback.
 - Update `session.json` via atomic replace: set `completed_passes` to `1`, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
 
 ---
@@ -753,6 +777,11 @@ For each pass from 2 to `pass_count`:
 4. **Capture outputs** to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
 5. **Re-synthesize** following Phase 4 (re-score only affected dimensions, re-adjudicate only targeted disputes). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
+
+6. **Final-pass deslop**: when this is the final pass (last iteration
+   of the loop, or convergence), run Phase 4's Deslop Pass step on
+   `$SESSION_DIR/pass-{N}/synthesis.md` before presenting. Gated on
+   `--no-deslop` exactly as in Phase 4.
 
 6. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
 

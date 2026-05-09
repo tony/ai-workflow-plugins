@@ -1,7 +1,7 @@
 ---
 description: Weave refine — iteratively improve an artifact through multi-model critique and weaving across multiple passes
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
+argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Refine
@@ -80,6 +80,9 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--timeout=N\|none` | seconds or `none` | 450s | Timeout for external model commands |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
 | `--judge=host\|round-robin` | judge mode | `host` | Who judges each pass |
+| `--no-deslop` | flag | off | Skip the final deslop pass on the woven synthesis |
+| `--quiet-deslop` | flag | off | Replace the 8-line deslop summary with one line |
+| `--verbose-deslop` | flag | off | Add tier letter, signature id, confidence per finding |
 
 **Mode presets** set default passes and timeout when not explicitly overridden:
 
@@ -780,6 +783,25 @@ At each pass boundary, check for early-stop (Step 5). If convergence is detected
 
 **Goal**: Present the refined artifact with full rationale chain showing its evolution.
 
+### Step 0: Deslop Pass (final synthesis)
+
+Unless `--no-deslop` was set, polish the final pass's woven artifact
+before rendering the user-facing output. Read
+`${CLAUDE_PLUGIN_ROOT}/references/deslop-pass.md` and apply it with:
+
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-<final>/woven.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `BASELINE_SHA` = the trunk SHA captured by the repo guard
+- `DESLOP_MODE` = `quiet` if `--quiet-deslop`, `verbose` if `--verbose-deslop`, else `default`
+
+The deslop pass mutates the final pass's `woven.md` in place and writes
+a `woven.pre-deslop.md` sibling. The Step 1 template below then embeds
+the desloped content. If the registry resolves to neither pr nor slop,
+the pass emits a one-line skip and Step 1 proceeds with the original
+woven content.
+
+### Step 1: Render
+
 ```markdown
 # Refinement Complete
 
@@ -822,6 +844,8 @@ At each pass boundary, check for early-stop (Step 5). If convergence is detected
 ---
 
 **Session artifacts**: $SESSION_DIR
+
+<deslop-summary-block — emitted only when Step 0 ran; placement matches `references/deslop-pass.md` Step 6>
 ```
 
 After presenting the final result, finalize the session:

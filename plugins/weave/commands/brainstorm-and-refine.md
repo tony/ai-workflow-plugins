@@ -1,7 +1,7 @@
 ---
 description: Weave brainstorm & refine — generate independent original ideas from Claude, Gemini, and GPT, then iteratively judge, weave, and refine them into the best possible result
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...]"
+argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Brainstorm & Refine
@@ -78,6 +78,9 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
 | `--judge=host\|round-robin` | judge mode | `host` | Who judges refinement passes |
 | `--preamble=...` | text | built-in | Override brainstorm variant preamble |
+| `--no-deslop` | flag | off | Skip the final deslop pass on the woven synthesis |
+| `--quiet-deslop` | flag | off | Replace the 8-line deslop summary with one line |
+| `--verbose-deslop` | flag | off | Add tier letter, signature id, confidence per finding |
 
 **Mode presets** set defaults for variants, passes, and timeout when not explicitly overridden:
 
@@ -859,6 +862,25 @@ After each pass completes:
 
 **Goal**: Present the refined artifact with full rationale chain showing its evolution from brainstorm through refinement.
 
+### Step 0: Deslop Pass (final synthesis)
+
+Unless `--no-deslop` was set, polish the final pass's woven artifact
+before rendering the user-facing output. Read
+`${CLAUDE_PLUGIN_ROOT}/references/deslop-pass.md` and apply it with:
+
+- `ARTIFACT_PATH` = `$SESSION_DIR/refine/pass-<final>/woven.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `BASELINE_SHA` = the trunk SHA captured by the repo guard
+- `DESLOP_MODE` = `quiet` if `--quiet-deslop`, `verbose` if `--verbose-deslop`, else `default`
+
+The deslop pass mutates the final pass's `woven.md` in place and writes
+a `woven.pre-deslop.md` sibling. Brainstorm originals are NEVER
+desloped — diversity is the point of the brainstorm phase. Step 1 below
+embeds the desloped final-pass woven content. Skips cleanly if the
+registry resolves to neither pr nor slop.
+
+### Step 1: Render
+
 ```markdown
 # Brainstorm & Refine Complete
 
@@ -920,6 +942,8 @@ After each pass completes:
 ---
 
 **Session artifacts**: $SESSION_DIR
+
+<deslop-summary-block — emitted only when Step 0 ran; placement matches `references/deslop-pass.md` Step 6>
 ```
 
 After presenting the final result, finalize the session:

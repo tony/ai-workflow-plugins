@@ -1,7 +1,7 @@
 ---
 description: Weave question — ask Claude, Gemini, and GPT the same question in parallel, then synthesize the best answer
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<question> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
+argument-hint: "<question> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Ask
@@ -73,6 +73,9 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--passes=N` | 1–5 | 1 | Number of synthesis passes |
 | `--timeout=N\|none` | seconds or `none` | command-specific | Timeout for external model commands |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
+| `--no-deslop` | flag | off | Skip the final deslop pass on the synthesised answer |
+| `--quiet-deslop` | flag | off | Replace the 8-line deslop summary with one line |
+| `--verbose-deslop` | flag | off | Add tier letter, signature id, confidence per finding |
 
 **Mode presets** set default passes and timeout when not explicitly overridden:
 
@@ -514,6 +517,26 @@ Launch an independent Task agent (`subagent_type: "general-purpose"`) to challen
 
 Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md`. Incorporate valid findings into the final output — verify each critic finding against the codebase before accepting it.
 
+**Step 6: Deslop pass (final pass only)**
+
+This step runs only when the current pass is the final pass — for
+`pass_count == 1`, that is this pass; for `pass_count >= 2`, it runs at
+the end of Phase 5's last iteration. Skip if `--no-deslop` was set.
+
+1. Write the synthesised answer to `$SESSION_DIR/pass-NNNN/synthesis.md`
+   *now*, before rendering the Present template (the post-Present write
+   in earlier versions of this command is replaced by this step — the
+   file is materialised here so the deslop pass can edit it).
+2. Read `${CLAUDE_PLUGIN_ROOT}/references/deslop-pass.md` and apply it
+   with `ARTIFACT_PATH=$SESSION_DIR/pass-NNNN/synthesis.md`,
+   `SESSION_DIR`, the captured `BASELINE_SHA`, and `DESLOP_MODE` set
+   from the flag (`quiet` / `verbose` / `default`).
+3. Re-read `synthesis.md` to obtain the desloped answer text. Render
+   the Present template below using the desloped content. The deslop
+   summary block (placement defined in `references/deslop-pass.md`
+   Step 6) appears after the Attribution section in the rendered
+   output.
+
 ### Present the Answer
 
 ```markdown
@@ -554,12 +577,16 @@ Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md`. Incorporate v
 **Models participated**: Claude, Gemini, GPT (or subset)
 **Models unavailable/failed**: (if any)
 **Session artifacts**: $SESSION_DIR
+
+<deslop-summary-block — emitted only when Step 6 ran; placement matches `references/deslop-pass.md` Step 6>
 ```
 
 After presenting the answer, persist the synthesis:
 
 - **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation. Append a `repo_guard_final` event to `events.jsonl`.
-- Write the synthesized answer to `$SESSION_DIR/pass-0001/synthesis.md`
+- The synthesised answer was already written to
+  `$SESSION_DIR/pass-0001/synthesis.md` by Step 6 (Deslop pass). When
+  `--no-deslop` was set, write it now as a fallback.
 - Update `session.json` via atomic replace: set `completed_passes` to `1`, `updated_at` to now. Append a `pass_complete` event to `events.jsonl`.
 
 ---
@@ -608,6 +635,11 @@ For each pass from 2 to `pass_count`:
 5. **Re-synthesize** following Phase 4 (re-score only affected dimensions, re-adjudicate only targeted disputes). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
 
 6. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
+
+7. **Final-pass deslop**: when this is the final pass (last iteration
+   of the loop, or convergence), run Phase 4 Step 6 (Deslop pass) on
+   `$SESSION_DIR/pass-{N}/synthesis.md` before presenting. The pass is
+   gated on `--no-deslop` exactly as in Phase 4.
 
 Present the final-pass synthesis, adding a **Refinement Notes** section describing what was deepened, corrected, or confirmed across passes.
 
