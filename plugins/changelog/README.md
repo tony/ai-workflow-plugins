@@ -24,7 +24,7 @@ Install the plugin:
 
 ## 5-Phase Workflow
 
-1. **Gather context** — Detect project name, find changelog file, analyze its format, check for PR, collect commits
+1. **Gather context** — Detect project name, read project conventions (AGENTS.md/CLAUDE.md), find changelog file, analyze its format, check for PR, collect commits
 2. **Categorize commits** — Parse commit types, group related commits (e.g., TDD sequences collapse into one entry)
 3. **Generate entries** — Write markdown matching the existing changelog style
 4. **Present for review** — Show proposed entries and insertion point, wait for user approval
@@ -41,11 +41,11 @@ The command auto-detects the changelog format from the existing file:
 
 ## Commit Categorization
 
-Commits are mapped to changelog sections based on their type prefix:
+Commits are mapped to changelog sections based on their type prefix. **Section names mirror the existing CHANGES file when one exists** — the table below lists fallback names used only when the file has no precedent:
 
-| Commit type | Section |
-|-------------|---------|
-| `feat` | Features |
+| Commit type | Fallback section |
+|-------------|------------------|
+| `feat` | What's new (or `Features`, if the project uses that) |
 | `fix` | Bug fixes |
 | `docs` | Documentation |
 | `test` | Tests |
@@ -55,6 +55,16 @@ Related commits are grouped automatically:
 - TDD sequences (xfail → fix → remove xfail) collapse into a single bug fix entry
 - Sequential feature commits on the same component merge into one entry
 - Merge commits and formatting-only changes are skipped
+
+## Project Conventions
+
+The command reads `AGENTS.md`, `CLAUDE.md`, and similar convention files at the repo root in Phase 1, and applies them with this priority:
+
+1. **AGENTS.md / CLAUDE.md** (explicit project rules) — wins over everything else
+2. **Existing CHANGES file** (implicit homogeneity) — section order, heading capitalization, entry shape, and proportionality are mirrored from the most recent populated release
+3. **Command defaults** — used only when neither source has precedent
+
+This applies to both the changelog entries themselves and the commit message used when the CHANGES update is committed. If the project's AGENTS.md prescribes a commit format (e.g., `Scope(type[detail])` with `why:` / `what:` body), the command follows it instead of its fallback `docs(CHANGES) <description>` form.
 
 ## Prerequisites
 

@@ -25,18 +25,25 @@ Additional context from user: $ARGUMENTS
    - `go.mod` → module path (last segment)
    - Fall back to the repository directory name
 
-2. **Detect trunk branch**:
+2. **Read project conventions** — check the repo root for convention files and record what they prescribe. Look at `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules/*`, `.github/AGENTS.md`, and any equivalent. Extract:
+   - **Commit message format** — scope/type pattern (e.g., `Scope(type[detail]) subject`), body structure (e.g., `why:` / `what:` blocks), line-wrap budget (e.g., 72 chars), component-naming conventions
+   - **Any prescribed CHANGES/release-notes format or voice**
+   - **Any project-specific section names** (e.g., the project might use `Features` instead of `What's new`)
+
+   These conventions **outrank** the defaults later in this command. If a project convention conflicts with a fallback rule below, the project convention wins.
+
+3. **Detect trunk branch**:
    ```
    git symbolic-ref refs/remotes/origin/HEAD
    ```
    - Strip `refs/remotes/origin/` prefix to get branch name
    - Fall back to `master` if the above fails
 
-3. **Verify not on trunk**:
+4. **Verify not on trunk**:
    - Check current branch: `git branch --show-current`
    - If on trunk, report "Already on trunk branch — nothing to generate" and stop
 
-4. **Find and read the changelog file** — scan the repo root for common changelog filenames:
+5. **Find and read the changelog file** — scan the repo root for common changelog filenames:
    - `CHANGES`, `CHANGES.md`
    - `CHANGELOG`, `CHANGELOG.md`
    - `HISTORY`, `HISTORY.md`
@@ -44,21 +51,21 @@ Additional context from user: $ARGUMENTS
    - If multiple exist, prefer the one with the most content
    - If none exist, report "No changelog file found" and ask the user which filename to create
 
-5. **Analyze the changelog format**:
+6. **Analyze the changelog format** — this is the homogeneity step; the existing file is the source of truth for shape:
    - **Heading format**: Detect the pattern used for release headings (e.g., `## v1.2.3`, `## [1.2.3]`, `## project v1.2.3`, `## 1.2.3 (YYYY-MM-DD)`)
    - **Unreleased section**: Look for an "unreleased" heading or a placeholder comment (e.g., `<!-- END PLACEHOLDER`, `## [Unreleased]`, `## Unreleased`)
    - **Insertion point**: Determine where new entries go — after a placeholder comment, under an unreleased heading, or at the top of the file
-   - **Section headings**: Note existing section headings (e.g., `### Bug fixes`, `### Features`) and their capitalization style
-   - Record this format to match it exactly when generating entries
+   - **Section headings, order, and capitalization**: Look at the most recent populated release. Record the exact section names (`Features` vs. `What's new`, `Bug fixes` vs. `Bug Fixes`), their sequence, and any sections the project uses that aren't in the default list. Mirror this exactly when generating new entries.
+   - **Entry shape and proportionality**: Note whether the project uses plain bullets, `####` sub-section headings, paragraph-per-entry, etc., and the typical entry length. Match it.
 
-6. **Check for PR**:
+7. **Check for PR**:
    ```
    gh pr view --json number,title,body,labels 2>/dev/null
    ```
    - If a PR exists, extract the number, title, body, and labels
    - If no PR exists, note that `(#???)` placeholders will be used
 
-7. **Get commits**:
+8. **Get commits**:
    ```
    git log <trunk>..HEAD --oneline
    ```
@@ -112,22 +119,22 @@ A structured list of entries grouped by section, each with:
 
 1. **Section headings**: Match the style found in Phase 1 (e.g., `### Bug fixes`, `### Bug Fixes`)
 
-2. **Section order** (only include sections that have entries — this order is mandatory, never reorder):
-   1. Breaking changes
-   2. What's new
-   3. Bug fixes
-   4. Documentation
-   5. Tests
-   6. Development
+2. **Section order — mirror the existing CHANGES first.** The homogeneity rule: whatever the project already does wins. Resolve in this priority:
 
-   **IMPORTANT**: Always use the exact heading names above. In particular, use `### What's new` (not "Features" or "New features") — this matches the project's established convention in recent releases.
+   1. **Project convention from AGENTS.md / CLAUDE.md** (read in Phase 1). If the project's convention files prescribe a release-notes format or section order, follow it exactly. This wins over everything else.
+   2. **Existing CHANGES file precedent.** If the most recent populated release in the changelog establishes a section order and naming (e.g., the project uses `### Features` and `### Bug Fixes` in that order), mirror it — same sequence, same heading names, same capitalization. Don't drag `Features` to `What's new`; don't promote `Development` above `Bug fixes` if the project doesn't.
+   3. **Fallback (no precedent in either source).** When the CHANGES is empty or has no populated release to mirror, fall back to this default order, including only sections that have entries:
+
+      Breaking changes → What's new → Bug fixes → Documentation → Tests → Development
 
 3. **Simple entries** — single bullet for one-line changes:
    ```markdown
    - Brief description of the change (#123)
    ```
 
-4. **Sub-section entries** — `####` heading + 2-4 lines of product-level prose. Use this for new packages, new flags, new behaviours, or notable changes to existing surface — anything a downstream user needs to learn rather than just notice. The heading names the product change; the prose covers usefulness, integration, and trade-offs:
+4. **Sub-section entries** — `####` heading + 2-4 lines of product-level prose. Use this for new packages, new flags, new behaviours, or notable changes to existing surface — anything a downstream user needs to learn rather than just notice. The heading names the product change; the prose covers usefulness, integration, and trade-offs.
+
+   **If the existing CHANGES already has a sub-section convention, match it instead.** The shapes below are fallback defaults for projects with no precedent. If the project uses paragraph-only entries, bullet-only entries, or a different heading level for notable changes, mirror that:
 
    ```markdown
    #### New package: `<name>`
@@ -161,32 +168,48 @@ A structured list of entries grouped by section, each with:
    - If PR number is known: `(#512)`
    - If no PR exists: `(#???)`
 
-6. **Match existing style**:
-   - Check whether the project uses "Bug fixes" or "Bug Fixes" (match existing capitalization)
-   - This project uses "What's new" (not "Features" or "New features")
-   - Match the heading level, bullet style, and overall format of existing entries
-   - Preserve the project's conventions
+6. **Match existing style** (the homogeneity rule, applied per-detail):
+   - Match heading capitalization exactly — `Bug fixes` vs. `Bug Fixes`, `Features` vs. `What's new`, etc.
+   - Match the heading level used for entry groups (`###` vs. `####`)
+   - Match bullet style, prose vs. bullet preference, blank-line spacing, and any other shape detail visible in recent populated releases
+   - When in doubt, copy the shape of the most recent release verbatim and adapt only the content
 
-### Entry writing guidelines
+### Voice
 
-- **Product-level perspective — the "at-a-glance" test.** A reader skimming the changelog at upgrade time should answer *"what is this, why does it matter to me?"* in one breath. If they need to mentally compile a type signature, look up a signal name, or trace internal mechanics to get there, the entry is doing the wrong job. Lead with what the user GAINS, can now DO, or needs to KNOW — anchored to one of the four upgrade-time decisions: should I upgrade now, will my code break, can I drop a workaround / take a new affordance, or was my bug just fixed? Each entry should land on one of those axes in its first sentence.
-- **Keep depth out of the changelog.** The following patterns belong in autodoc, source, and the linked PR — not in CHANGES. Call them out and rewrite when you see them in a draft entry:
-  - **Type signatures** — `float | None`, `Optional[X]`, generic params, return types.
-  - **Signal / syscall / kernel names** — `SIGTERM`, `SIGKILL`, `epoll`, `mmap`, "kernel pipe buffer", "non-blocking fd".
-  - **Internal mechanics** — selectors, busy-loops, race windows, buffer sizes, lock files, the *cause* of a fix rather than its effect on the user.
-  - **Dunder / private method names** — `__str__`, `__init__`, `_internal_helper`.
-  - **Implementation flags or constants** — `_TIMEOUT_GRACE_SECONDS`, internal env vars, feature toggles invisible to consumers.
+**Product-facing, 10,000-ft, upgrade-time-decision oriented.** Each entry answers one of four reader questions in its first sentence: *should I upgrade, will my code break, can I drop a workaround / take a new affordance, was my bug just fixed?* Lead with what the user GAINS, can now DO, or needs to KNOW — never with what was implemented.
 
-  Depth lives in autodoc, source, and git history; the PR link in each entry is the doorway for readers who want it. The changelog is a "should I care?" filter, not a manual or a release-notes blog post.
-- **Discuss usefulness and downstream impact.** When a new package or feature has a non-obvious integration story, mention it: drop-in compatibility (`Drop-in for X`), default activation (`Replaces X in DEFAULT_EXTENSIONS`), auto-derivation (`auto-derives X, Y, Z from a single docs_url`), or accepted-but-ignored config keys with a warning. Two short sentences usually do this; rarely more.
-- **Brevity.** Aim for 2-4 lines per sub-section entry, 1-2 lines per simple bullet. If an entry is growing past that, the underlying change probably wants to be split into multiple entries (one per shipped surface). Long prose buries the impact. *If a sentence reads like it was lifted from a docstring or a stack trace, cut it — that information has a better home in the linked PR or in autodoc.*
-- **Skip what's not user-visible.** Refactors that don't change behaviour, type-only annotations, internal renames, lint cleanups, CI tweaks, test-infra changes, dev-tooling bumps — none belong in CHANGES. The diff and commit log are the right home for those.
-- Use present tense for entry titles ("Add support for..." not "Added support for...").
-- Don't repeat the section heading in the entry text.
-- Never include numeric tallies — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). These are brittle and duplicate the diff.
-- Never include git refs — SHAs, commit hashes, branch names, tag names, or line numbers. These break when history is rebased or tags move.
+The changelog is a *"should I care?"* filter, not a manual or a release-notes blog post. Depth lives in autodoc, source, and git history; the PR link in each entry is the doorway for readers who want it.
 
-### Good vs. bad framing
+#### What belongs in an entry
+
+- **Usefulness and downstream impact.** When a new package or feature has a non-obvious integration story, mention it: drop-in compatibility (`Drop-in for X`), default activation (`Replaces X in DEFAULT_EXTENSIONS`), auto-derivation (`auto-derives X, Y, Z from a single docs_url`), or accepted-but-ignored config keys with a warning. Two short sentences usually do this; rarely more.
+- **Present-tense entry titles.** "Add support for..." not "Added support for...".
+- **PR link.** Every entry closes with `(#123)` or `(#???)`.
+
+#### What to exclude
+
+These patterns belong in autodoc, source, and the linked PR — never in CHANGES. Call them out and rewrite when you see them in a draft entry:
+
+- **Type signatures** — `float | None`, `Optional[X]`, generic params, return types.
+- **Signal / syscall / kernel names** — `SIGTERM`, `SIGKILL`, `epoll`, `mmap`, "kernel pipe buffer", "non-blocking fd".
+- **Internal mechanics** — selectors, busy-loops, race windows, buffer sizes, lock files, the *cause* of a fix rather than its effect on the user.
+- **Dunder / private method names** — `__str__`, `__init__`, `_internal_helper`.
+- **Implementation flags or constants** — `_TIMEOUT_GRACE_SECONDS`, internal env vars, feature toggles invisible to consumers.
+- **Numeric tallies** — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). Brittle, and duplicate the diff.
+- **Git refs** — SHAs, commit hashes, branch names, tag names, line numbers. Break when history is rebased or tags move.
+- **Non-user-visible work** — refactors that don't change behaviour, type-only annotations, internal renames, lint cleanups, CI tweaks, test-infra changes, dev-tooling bumps. The diff and commit log are the right home.
+- **Section-heading repetition.** Don't repeat the section heading in the entry text.
+
+#### Proportionality
+
+- 1-2 lines per simple bullet
+- 2-4 lines per `####` sub-section entry
+- If an entry grows past that, the underlying change probably wants to be split into multiple entries (one per shipped surface). Long prose buries the impact.
+- If a sentence reads like it was lifted from a docstring or a stack trace, cut it — that information has a better home in the linked PR or in autodoc.
+
+When the existing CHANGES file establishes its own proportionality (e.g., one-line bullets only, or paragraph-per-entry), match it.
+
+#### Good vs. bad framing
 
 | Bad — describes the commit, or leaks implementation | Good — describes the user-visible change |
 |---|---|
@@ -198,12 +221,9 @@ A structured list of entries grouped by section, each with:
 
 **The pattern in the last two rows**: the *bad* version reads like a release-notes blog post or an autodoc summary; the *good* version answers *"what's this, why care?"* and stops. Anyone wanting the implementation detail can follow the PR link and read the diff.
 
-### Whole-branch perspective
+#### Whole-branch perspective
 
-Changelog entries describe the **net shipped result** of the branch, not its
-internal commit history. Collapse fixup commits, reverts-then-re-adds, and
-intermediate states. A TDD sequence (add failing test → fix → clean up) becomes
-one bug fix entry, not three.
+Changelog entries describe the **net shipped result** of the branch, not its internal commit history. Collapse fixup commits, reverts-then-re-adds, and intermediate states. A TDD sequence (add failing test → fix → clean up) becomes one bug fix entry, not three.
 
 ---
 
@@ -276,16 +296,29 @@ one bug fix entry, not three.
 
 ### Commit message conventions for CHANGES edits
 
-When the user asks to commit the CHANGES update, follow these rules:
+When the user asks to commit the CHANGES update, the commit message follows a tiered rule:
 
-1. **`#PRNUM` references belong in CHANGES, never in commit messages.** CHANGES entries reference PRs (e.g., `(#511)`) because they are user-facing and link to GitHub. Commit messages must never contain `#123` — the PR number may not exist yet, and git's merge history already tracks which PR a commit belongs to.
+1. **Project convention wins.** If `AGENTS.md` / `CLAUDE.md` (read in Phase 1) prescribes a commit format, use it exactly — including any required subject pattern, body structure, and line-wrap budget. For example, a project might prescribe:
 
-2. **Don't be redundant with the component prefix.** The commit prefix `docs(CHANGES)` already says "this is a changelog edit." The subject line should describe *what the changelog covers*, not that a changelog was added. For example:
-   - **Good**: `docs(CHANGES) Help-on-empty CLI and sync --all flag`
-   - **Bad**: `docs(CHANGES) Add changelog entry for help-on-empty CLI`
-   - **Bad**: `docs(CHANGES[v1.53.x]) ...` — the version is unknown until merge
+   ```
+   Scope(type[detail]) concise description
 
-3. **Use `docs(CHANGES)` as the component.** No sub-component (no `[v1.53.x]` etc.) since the target release version is not known at commit time.
+   why: Explanation of necessity or impact.
+   what:
+   - Specific technical changes made
+   ```
+
+   with 72-character body wrapping. Use the project's `type` for docs edits (typically `docs`), the project's component-detail style (e.g., `docs(CHANGES)`), and the project's body structure. The body should say *why* the changelog was updated (e.g., "Document help-on-empty CLI and sync --all flag for v1.53") and *what* it adds (a bulleted recap of the new sections), wrapped to the prescribed width.
+
+2. **Fallback when no convention is documented.** Use `docs(CHANGES) <description>` as the subject with no body.
+
+3. **Universal rules** (apply regardless of project convention):
+
+   - **`#PRNUM` references belong in CHANGES, never in commit messages.** CHANGES entries reference PRs (e.g., `(#511)`) because they are user-facing and link to GitHub. Commit messages must never contain `#123` — the PR number may not exist yet, and git's merge history already tracks which PR a commit belongs to.
+   - **The subject describes *what the changelog covers*, not that a changelog was added.**
+     - **Good**: `docs(CHANGES) Help-on-empty CLI and sync --all flag`
+     - **Bad**: `docs(CHANGES) Add changelog entry for help-on-empty CLI`
+   - **No version sub-component.** Avoid `docs(CHANGES[v1.53.x]) ...` — the target release version isn't known at commit time.
 
 ### Edge case: merging with existing entries
 
