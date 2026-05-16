@@ -188,11 +188,6 @@ test:
 - The commit message for the work itself (see *Git Commit Standards*
   above).
 
-### Where this is enforced
-
-- `/pr:pr` and `/pr:review-pr` exclude within-branch
-  tactical narrative from PR bodies and flag it during review.
-
 ## Plugin Quality Standards
 
 ### Command Files
