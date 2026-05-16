@@ -115,6 +115,88 @@ EOF
 )"
 ```
 
+## Shipped vs. Branch-Internal Content
+
+Long-running branches accumulate tactical decisions — renames, internal
+refactors, attempts-then-reverts, intermediate states. Those decisions
+belong in **git commit messages**, which a reader holds alongside the
+diff that produced them. They do **not** belong in the artifacts being
+shipped: code comments, docstrings, README, CHANGES, PR descriptions,
+release notes, migration guides.
+
+The git diff is authoritative for *what changed*. The commit body is
+the right home for *why it changed*. Restating either inside the
+artifact itself adds noise without information — the downstream reader
+holds only the current code and the published release notes, not the
+branch history.
+
+### Branch-internal patterns to keep out of shipped artifacts
+
+- **Renames of unshipped symbols** — "Renamed from `foo`", "was
+  previously called `bar`", "used to be `baz`", "formerly known as
+  `qux`". If the old name never appeared in a published release, no
+  reader will ever search for it.
+- **Within-branch editing sequences** — "first we tried X, then
+  switched to Y", "the old approach was Z", "we removed the wrapper
+  and inlined it instead".
+- **Diff paraphrases inside the change** — "added handling for…",
+  "refactored to use…", "moved [thing] here", "removed the old
+  helper". `git show` already says this.
+- **Numeric tallies of within-branch work** — "split 3 commits into
+  1", "across 12 files", "adds 7 tests". `git diff --stat` shows this.
+- **Phantom `### Fixes` entries** — release-notes bullets that
+  "fix" behavior that did not exist in any published release. See
+  the Published-Release Test below.
+
+### What IS legitimate (do not strip these)
+
+- **Public deprecation notices** for symbols that **did** appear in
+  a published release. Test: `git log --all --tags -- <symbol>`
+  finds the symbol in trunk before the branch point, or in a tagged
+  release.
+- **Migration guides** for users of an old shipped surface.
+- **Hidden-constraint comments** that document *why the current code
+  looks the way it does* — invariants, surprising platform behavior,
+  workarounds for specific upstream bugs. The test: would the comment
+  make sense to a reader who had never seen the previous version?
+- **`### Fixes` / `### Bug fixes` CHANGES entries** for bugs
+  experienced by users of a published release.
+- **Commit messages themselves** — branch-internal narrative is
+  exactly what they're for. Reviewers want the engineering story.
+
+### The Published-Release Test
+
+Before adding any `### Fixes` framing, rename narrative, or
+"previously did X" contrast to a user-facing surface, apply:
+
+> Did users running the most recently published release ever
+> experience this (bug / old name / old behavior)?
+
+If the answer is no — because the behavior, code path, or even the
+*concept* didn't exist in a published release — the content is
+branch-internal narrative, not a user-visible change. Symmetric
+phrasings include "no longer raises", "no longer fails", "no longer
+crashes": published code that never raised at all means there's no
+regression for a user to recognize.
+
+Better homes for branch-internal narrative that doesn't pass the
+test:
+
+- The design-description paragraph for the change that introduced
+  the contract being mitigated — keep the design and its guardrail
+  in the same paragraph.
+- The commit message for the work itself (see *Git Commit Standards*
+  above).
+
+### Where this is enforced
+
+- `/pr:deslop` and `/slop:scan` flag the bleed via `branch-internal.*`
+  signatures in `plugins/{pr,slop}/references/signatures.yml`.
+- `/changelog` applies the Published-Release Test to candidate
+  `### Fixes` entries before emitting them.
+- `/pr:pr-description` and `/pr:review-pr` exclude within-branch
+  tactical narrative from PR bodies and flag it during review.
+
 ## Plugin Quality Standards
 
 ### Command Files
