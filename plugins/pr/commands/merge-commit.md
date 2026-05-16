@@ -8,6 +8,8 @@ allowed-tools: ["Bash", "Read"]
 
 Create a gold-standard merge commit message for the current branch. Merge commits are the **user-facing, product-level** summary that appears in `git log --merges` on the main branch.
 
+Merge commit text is user-facing. Apply the Published-Release Test before adding rename history, `### Fixes` for behavior that never shipped, or "no longer X" framing. See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*.
+
 User hint: $ARGUMENTS
 
 ## Context

@@ -46,6 +46,9 @@ explain when the rule is suppressed automatically.
 | `ai-slop.co-authored-by-ai` | remove | Demote to advisory if any commit in the last 50 trunk commits used `Co-Authored-By:` legitimately (project pair-programming convention). |
 | `hardcoded.test-runner` | rewrite | Suppress when the matching manifest is present (e.g., `package.json` for `npm test`). |
 | `hardcoded.os-paths` | rewrite | Skip in test fixtures and example documentation. |
+| `branch-internal.rename-narrative` | rewrite | Skip when old symbol appears in trunk before branch point. Skip in `CHANGES` / `CHANGELOG` / `MIGRATION` / `UPGRADING` / `*deprecation*` files and inside `Deprecated:` / `Deprecation:` blocks. |
+| `branch-internal.diff-paraphrase` | ask | Skip when comment explains a hidden constraint rather than narrating the edit. Skip in `CHANGES` / `CHANGELOG` files where describing the change is the purpose. |
+| `branch-internal.phantom-fix` | ask | Skip when subject names a symptom that appears in trunk before branch point. Heuristic: only fires on `### Fix*` headings or "no longer raises/fails" phrasing in `CHANGES*` / `CHANGELOG*` / `releases/*.md` files. |
 
 ---
 
@@ -62,6 +65,7 @@ own trunk history uses regularly are demoted to summary-only.
 | `verbose.defensive-wrapping` | ask | May be load-bearing — defensive coding around third-party calls is legitimate. |
 | `structure.multi-topic-commit` | ask | Splitting a commit is a creative act; the skill flags but never auto-splits. |
 | `brittle.dates` | rewrite | "As of 2026" rots, but dated docs may intentionally pin a moment in time. |
+| `branch-internal.intermediate-state-narrative` | ignore | Advisory only — may be legitimate when the contrast point is a real previously-shipped behavior. |
 
 ---
 
@@ -77,6 +81,21 @@ When applying any rule, also apply these whole-document suppressions:
 | Debug calls | In tests asserting logging/debugging behavior, in CLI tool code paths, in `scripts/`. |
 | Tone words | Tier C signals at ≥ 3 occurrences in the last 50 trunk commits — demoted to summary-only. |
 | Hardcoded test runner | When the matching manifest exists (`pyproject.toml` → `pytest` may be the actual command). |
+| Rename narrative | Symbol existed in a published release (found in `git log` before branch point), OR file is `CHANGES` / `CHANGELOG` / migration / deprecation context. |
+
+---
+
+## Branch-internal narrative bleed
+
+The `branch-internal.*` signature family detects within-branch tactical narrative leaking into shipped artifacts. See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative* for the principle, the Published-Release Test diagnostic, and the cleanup-in-hindsight protocol.
+
+**Worked example** — the discriminator is whether the named symbol or behavior existed in a published release:
+
+| Bleed (flag) | Not bleed (keep) |
+|---|---|
+| `Renamed from test_foo_old` in an unmerged-branch test docstring | `Deprecated: OldClass was renamed to NewClass in v2.0` (`OldClass` shipped) |
+| `### Fixes` entry for a regression the branch itself introduced | `### Fixes` entry for a bug present in the most recent released version |
+| `no longer raises spuriously on resize-grow` (the raise never shipped) | `no longer hangs on large datasets` (the hang shipped in v0.4 and earlier) |
 
 ---
 

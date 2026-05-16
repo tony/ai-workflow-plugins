@@ -221,3 +221,89 @@ signatures:
     pattern: '(?i)\b(as of|current as of|valid through|last updated)\s+(20\d{2}|January|February|March|April|May|June|July|August|September|October|November|December)\b'
     rationale: '"As of <date>" markers rot immediately; reference behavior or version, not calendar time.'
     fp-guard: 'May be intentional in dated documentation; never auto-apply.'
+
+  # ─── Branch-internal narrative bleed ────────────────────────────
+  #
+  # Within-branch tactical decisions (renames, intermediate states,
+  # phantom fixes) leaking from commit messages into the artifacts
+  # being committed. Defined in AGENTS.md § Shipped vs. Branch-Internal
+  # Narrative; this signature family is the detection layer.
+
+  - id: branch-internal.rename-narrative
+    tier: B
+    confidence: high
+    action: rewrite
+    kind: regex
+    target: [diff, file]
+    pattern: '(?i)\b(renamed?\s+from|was\s+(previously|formerly|originally)\s+(called|named|known\s+as)|used\s+to\s+be\s+(called|named|known\s+as)|formerly\s+(called|named|known\s+as)|originally\s+(named|called)|previously\s+named)\b'
+    rationale: |
+      In-artifact narration of a within-branch rename. The git diff
+      already shows the rename; the editing decision belongs in the
+      commit message, not the artifact. Common in test names,
+      internal helpers, and docstrings during long-running branches.
+    fp-guard: |
+      Skip when the named old symbol appears in `git log` before the
+      branch point (it was in a published release). Skip in files
+      matching `CHANGES*`, `CHANGELOG*`, `MIGRATION*`, `UPGRADING*`,
+      `*deprecation*` and inside `Deprecated:` / `Deprecation:`
+      blocks — the legitimate homes for public-rename narration.
+
+  - id: branch-internal.diff-paraphrase
+    tier: B
+    confidence: medium
+    action: ask
+    kind: semantic
+    target: [diff]
+    rationale: |
+      Code comment, docstring, or README paragraph paraphrases the
+      surrounding diff — "added handling for X", "refactored to use
+      Y", "moved Z here", "removed the old wrapper". Reader gets no
+      information they would not have by reading the code or the
+      commit message.
+    fp-guard: |
+      Skip when the comment explains a hidden constraint or
+      non-obvious invariant in the current code rather than
+      describing the edit — test: would the comment make sense to a
+      reader who had never seen the previous version? Skip in
+      `CHANGES` / `CHANGELOG` files where describing the change is
+      the purpose.
+
+  - id: branch-internal.intermediate-state-narrative
+    tier: C
+    confidence: low
+    action: ignore
+    kind: semantic
+    target: [diff, file, message-body]
+    rationale: |
+      Narrates a within-branch editing sequence inside the shipped
+      artifact — "first we tried X, then switched to Y", "this used
+      to wrap Z but no longer does", "we removed the old approach".
+      Belongs in commit messages of the relevant commits, not the
+      code or README.
+    fp-guard: |
+      Advisory only. May be legitimate when the contrast point is a
+      real previously-shipped behavior (check `git log` before the
+      branch); never auto-apply.
+
+  - id: branch-internal.phantom-fix
+    tier: B
+    confidence: medium
+    action: ask
+    kind: semantic
+    target: [file]
+    rationale: |
+      A `### Fixes` / `### Bug fixes` entry (or "no longer raises" /
+      "no longer fails" phrasing) in a CHANGES, CHANGELOG, or
+      release-notes file whose subject describes behavior that did
+      not exist in any published release. The "fix" is mitigating a
+      contract introduced earlier in the same branch — published-code
+      users never hit the bug and will be confused looking for it.
+      Belongs in the design-description paragraph of the change that
+      introduced the mitigated contract, or in the commit message.
+    fp-guard: |
+      Skip when the subject names a symbol or behavior that appears
+      in trunk before the branch point. Heuristic: file path matches
+      `CHANGES*`, `CHANGELOG*`, or `releases/*.md`; entry is under a
+      `### Fix*` / `### Bug fix*` heading or contains "no longer
+      (raises|fails|errors|crashes)"; and no closed issue or
+      pre-branch commit references the symptom.

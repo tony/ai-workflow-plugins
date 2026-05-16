@@ -55,6 +55,13 @@ Three disciplines:
    (`git checkout -- <file>`) and the run continues with the next
    finding.
 
+Slop includes **branch-internal narrative bleed** — within-branch
+tactical decisions (renames, intermediate states, phantom `### Fixes`)
+that leak into shipped artifacts. The principle and the
+Published-Release Test diagnostic are in
+`AGENTS.md` § *Shipped vs. Branch-Internal Narrative*; the scan flags
+candidates in `diff` and `file` targets.
+
 ## `$ARGUMENTS` contract
 
 If `$ARGUMENTS` is empty, scan all tracked files at HEAD with the
