@@ -43,6 +43,10 @@ If no project convention is found, fall back to Conventional Commits: `type(scop
 
 Match the style of the recent commits shown above — capitalization, tense, level of detail.
 
+### Message scope
+
+Commit messages are the canonical home for branch-internal narrative — renames, refactors, attempts-then-reverts, intermediate states, "first I tried X" stories. Put that content *here*, not in the artifacts the commit modifies (code, docstrings, README, CHANGES, PR descriptions). See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*.
+
 ---
 
 ## Procedure
