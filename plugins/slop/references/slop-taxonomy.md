@@ -71,6 +71,7 @@ own trunk history uses regularly are demoted to summary-only.
 | `verbose.defensive-wrapping` | ask | May be load-bearing — defensive coding around third-party calls is legitimate. |
 | `structure.multi-topic-commit` | ask | Splitting a commit is a creative act; the skill flags but never auto-splits. |
 | `brittle.dates` | rewrite | "As of 2026" rots, but dated docs may intentionally pin a moment in time. |
+| `branch-internal.intermediate-state-narrative` | ignore | Advisory only — may be legitimate when the contrast point is a real previously-shipped behavior. |
 
 ---
 
