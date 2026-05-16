@@ -53,9 +53,9 @@ explain when the rule is suppressed automatically.
 | `ai-slop.co-authored-by-ai` | remove | Demote to advisory if any commit in the last 50 trunk commits used `Co-Authored-By:` legitimately (project pair-programming convention). |
 | `hardcoded.test-runner` | rewrite | Suppress when the matching manifest is present (e.g., `package.json` for `npm test`). |
 | `hardcoded.os-paths` | rewrite | Skip in test fixtures and example documentation. |
-| `branch-internal.rename-narrative` | rewrite | Skip when old symbol appears in trunk before branch point. Skip in `CHANGES` / `CHANGELOG` / `MIGRATION` / `UPGRADING` / `*deprecation*` files. |
-| `branch-internal.diff-paraphrase` | ask | Skip when comment explains a hidden constraint rather than narrating the edit. Skip in changelog/release-notes contexts. |
-| `branch-internal.phantom-fix` | ask | Skip when subject names a symptom that appears in trunk before branch point. Heuristic: only fires on `### Fix*` headings or "no longer raises/fails" phrasing in CHANGES/CHANGELOG/release-notes files. |
+| `branch-internal.rename-narrative` | rewrite | Skip when old symbol appears in trunk before branch point. Skip in `CHANGES` / `CHANGELOG` / `MIGRATION` / `UPGRADING` / `*deprecation*` files and inside `Deprecated:` / `Deprecation:` blocks. |
+| `branch-internal.diff-paraphrase` | ask | Skip when comment explains a hidden constraint rather than narrating the edit. Skip in `CHANGES` / `CHANGELOG` files where describing the change is the purpose. |
+| `branch-internal.phantom-fix` | ask | Skip when subject names a symptom that appears in trunk before branch point. Heuristic: only fires on `### Fix*` headings or "no longer raises/fails" phrasing in `CHANGES*` / `CHANGELOG*` / `releases/*.md` files. |
 
 ---
 
