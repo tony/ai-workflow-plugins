@@ -53,6 +53,7 @@ explain when the rule is suppressed automatically.
 | `ai-slop.co-authored-by-ai` | remove | Demote to advisory if any commit in the last 50 trunk commits used `Co-Authored-By:` legitimately (project pair-programming convention). |
 | `hardcoded.test-runner` | rewrite | Suppress when the matching manifest is present (e.g., `package.json` for `npm test`). |
 | `hardcoded.os-paths` | rewrite | Skip in test fixtures and example documentation. |
+| `branch-internal.rename-narrative` | rewrite | Skip when old symbol appears in trunk before branch point. Skip in `CHANGES` / `CHANGELOG` / `MIGRATION` / `UPGRADING` / `*deprecation*` files. |
 
 ---
 
@@ -84,6 +85,7 @@ When applying any rule, also apply these whole-document suppressions:
 | Debug calls | In tests asserting logging/debugging behavior, in CLI tool code paths, in `scripts/`. |
 | Tone words | Tier C signals at ≥ 3 occurrences in the last 50 trunk commits — demoted to summary-only. |
 | Hardcoded test runner | When the matching manifest exists (`pyproject.toml` → `pytest` may be the actual command). |
+| Rename narrative | Symbol existed in a published release (found in `git log` before branch point), OR file is `CHANGES` / `CHANGELOG` / migration / deprecation context. |
 
 ---
 

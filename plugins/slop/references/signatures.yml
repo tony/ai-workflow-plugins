@@ -235,3 +235,29 @@ signatures:
     pattern: '(?i)\b(as of|current as of|valid through|last updated)\s+(20\d{2}|January|February|March|April|May|June|July|August|September|October|November|December)\b'
     rationale: '"As of <date>" markers rot immediately; reference behavior or version, not calendar time.'
     fp-guard: 'May be intentional in dated documentation; never auto-apply.'
+
+  # ─── Branch-internal narrative bleed ────────────────────────────
+  #
+  # Within-branch tactical decisions (renames, intermediate states,
+  # phantom fixes) leaking from commit messages into the artifacts
+  # being committed. Defined in AGENTS.md § Shipped vs. Branch-Internal
+  # Narrative; this signature family is the detection layer.
+
+  - id: branch-internal.rename-narrative
+    tier: B
+    confidence: high
+    action: rewrite
+    kind: regex
+    target: [diff, file]
+    pattern: '(?i)\b(renamed?\s+from|was\s+(previously|formerly|originally)\s+(called|named|known\s+as)|used\s+to\s+be\s+(called|named|known\s+as)|formerly\s+(called|named|known\s+as)|originally\s+(named|called)|previously\s+named)\b'
+    rationale: |
+      In-artifact narration of a within-branch rename. The git diff
+      already shows the rename; the editing decision belongs in the
+      commit message, not the artifact. Common in test names,
+      internal helpers, and docstrings during long-running branches.
+    fp-guard: |
+      Skip when the named old symbol appears in `git log` before the
+      branch point (it was in a published release). Skip in files
+      matching `CHANGES*`, `CHANGELOG*`, `MIGRATION*`, `UPGRADING*`,
+      `*deprecation*` and inside `Deprecated:` / `Deprecation:`
+      blocks — the legitimate homes for public-rename narration.
