@@ -115,78 +115,62 @@ EOF
 )"
 ```
 
-## Shipped vs. Branch-Internal Content
+## Shipped vs. Branch-Internal Narrative
 
-Long-running branches accumulate tactical decisions — renames, internal
-refactors, attempts-then-reverts, intermediate states. Those decisions
-belong in **git commit messages**, which a reader holds alongside the
-diff that produced them. They do **not** belong in the artifacts being
-shipped: code comments, docstrings, README, CHANGES, PR descriptions,
-release notes, migration guides.
+Long-running branches accumulate tactical decisions — renames,
+refactors, attempts-then-reverts, intermediate states. Commit messages
+and the diff hold *what changed* and *why*. Do not restate either in
+artifacts the downstream reader holds: code, docstrings, README,
+CHANGES, PR descriptions, release notes, migration guides.
 
-The git diff is authoritative for *what changed*. The commit body is
-the right home for *why it changed*. Restating either inside the
-artifact itself adds noise without information — the downstream reader
-holds only the current code and the published release notes, not the
-branch history.
+When deciding what counts as branch-internal, use trunk or the parent
+branch as the baseline — not intermediate states inside the current
+branch.
 
-### Branch-internal patterns to keep out of shipped artifacts
+**The Published-Release Test**
 
-- **Renames of unshipped symbols** — "Renamed from `foo`", "was
-  previously called `bar`", "used to be `baz`", "formerly known as
-  `qux`". If the old name never appeared in a published release, no
-  reader will ever search for it.
-- **Within-branch editing sequences** — "first we tried X, then
-  switched to Y", "the old approach was Z", "we removed the wrapper
-  and inlined it instead".
-- **Diff paraphrases inside the change** — "added handling for…",
-  "refactored to use…", "moved [thing] here", "removed the old
-  helper". `git show` already says this.
-- **Numeric tallies of within-branch work** — "split 3 commits into
-  1", "across 12 files", "adds 7 tests". `git diff --stat` shows this.
-- **Phantom `### Fixes` entries** — release-notes bullets that
-  "fix" behavior that did not exist in any published release. See
-  the Published-Release Test below.
+Before adding rename history, "previously" / "formerly" / "no longer
+X" phrasing, "removed" / "moved" / "refactored" / "fixed" diff
+paraphrases, or `### Fixes` entries to a user-facing surface, ask:
 
-### What IS legitimate (do not strip these)
+> Did users of the most recently published release ever experience
+> this old name, old behavior, or bug?
 
-- **Public deprecation notices** for symbols that **did** appear in
-  a published release. Test: `git log --all --tags -- <symbol>`
-  finds the symbol in trunk before the branch point, or in a tagged
+If the answer is no, it is branch-internal narrative. Move it to the
+commit message and describe only the current state in the artifact.
+
+**Keep in shipped artifacts**
+
+- Deprecations and migration guides for symbols that actually shipped.
+- `### Fixes` entries for bugs that affected users of a published
   release.
-- **Migration guides** for users of an old shipped surface.
-- **Hidden-constraint comments** that document *why the current code
-  looks the way it does* — invariants, surprising platform behavior,
-  workarounds for specific upstream bugs. The test: would the comment
-  make sense to a reader who had never seen the previous version?
-- **`### Fixes` / `### Bug fixes` CHANGES entries** for bugs
-  experienced by users of a published release.
-- **Commit messages themselves** — branch-internal narrative is
-  exactly what they're for. Reviewers want the engineering story.
+- Comments explaining *why the current code looks this way* —
+  invariants, platform quirks, upstream bug workarounds — that make
+  sense to a reader who never saw the previous version.
 
-### The Published-Release Test
+**Default**: when in doubt, keep the artifact clean and put the story
+in the commit.
 
-Before adding any `### Fixes` framing, rename narrative, or
-"previously did X" contrast to a user-facing surface, apply:
+### Cleanup in Hindsight
 
-> Did users running the most recently published release ever
-> experience this (bug / old name / old behavior)?
+When applying this rule retroactively from inside a feature branch,
+first establish scope by diffing against the parent branch (or trunk)
+to identify which commits this branch actually introduced. Then:
 
-If the answer is no — because the behavior, code path, or even the
-*concept* didn't exist in a published release — the content is
-branch-internal narrative, not a user-visible change. Symmetric
-phrasings include "no longer raises", "no longer fails", "no longer
-crashes": published code that never raised at all means there's no
-regression for a user to recognize.
-
-Better homes for branch-internal narrative that doesn't pass the
-test:
-
-- The design-description paragraph for the change that introduced
-  the contract being mitigated — keep the design and its guardrail
-  in the same paragraph.
-- The commit message for the work itself (see *Git Commit Standards*
-  above).
+- **Commits introduced in this branch** — prompt the user with two
+  options: `fixup!` commits with `git rebase --autosquash` to address
+  each causal commit at its source, or a single cleanup commit at
+  branch tip. User chooses.
+- **Commits already in trunk or a parent branch** — default to
+  leaving them alone. Do not raise them as cleanup candidates; act
+  only on explicit user instruction. If the user opts in, fold the
+  cleanup into a single commit at branch tip and do not rewrite trunk
+  or parent-branch history.
+- **Scope guard** — if cleaning in-branch bleed would touch a
+  colleague's in-flight work or expand the branch beyond its stated
+  goal, default to staying in lane: protect the project's current
+  goal, leave prior bleed alone, and don't introduce new bleed in the
+  current change.
 
 ## Plugin Quality Standards
 
