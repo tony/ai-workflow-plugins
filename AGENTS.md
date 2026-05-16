@@ -190,8 +190,6 @@ test:
 
 ### Where this is enforced
 
-- `/pr:deslop` and `/slop:scan` flag the bleed via `branch-internal.*`
-  signatures in `plugins/{pr,slop}/references/signatures.yml`.
 - `/changelog` applies the Published-Release Test to candidate
   `### Fixes` entries before emitting them.
 - `/pr:pr` and `/pr:review-pr` exclude within-branch
