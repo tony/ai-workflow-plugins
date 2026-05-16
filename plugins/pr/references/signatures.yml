@@ -247,3 +247,23 @@ signatures:
       matching `CHANGES*`, `CHANGELOG*`, `MIGRATION*`, `UPGRADING*`,
       `*deprecation*` and inside `Deprecated:` / `Deprecation:`
       blocks — the legitimate homes for public-rename narration.
+
+  - id: branch-internal.diff-paraphrase
+    tier: B
+    confidence: medium
+    action: ask
+    kind: semantic
+    target: [diff]
+    rationale: |
+      Code comment, docstring, or README paragraph paraphrases the
+      surrounding diff — "added handling for X", "refactored to use
+      Y", "moved Z here", "removed the old wrapper". Reader gets no
+      information they would not have by reading the code or the
+      commit message.
+    fp-guard: |
+      Skip when the comment explains a hidden constraint or
+      non-obvious invariant in the current code rather than
+      describing the edit — test: would the comment make sense to a
+      reader who had never seen the previous version? Skip in
+      `CHANGES` / `CHANGELOG` files where describing the change is
+      the purpose.
