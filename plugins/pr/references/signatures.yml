@@ -267,3 +267,20 @@ signatures:
       reader who had never seen the previous version? Skip in
       `CHANGES` / `CHANGELOG` files where describing the change is
       the purpose.
+
+  - id: branch-internal.intermediate-state-narrative
+    tier: C
+    confidence: low
+    action: ignore
+    kind: semantic
+    target: [diff, file, message-body]
+    rationale: |
+      Narrates a within-branch editing sequence inside the shipped
+      artifact — "first we tried X, then switched to Y", "this used
+      to wrap Z but no longer does", "we removed the old approach".
+      Belongs in commit messages of the relevant commits, not the
+      code or README.
+    fp-guard: |
+      Advisory only. May be legitimate when the contrast point is a
+      real previously-shipped behavior (check `git log` before the
+      branch); never auto-apply.
