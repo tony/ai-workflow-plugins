@@ -58,9 +58,9 @@ Three disciplines:
 Slop includes **branch-internal narrative bleed** — within-branch
 tactical decisions (renames, intermediate states, phantom `### Fixes`)
 that leak into shipped artifacts. The principle and the
-Published-Release Test diagnostic are in `AGENTS.md` § *Shipped vs.
-Branch-Internal Narrative*; the scan flags candidates in `diff` and
-`file` targets.
+Published-Release Test diagnostic are in
+`AGENTS.md` § *Shipped vs. Branch-Internal Narrative*; the scan flags
+candidates in `diff` and `file` targets.
 
 ## `$ARGUMENTS` contract
 
