@@ -298,3 +298,26 @@ signatures:
       Advisory only. May be legitimate when the contrast point is a
       real previously-shipped behavior (check `git log` before the
       branch); never auto-apply.
+
+  - id: branch-internal.phantom-fix
+    tier: B
+    confidence: medium
+    action: ask
+    kind: semantic
+    target: [file]
+    rationale: |
+      A `### Fixes` / `### Bug fixes` entry (or "no longer raises" /
+      "no longer fails" phrasing) in a CHANGES, CHANGELOG, or
+      release-notes file whose subject describes behavior that did
+      not exist in any published release. The "fix" is mitigating a
+      contract introduced earlier in the same branch — published-code
+      users never hit the bug and will be confused looking for it.
+      Belongs in the design-description paragraph of the change that
+      introduced the mitigated contract, or in the commit message.
+    fp-guard: |
+      Skip when the subject names a symbol or behavior that appears
+      in trunk before the branch point. Heuristic: file path matches
+      `CHANGES*`, `CHANGELOG*`, or `releases/*.md`; entry is under a
+      `### Fix*` / `### Bug fix*` heading or contains "no longer
+      (raises|fails|errors|crashes)"; and no closed issue or
+      pre-branch commit references the symptom.
