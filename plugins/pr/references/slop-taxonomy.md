@@ -48,6 +48,7 @@ explain when the rule is suppressed automatically.
 | `hardcoded.os-paths` | rewrite | Skip in test fixtures and example documentation. |
 | `branch-internal.rename-narrative` | rewrite | Skip when old symbol appears in trunk before branch point. Skip in `CHANGES` / `CHANGELOG` / `MIGRATION` / `UPGRADING` / `*deprecation*` files. |
 | `branch-internal.diff-paraphrase` | ask | Skip when comment explains a hidden constraint rather than narrating the edit. Skip in changelog/release-notes contexts. |
+| `branch-internal.phantom-fix` | ask | Skip when subject names a symptom that appears in trunk before branch point. Heuristic: only fires on `### Fix*` headings or "no longer raises/fails" phrasing in CHANGES/CHANGELOG/release-notes files. |
 
 ---
 
