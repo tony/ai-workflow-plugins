@@ -59,6 +59,13 @@ Three disciplines:
    require `--force-rewrite-pushed`. Branches with merge commits
    refuse `--apply-rebase` entirely.
 
+Slop includes **branch-internal narrative bleed** — within-branch
+tactical decisions (renames of unshipped symbols, intermediate states,
+phantom `### Fixes`) that leak from commits into the artifacts being
+committed. Reviewing the diff and the commit message for those
+phrasings is part of the audit; the rule and the Published-Release
+Test are in `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*.
+
 ## `$ARGUMENTS` contract
 
 If `$ARGUMENTS` is empty, default to `<trunk>..HEAD` (trunk
