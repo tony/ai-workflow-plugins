@@ -194,7 +194,7 @@ test:
   signatures in `plugins/{pr,slop}/references/signatures.yml`.
 - `/changelog` applies the Published-Release Test to candidate
   `### Fixes` entries before emitting them.
-- `/pr:pr-description` and `/pr:review-pr` exclude within-branch
+- `/pr:pr` and `/pr:review-pr` exclude within-branch
   tactical narrative from PR bodies and flag it during review.
 
 ## Plugin Quality Standards
