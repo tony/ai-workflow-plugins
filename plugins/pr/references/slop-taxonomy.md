@@ -80,6 +80,20 @@ When applying any rule, also apply these whole-document suppressions:
 
 ---
 
+## Branch-internal narrative bleed
+
+The `branch-internal.*` signature family detects within-branch tactical narrative leaking into shipped artifacts. See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative* for the principle, the Published-Release Test diagnostic, and the cleanup-in-hindsight protocol.
+
+**Worked example** — the discriminator is whether the named symbol or behavior existed in a published release:
+
+| Bleed (flag) | Not bleed (keep) |
+|---|---|
+| `Renamed from test_foo_old` in an unmerged-branch test docstring | `Deprecated: OldClass was renamed to NewClass in v2.0` (`OldClass` shipped) |
+| `### Fixes` entry for a regression the branch itself introduced | `### Fixes` entry for a bug present in the most recent released version |
+| `no longer raises spuriously on resize-grow` (the raise never shipped) | `no longer hangs on large datasets` (the hang shipped in v0.4 and earlier) |
+
+---
+
 ## How tiers interact with `--budget`
 
 The budget setting (Step 7 of the skill) caps how many findings per
