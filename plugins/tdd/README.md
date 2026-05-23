@@ -20,7 +20,7 @@ Install the plugin:
 
 | Component | Description |
 |-----------|-------------|
-| `/tdd:fix` | Lightweight xfail-driven TDD bug-fix loop |
+| `/tdd:fix` | Standard xfail-driven TDD bug-fix loop |
 | `/tdd:xfail` | Hermetic xfail workflow with diff gates, mock contamination guards, and CI checkpoints |
 
 ## `/tdd:fix` — 6-Phase Workflow
