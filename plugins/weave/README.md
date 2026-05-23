@@ -153,6 +153,15 @@ This works across AI coding tools:
 If plan mode is unavailable, the commands still work — the phase structure
 guides analysis before execution.
 
+### Output rendering and next-step panel
+
+All weave commands render their final output through the shared reference
+`references/present-results.md`. This reference enforces a strict output
+contract (hero block + prescribed sections + no invented headings) and
+presents a next-step panel that lets the user act on findings — including
+an active plan-mode handoff for commands whose results imply implementation
+work.
+
 ## Sub-Agent Architecture
 
 All weave commands use the Task tool to delegate work to sub-agents. Each model execution runs in its own sub-agent,

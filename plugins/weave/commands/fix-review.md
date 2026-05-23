@@ -196,19 +196,21 @@ No uncommitted changes should remain before moving to the next finding.
 
 ---
 
-## Phase 4: Summary
+## Phase 4: Present results
 
-After processing all valid findings, present a summary:
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-1. **Applied fixes**: List each committed fix with its commit hash and consensus level
-2. **Tests added/extended**: List test coverage improvements per finding
-3. **Skipped findings**: List each invalid/out-of-scope finding with the reason
-4. **Final verification**: Run the full quality gate one last time
-5. Report the final pass/fail status
-6. Show the commit log for the session:
-   ```bash
-   git log --oneline -<N>
-   ```
+- `RESULT_KIND` = `fix-review`
+- `ARTIFACT_PATH` = `$SESSION_DIR/phase-4-summary.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = 1
+- `IN_PLAN_MODE` = true
+- `MODELS` = null
+- `LABEL_MAP_PATH` = null
+
+After the reference returns, finalize the session: run the full quality
+gate one last time, show the commit log for the session, and report the
+final pass/fail status.
 
 ---
 

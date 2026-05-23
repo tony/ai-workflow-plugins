@@ -800,70 +800,25 @@ the desloped content. If the registry resolves to neither pr nor slop,
 the pass emits a one-line skip and Step 1 proceeds with the original
 woven content.
 
-### Step 1: Render
+### Step 1: Present the result
 
-```markdown
-# Refinement Complete
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Original artifact**: <first 100 chars of artifact or file path>
-**Passes completed**: N (of M requested)
-**Convergence**: <"early-stop at pass N" or "completed all M passes">
+- `RESULT_KIND` = `refine`
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-<final>/woven.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the number of completed passes
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
-## Evolution Summary
-- Pass 1: <what changed and why — which model won, what was incorporated from runners-up>
-- Pass 2: <what changed and why — which model won, what new improvements emerged>
-- ...
+After the reference returns, finalize the session:
 
-## Final Result
-
-<the final woven artifact from the last completed pass>
-
-## Full Rationale Chain
-
-### Pass 1
-
-#### Judge's Assessment
-**Winner**: <model> (score: XX/40)
-**Rationale**: <why this was the best version>
-
-#### Strengths from Runners-Up
-- From <model>: <specific strength incorporated>
-- From <model>: <specific strength incorporated>
-
-#### Weaknesses Addressed
-- <weakness in winner that was fixed in the woven version>
-
-#### Expert Rationales
-- **Claude**: <summary of Claude's rationale for its changes>
-- **Gemini**: <summary of Gemini's rationale for its changes>
-- **GPT**: <summary of GPT's rationale for its changes>
-
-### Pass 2
-...
-
----
-
-**Session artifacts**: $SESSION_DIR
-
-<deslop-summary-block — emitted only when Step 0 ran; placement matches `references/deslop-pass.md` Step 6>
-```
-
-After presenting the final result, finalize the session:
-
-- **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation. Append a `repo_guard_final` event to `events.jsonl`.
+- **Repo Guard**: Run session-end verification. Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation.
 - Write the final woven artifact to `$SESSION_DIR/final.md`
 - Update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now
-- Append a `session_complete` event to `events.jsonl`:
-
-```json
-{"event":"session_complete","timestamp":"<ISO 8601 UTC>","command":"refine","completed_passes":N,"converged":<true|false>}
-```
-
-- Update `latest` symlink:
-
-```bash
-ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/refine/latest"
-```
+- Append a `session_complete` event to `events.jsonl`
+- Update `latest` symlink
 
 ---
 
