@@ -16,13 +16,14 @@ Install the plugin:
 /plugin install tdd@ai-workflow-plugins
 ```
 
-## Command
+## Components
 
-| Command | Description |
-|---------|-------------|
-| `/tdd:fix` | Run the full xfail-driven TDD bug-fix loop |
+| Component | Description |
+|-----------|-------------|
+| `/tdd:fix` | Lightweight xfail-driven TDD bug-fix loop |
+| `/tdd:xfail` | Hermetic xfail workflow with diff gates, mock contamination guards, and CI checkpoints |
 
-## 6-Phase Workflow
+## `/tdd:fix` — 6-Phase Workflow
 
 1. **Understand the bug** — Parse the report into symptom, expected behavior, trigger conditions
 2. **Write a failing test** — Create an xfail-marked test that reproduces the bug
@@ -49,6 +50,19 @@ For other frameworks, the command uses whatever skip/pending/expected-failure me
 ## Quality Gate Discovery
 
 The command reads AGENTS.md / CLAUDE.md to discover the project's quality gates (test runner, linter, formatter, type checker). All gates must pass before each commit.
+
+## `/tdd:xfail` — Hermetic Reproduction Protocol
+
+A strict variant of the TDD workflow that enforces proof at every phase boundary:
+
+1. **Reproduce** — Write a test with `strict=True` xfail; confirm it xfails
+2. **Verify reproduction** — Temporarily remove xfail, confirm the test fails for the right reason (not mock contamination)
+3. **Apply fix** — Source code only, zero test file changes; xfail now XPASSes
+4. **Verify isolation** — Stash the fix, confirm the bug returns; pop, confirm it's gone
+5. **Remove xfail** — Test file only, zero source changes; test passes normally
+6. **Final verification** — Full suite green, three commits with correct file separation
+
+Each commit passes a `git diff --stat` gate ensuring test-only and source-only commits stay separated. The stash round-trip in step 4 proves the fix is what resolved the test.
 
 ## Cross-Dependency Bugs
 
