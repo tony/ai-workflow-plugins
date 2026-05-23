@@ -53,7 +53,7 @@ Check each applicable dimension. Not every dimension applies to every PR — a o
 | **Cross-references** | Companion PRs, related issues, tracking links where relevant? |
 | **Before/After** | For behavioral changes, are both states shown in labeled code blocks? |
 | **No brittle details** | Does the description avoid test counts, SHAs, line numbers, or file/line-changed counts? These duplicate what the reviewer sees in the diff. |
-| **No branch-internal narrative** | Does the description avoid rename history, "no longer X" / "previously Y" phrasing, and `### Fixes` framing for behavior that never appeared in a published release? See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*. The Published-Release Test is the diagnostic. |
+| **No branch-internal narrative** | Does the description avoid rename history, "no longer X" / "previously Y" phrasing, and `### Fixes` framing for behavior that never appeared in a published release? See `AGENTS.md` § *The Published-Release Test*. |
 | **Whole-branch perspective** | Does it describe the net shipped result, or does it narrate the branch's commit-by-commit evolution? |
 
 ### 4. Report

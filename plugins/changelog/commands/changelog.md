@@ -198,7 +198,7 @@ These patterns belong in autodoc, source, and the linked PR — never in CHANGES
 - **Numeric tallies** — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). Brittle, and duplicate the diff.
 - **Git refs** — SHAs, commit hashes, branch names, tag names, line numbers. Break when history is rebased or tags move.
 - **Non-user-visible work** — refactors that don't change behaviour, type-only annotations, internal renames, lint cleanups, CI tweaks, test-infra changes, dev-tooling bumps. The diff and commit log are the right home.
-- **Phantom fixes** — `### Fixes` entries (or "no longer raises / fails / errors / crashes" phrasings) for behavior that did not exist in any published release. Apply the Published-Release Test (`AGENTS.md` § *Shipped vs. Branch-Internal Narrative*): did users of the most recently published release ever experience this bug? If no, the entry belongs in the design-description paragraph of the feature that introduced the contract, not under `### Fixes`.
+- **Phantom fixes** — `### Fixes` entries (or "no longer raises / fails / errors / crashes" phrasings) for behavior that did not exist in any published release. Apply the Published-Release Test (`AGENTS.md` § *The Published-Release Test*): did users of the most recently published release ever experience this bug? If no, the entry belongs in the design-description paragraph of the feature that introduced the contract, not under `### Fixes`.
 - **Section-heading repetition.** Don't repeat the section heading in the entry text.
 
 #### Proportionality

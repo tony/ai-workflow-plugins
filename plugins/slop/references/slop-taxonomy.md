@@ -94,7 +94,7 @@ When applying any rule, also apply these whole-document suppressions:
 
 ## Branch-internal narrative bleed
 
-The `branch-internal.*` signature family detects within-branch tactical narrative leaking into shipped artifacts. See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative* for the principle, the Published-Release Test diagnostic, and the cleanup-in-hindsight protocol.
+The `branch-internal.*` signature family detects within-branch tactical narrative leaking into shipped artifacts. See `AGENTS.md` § *AI Slop Prevention* for the principle, the Published-Release Test diagnostic, and the cleanup-in-hindsight protocol.
 
 **Worked example** — the discriminator is whether the named symbol or behavior existed in a published release:
 

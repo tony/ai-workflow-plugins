@@ -133,8 +133,9 @@ patterns:
   file/test counts, dated "as of" claims, bare SHAs, and local
   absolute paths unless they are strict evidentiary artifacts (e.g.,
   benchmark logs).
-- **Diff Narration:** Do not add comments, docs, or release notes that
-  merely restate what moved, was renamed, or was removed. The diff and
+- **Diff Narration:** Do not restate what moved, was renamed, or was
+  removed in artifacts the downstream reader holds: code, docstrings,
+  README, CHANGES, PR descriptions, or release notes. The diff and
   commit message already carry this history.
 - **Branch-Internal Narrative:** Do not mention intermediate branch
   states, abandoned approaches, or "no longer" behavior unless users

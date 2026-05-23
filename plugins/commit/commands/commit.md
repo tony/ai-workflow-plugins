@@ -45,7 +45,7 @@ Match the style of the recent commits shown above — capitalization, tense, lev
 
 ### Message scope
 
-Commit messages are the canonical home for branch-internal narrative — renames, refactors, attempts-then-reverts, intermediate states, "first I tried X" stories. Put that content *here*, not in the artifacts the commit modifies (code, docstrings, README, CHANGES, PR descriptions). See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*.
+Commit messages are the canonical home for branch-internal narrative — renames, refactors, attempts-then-reverts, intermediate states, "first I tried X" stories. Put that content *here*, not in the artifacts the commit modifies (code, docstrings, README, CHANGES, PR descriptions). See `AGENTS.md` § *AI Slop Prevention*.
 
 ---
 
