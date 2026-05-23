@@ -633,64 +633,20 @@ For each file modified by any model:
 3. **Score each version** using the general rubric dimensions (per file, not just overall)
 4. **Select the best version per file** — this may come from different models for different files
 
-### Step 4: Present Analysis to User
+### Present the analysis
 
-```markdown
-# Weave Implementation Analysis
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Task**: <user's task>
+- `RESULT_KIND` = `execute`
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-NNNN/synthesis.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the resolved pass count
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
-## Quality Gate Results
-
-| Label | Formatter | Linter | Type checker | Tests | Overall |
-|-------|-----------|--------|--------------|-------|---------|
-| A | pass/fail | pass/fail | pass/fail | pass/fail | pass/fail |
-| B | pass/fail | pass/fail | pass/fail | pass/fail | pass/fail |
-| C | pass/fail | pass/fail | pass/fail | pass/fail | pass/fail |
-
-## Overall Scores
-
-| Dimension | A | B | C |
-|-----------|---|---|---|
-| Correctness (3×) | /10 | /10 | /10 |
-| Completeness (2×) | /10 | /10 | /10 |
-| Convention adherence (2×) | /10 | /10 | /10 |
-| Risk awareness (1×) | /10 | /10 | /10 |
-| Scope discipline (1×) | /10 | /10 | /10 |
-| **Weighted total** | | | |
-
-## File-by-File Best Approach
-
-| File | Best From | Score | Why |
-|------|-----------|-------|-----|
-| `src/foo` | A | 8.5 | Better error handling, follows project patterns |
-| `src/bar` | B | 7.2 | More complete implementation, covers edge case X |
-| `tests/test_foo` | C | 9.0 | Better use of existing test fixtures |
-
-## Verification Summary
-
-**Verified claims**: <count> | **False**: <count>
-
-## Synthesis Plan
-
-1. Take `src/foo` from A's implementation
-2. Take `src/bar` from B's implementation
-3. Take `tests/test_foo` from C's implementation
-4. Combine and verify quality gates pass
-
-## Critic Findings
-
-<Issues found by critic, or "No issues found">
-
-## Attribution
-
-**Label mapping**: A = <model>, B = <model>, C = <model>
-**Models participated**: Claude, Gemini, GPT (or subset)
-**Models unavailable/failed**: (if any)
-**Session artifacts**: $SESSION_DIR
-```
-
-**Wait for user confirmation** before applying the synthesis.
+After the reference returns, finalize the session per the existing
+session finalization block.
 
 After presenting the analysis, persist the synthesis:
 
