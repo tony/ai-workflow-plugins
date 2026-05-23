@@ -98,19 +98,6 @@ class Author(pydantic.BaseModel):
     url: str | None = None
 
 
-VALID_CATEGORIES = (
-    "database",
-    "deployment",
-    "design",
-    "development",
-    "learning",
-    "monitoring",
-    "productivity",
-    "security",
-    "testing",
-)
-"""Valid plugin marketplace categories (alphabetical)."""
-
 Category = t.Literal[
     "database",
     "deployment",
