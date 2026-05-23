@@ -879,89 +879,25 @@ desloped — diversity is the point of the brainstorm phase. Step 1 below
 embeds the desloped final-pass woven content. Skips cleanly if the
 registry resolves to neither pr nor slop.
 
-### Step 1: Render
+### Step 1: Present the result
 
-```markdown
-# Brainstorm & Refine Complete
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Prompt**: <user's prompt>
-**Brainstorm originals**: <count> (<models> x <variants>)
-**Selected for refinement**: <count>
-**Refinement passes completed**: N (of M requested)
-**Convergence**: <"early-stop at pass N" or "completed all M passes">
+- `RESULT_KIND` = `brainstorm-and-refine`
+- `ARTIFACT_PATH` = `$SESSION_DIR/refine/pass-<final>/woven.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the number of completed refine passes
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/refine/pass-NNNN/label-map.json`
 
-## Evolution Summary
-- Brainstorm: <count> originals from <models>, <variants> variants each
-- Pass 1 (from originals): <which original won, what was incorporated from others>
-- Pass 2: <what changed and why — which model won, what new improvements emerged>
-- ...
+After the reference returns, finalize the session:
 
-## Final Result
-
-<the final woven artifact from the last completed pass>
-
-## Full Rationale Chain
-
-### Brainstorm Phase
-<count> originals generated. Selected for refinement: <list of labels>
-
-### Pass 1 (from brainstorm originals)
-
-#### Judge's Assessment
-**Winner**: <label> (score: XX/40)
-**Rationale**: <why this was the best original>
-
-#### Strengths from Runners-Up
-- From <label>: <specific strength incorporated>
-- From <label>: <specific strength incorporated>
-
-#### Weaknesses Addressed
-- <weakness in winner that was fixed in the woven version>
-
-### Pass 2
-
-#### Judge's Assessment
-**Winner**: <model> (score: XX/40)
-**Rationale**: <why this was the best version>
-
-#### Strengths from Runners-Up
-- From <model>: <specific strength incorporated>
-- From <model>: <specific strength incorporated>
-
-#### Weaknesses Addressed
-- <weakness>
-
-#### Expert Rationales
-- **Claude**: <summary of Claude's rationale for its changes>
-- **Gemini**: <summary of Gemini's rationale for its changes>
-- **GPT**: <summary of GPT's rationale for its changes>
-
-### Pass 3
-...
-
----
-
-**Session artifacts**: $SESSION_DIR
-
-<deslop-summary-block — emitted only when Step 0 ran; placement matches `references/deslop-pass.md` Step 6>
-```
-
-After presenting the final result, finalize the session:
-
-- **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). Capture `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"`. If `$CURRENT_STATUS` differs from `$REPO_FINGERPRINT`, revert and log the violation: `printf '{"event":"repo_guard_violation","timestamp":"%s","model":"session-end","reverted":true}\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >>"$SESSION_DIR/guard-events.jsonl"`.
-- Write the final woven artifact to `$SESSION_DIR/refine/final.md`
-- Update `session.json` via atomic replace: set `status` to `"completed"`, `phase` to `"complete"`, `updated_at` to now
-- Append a `session_complete` event to `events.jsonl`:
-
-```json
-{"event":"session_complete","timestamp":"<ISO 8601 UTC>","command":"brainstorm-and-refine","brainstorm_originals":<N>,"selected_for_refine":<M>,"completed_passes":<P>,"converged":<true|false>}
-```
-
-- Update `latest` symlink:
-
-```bash
-ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/brainstorm-and-refine/latest"
-```
+- **Repo Guard**: Run session-end verification. Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation.
+- Write the final woven artifact to `$SESSION_DIR/final.md`
+- Update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now
+- Append a `session_complete` event to `events.jsonl`
+- Update `latest` symlink
 
 ---
 
