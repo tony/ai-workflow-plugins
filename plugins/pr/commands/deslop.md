@@ -64,7 +64,7 @@ tactical decisions (renames of unshipped symbols, intermediate states,
 phantom `### Fixes`) that leak from commits into the artifacts being
 committed. Reviewing the diff and the commit message for those
 phrasings is part of the audit; the rule and the Published-Release
-Test are in `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*.
+Test are in `AGENTS.md` § *AI Slop Prevention*.
 
 ## `$ARGUMENTS` contract
 

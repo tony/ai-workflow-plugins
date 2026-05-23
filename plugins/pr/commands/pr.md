@@ -134,7 +134,7 @@ For removal or migration PRs, include "verify zero matches for X" items proving 
 - Details the reviewer can see in the diff
 - Redundant context already visible in `git log`
 - `Fixes #N` hardcoded in the body — use `gh pr create` flags or let GitHub auto-link
-- **Within-branch tactical narrative** — renames of unshipped symbols, "no longer X" / "previously Y" phrasing, diff paraphrases, or `### Fixes` framing for behavior that never shipped. Belongs in the commit messages of the commits that did the work. See `AGENTS.md` § *Shipped vs. Branch-Internal Narrative*; apply the Published-Release Test before including.
+- **Within-branch tactical narrative** — renames of unshipped symbols, "no longer X" / "previously Y" phrasing, diff paraphrases, or `### Fixes` framing for behavior that never shipped. Belongs in the commit messages of the commits that did the work. See `AGENTS.md` § *AI Slop Prevention*; apply the Published-Release Test before including.
 
 #### Whole-branch perspective
 

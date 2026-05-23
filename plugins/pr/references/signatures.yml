@@ -226,8 +226,8 @@ signatures:
   #
   # Within-branch tactical decisions (renames, intermediate states,
   # phantom fixes) leaking from commit messages into the artifacts
-  # being committed. Defined in AGENTS.md § Shipped vs. Branch-Internal
-  # Narrative; this signature family is the detection layer.
+  # being committed. Defined in AGENTS.md § AI Slop Prevention;
+  # this signature family is the detection layer.
 
   - id: branch-internal.rename-narrative
     tier: B
