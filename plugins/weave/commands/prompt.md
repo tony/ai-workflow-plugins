@@ -626,55 +626,20 @@ Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md`. Incorporate v
 
 In the verification step, additionally check quality gate results — a failing implementation gets Correctness capped at 3.
 
-### Step 4: Present Comparison to User
+### Present the comparison
 
-```markdown
-# Weave Implementation Comparison
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Task**: <user's prompt>
+- `RESULT_KIND` = `prompt`
+- `ARTIFACT_PATH` = `$SESSION_DIR/outputs/`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the resolved pass count
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
-## Quality Gate Results
-
-| Model | Formatter | Linter | Type checker | Tests | Overall |
-|-------|-----------|--------|--------------|-------|---------|
-| (label) | pass/fail | pass/fail | pass/fail | pass/fail | pass/fail |
-
-## Scores
-
-| Dimension | A | B | C |
-|-----------|---|---|---|
-| Correctness (3×) | /10 | /10 | /10 |
-| Completeness (2×) | /10 | /10 | /10 |
-| Convention adherence (2×) | /10 | /10 | /10 |
-| Risk awareness (1×) | /10 | /10 | /10 |
-| Scope discipline (1×) | /10 | /10 | /10 |
-| **Weighted total** | | | |
-
-## Verification Summary
-
-**Verified claims**: <count> | **False**: <count>
-
-## Recommendation
-
-**Best implementation**: <label> (revealed: <model>) — <reason based on scores>
-
-## Key Differences
-
-- <Label A> did X while <Label B> did Y — <which scored higher and why>
-
-## Critic Findings
-
-<Issues found by critic in the recommended implementation, or "No issues found">
-
-## Attribution
-
-**Label mapping**: A = <model>, B = <model>, C = <model>
-**Models participated**: Claude, Gemini, GPT (or subset)
-**Models unavailable/failed**: (if any)
-**Session artifacts**: $SESSION_DIR
-```
-
-**Wait for user to pick** which implementation to adopt, or accept the recommendation.
+After the reference returns, finalize the session per the existing
+session finalization block.
 
 After presenting the comparison, persist the synthesis:
 

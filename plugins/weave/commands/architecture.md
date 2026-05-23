@@ -656,56 +656,20 @@ For each file created or modified by any model:
 3. **Score each version** using the general rubric dimensions (per file)
 4. **Select the best version per file** — this may come from different models for different files
 
-### Step 4: Present Analysis to User
+### Present the analysis
 
-```markdown
-# Weave Architecture Analysis
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Goal**: <user's architecture goal>
+- `RESULT_KIND` = `architecture`
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-NNNN/synthesis.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the resolved pass count
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
-## Overall Scores
-
-| Dimension | A | B | C |
-|-----------|---|---|---|
-| Correctness (3×) | /10 | /10 | /10 |
-| Completeness (2×) | /10 | /10 | /10 |
-| Convention adherence (2×) | /10 | /10 | /10 |
-| Risk awareness (1×) | /10 | /10 | /10 |
-| Scope discipline (1×) | /10 | /10 | /10 |
-| **Weighted total** | | | |
-
-## File-by-File Best Approach
-
-| File | Best From | Score | Why |
-|------|-----------|-------|-----|
-| `AGENTS.md` | A | 8.5 | More complete commit conventions, better quality gate coverage |
-| `skills/review/SKILL.md` | B | 7.8 | Better scoped, clearer tool restrictions |
-| `tests/test_arch.py` | C | 9.0 | Tests meaningful invariants, not trivial assertions |
-
-## Verification Summary
-
-**Verified claims**: <count> | **False**: <count>
-
-## Synthesis Plan
-
-1. Take `AGENTS.md` from A's architecture
-2. Take `skills/review/SKILL.md` from B's architecture
-3. Take `tests/test_arch.py` from C's architecture
-4. Combine and verify cross-references are consistent
-
-## Critic Findings
-
-<Issues found by critic, or "No issues found">
-
-## Attribution
-
-**Label mapping**: A = <model>, B = <model>, C = <model>
-**Models participated**: Claude, Gemini, GPT (or subset)
-**Models unavailable/failed**: (if any)
-**Session artifacts**: $SESSION_DIR
-```
-
-**Wait for user confirmation** before applying the synthesis.
+After the reference returns, finalize the session per the existing
+session finalization block.
 
 After presenting the analysis, persist the synthesis:
 

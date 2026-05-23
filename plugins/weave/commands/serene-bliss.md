@@ -575,27 +575,33 @@ prepare for.
 
 ## Phase 7: Present Final Result
 
-Follow Phase 7 (Present Final Result) of
-`plugins/weave/commands/brainstorm-and-refine.md` verbatim. Present the
-final woven version, the full
-rationale chain across all passes, and the session directory path for
-post-session inspection.
+### Step 0: Deslop Pass
 
-**Deslop pass**: brainstorm-and-refine's Phase 7 Step 0 applies here —
-the final pass's `woven.md` is desloped before rendering, with a
-`woven.pre-deslop.md` sibling preserved. The `--no-deslop`,
-`--quiet-deslop`, and `--verbose-deslop` flags are honoured exactly as
-in brainstorm-and-refine.
+Unless `--no-deslop` was set, read
+`${CLAUDE_PLUGIN_ROOT}/references/deslop-pass.md` and apply it with:
 
-**Repo Guard**: The session-end verification from brainstorm-and-refine
-Phase 7 applies here — repo state is checked against the pre-session
-fingerprint before marking the session as completed.
+- `ARTIFACT_PATH` = `$SESSION_DIR/refine/pass-<final>/woven.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `BASELINE_SHA` = the trunk SHA captured by the repo guard
+- `DESLOP_MODE` = `quiet` if `--quiet-deslop`, `verbose` if `--verbose-deslop`, else `default`
 
-In the presentation summary, include one additional line specific to
-serene-bliss:
+### Step 1: Present the result
 
-> "Judged by: Panel (Claude + Gemini + GPT, peer-only averaging) across
-> N pass(es)."
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
+
+- `RESULT_KIND` = `serene-bliss`
+- `ARTIFACT_PATH` = `$SESSION_DIR/refine/pass-<final>/woven.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the number of completed refine passes
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/refine/pass-NNNN/label-map.json`
+
+In the presentation, include one additional line: "Judged by: Panel
+(Claude + Gemini + GPT, peer-only averaging) across N pass(es)."
+
+After the reference returns, finalize the session: repo guard, session.json,
+events.jsonl, latest symlink.
 
 ---
 

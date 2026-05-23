@@ -503,80 +503,20 @@ Read each output file from `$SESSION_DIR/outputs/`:
 
 Skip any files that do not exist (model variant was unavailable or failed).
 
-### Present the Results
+### Present the results
 
-When `--variants=1` (or variant count is 1), omit the variant label from output headers. Use just the model name (e.g., "Claude", not "Claude — Variant 1").
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Format for variants=1**:
+- `RESULT_KIND` = `brainstorm`
+- `ARTIFACT_PATH` = `$SESSION_DIR/outputs/`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = 1
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = null
 
-```markdown
-# Brainstorm Results
-
-**Prompt**: <user's prompt>
-**Models**: Claude, Gemini, GPT
-
----
-
-## Claude
-<response>
-
-## Gemini
-<response>
-
-## GPT
-<response>
-
----
-
-**Session artifacts**: $SESSION_DIR
-```
-
-**Format for variants > 1**:
-
-```markdown
-# Brainstorm Results
-
-**Prompt**: <user's prompt>
-**Models**: Claude, Gemini, GPT | **Variants per model**: N
-
----
-
-## Claude — Variant 1 (Conventional)
-<response>
-
-## Claude — Variant 2 (Creative)
-<response>
-
-## Gemini — Variant 1 (Conventional)
-<response>
-
-## Gemini — Variant 2 (Creative)
-<response>
-
-## GPT — Variant 1 (Conventional)
-<response>
-
-## GPT — Variant 2 (Creative)
-<response>
-
----
-
-**Session artifacts**: $SESSION_DIR
-```
-
-The variant label in parentheses matches the preamble direction:
-- Variant 1: (Conventional)
-- Variant 2: (Creative)
-- Variant 3: (Contrarian)
-
-When `--preamble` was used, omit the parenthetical label since the user provided a custom preamble. Use just "Variant 1", "Variant 2", "Variant 3".
-
-If a model variant failed or was unavailable, include a note in place of its response:
-
-```markdown
-## Gemini — Variant 2 (Creative)
-*Model unavailable or failed. See `$SESSION_DIR/stderr/gemini-v2.txt` for details.*
-```
+After the reference returns, finalize the session per the existing
+Finalize Session block.
 
 ### Finalize Session
 

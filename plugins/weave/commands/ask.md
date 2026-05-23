@@ -537,49 +537,20 @@ the end of Phase 5's last iteration. Skip if `--no-deslop` was set.
    Step 6) appears after the Attribution section in the rendered
    output.
 
-### Present the Answer
+### Present the answer
 
-```markdown
-# Answer
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-<Synthesized answer here, citing files and lines>
+- `RESULT_KIND` = `ask`
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-NNNN/synthesis.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the resolved pass count
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json` (or null for single-pass)
 
----
-
-## Scores
-
-| Dimension | A | B | C |
-|-----------|---|---|---|
-| Correctness (3×) | /10 | /10 | /10 |
-| Completeness (2×) | /10 | /10 | /10 |
-| Convention adherence (2×) | /10 | /10 | /10 |
-| Risk awareness (1×) | /10 | /10 | /10 |
-| Scope discipline (1×) | /10 | /10 | /10 |
-| **Weighted total** | | | |
-
-## Verification Summary
-
-**Verified claims**: <count> | **Plausible-unverified**: <count> | **False**: <count>
-
-## Adjudication
-
-**Agreed**: <key points all models concurred on>
-**Conflicts resolved**: <disagreements and which was correct, with code references>
-**Unresolvable**: <if any — both positions noted>
-
-## Critic Findings
-
-<Deltas from critic pass, or "No issues found">
-
-## Attribution
-
-**Label mapping**: A = <model>, B = <model>, C = <model>
-**Models participated**: Claude, Gemini, GPT (or subset)
-**Models unavailable/failed**: (if any)
-**Session artifacts**: $SESSION_DIR
-
-<deslop-summary-block — emitted only when Step 6 ran; placement matches `references/deslop-pass.md` Step 6>
-```
+After the reference returns, finalize the session per the existing
+session finalization block.
 
 After presenting the answer, persist the synthesis:
 

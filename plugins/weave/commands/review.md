@@ -651,80 +651,20 @@ the end of Phase 5's last iteration. Skip if `--no-deslop` was set.
    desloped report. The deslop summary block appears after the
    Attribution section.
 
-### Present the Report
+### Present the report
 
-```markdown
-# Weave Code Review Report
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-**Branch**: <branch-name>
-**Compared against**: origin/<trunk>
-**Files changed**: <count>
+- `RESULT_KIND` = `review`
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-NNNN/synthesis.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = the resolved pass count
+- `IN_PLAN_MODE` = false
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
-## Scores
-
-| Dimension | A | B | C |
-|-----------|---|---|---|
-| Correctness (3×) | /10 | /10 | /10 |
-| Specificity (2×) | /10 | /10 | /10 |
-| Severity calibration (2×) | /10 | /10 | /10 |
-| Actionability (1×) | /10 | /10 | /10 |
-| Convention coverage (1×) | /10 | /10 | /10 |
-| **Weighted total** | | | |
-
-## Verified Issues
-
-### Consensus Issues (flagged by multiple reviewers)
-
-#### Critical
-- [2+ reviewers] **file:42** — Description of verified issue
-  - Recommendation: ...
-
-#### Important
-- [2+ reviewers] **file:15** — Description of verified issue
-  - Recommendation: ...
-
-### Single-Reviewer Issues (verified)
-
-#### Critical
-- **file:88** — Description
-  - Recommendation: ...
-
-#### Important
-- **file:23** — Description
-  - Recommendation: ...
-
-#### Suggestions
-- **file:55** — Description
-  - Recommendation: ...
-
-## False Positives Rejected
-
-- **file:30** — Claimed issue: <description>. Rejected: <why it's not a real issue, with code reference>
-
-## Reviewer Disagreements
-
-<Adjudicated conflicts — which reviewer was correct and why>
-
-## Critic Findings
-
-<Additional issues found by critic pass, or "No additional issues">
-
-## Summary
-
-- **Total verified issues**: X
-- **False positives rejected**: Y
-- **Consensus issues**: Z (flagged by 2+ reviewers)
-- **Critical**: N
-
-## Attribution
-
-**Label mapping**: A = <model>, B = <model>, C = <model>
-**Reviewers participated**: Claude, Gemini, GPT (or subset)
-**Reviewers unavailable/failed**: (if any)
-**Session artifacts**: $SESSION_DIR
-
-<deslop-summary-block — emitted only when the Deslop Pass step ran; placement matches `references/deslop-pass.md` Step 6>
-```
+After the reference returns, finalize the session per the existing
+session finalization block.
 
 After presenting the report, persist the synthesis:
 

@@ -329,6 +329,21 @@ user course-correct before work begins.
 Include graceful degradation: if plan mode is unavailable, the skill's
 phase structure still guides analysis before execution.
 
+### Output Contract Convention
+
+Commands that produce structured output for users should declare their
+sections in a fixed order. When multiple commands share the same output
+pattern, extract the template into a portable reference file.
+
+1. A hero block is allowed at the top (1–4 lines, `⚠`/`✓` prefix or
+   short summary; no prose paragraphs).
+2. Body sections appear in a declared fixed order with verbatim level-2
+   headings. No invented sections.
+3. After the prescribed sections, end with an interactive next-step panel
+   (via `AskUserQuestion`) where the user can act on the result without
+   composing a follow-up command. Skip the panel only when the command
+   is already running inside plan mode.
+
 ### Accessible Code Blocks
 
 - **One command per code block** — never combine multiple commands in a single
