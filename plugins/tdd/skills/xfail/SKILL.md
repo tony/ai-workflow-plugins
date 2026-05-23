@@ -66,10 +66,25 @@ response and confirm with the user before proceeding.
 | Jest | `it.failing('...')` | Built-in (pass = fail) | Passing test fails suite |
 | Vitest | `it.fails('...')` | Built-in | Same as Jest |
 | Rust | `#[should_panic(expected = "...")]` | `expected` param | Wrong/no panic = failure |
-| Go | `t.Skip("known bug: ...")` | No strict equivalent | Must be manually enforced |
+| Go | `t.Skip("known bug: ...")` | No strict equivalent | See skip-cycle protocol below |
 
-For frameworks without strict xfail (Go, some others), substitute the
-diff-gate protocol below — it provides equivalent enforcement.
+### Frameworks without strict xfail (Go, others)
+
+`t.Skip` skips the test entirely — it never executes, so it cannot
+XPASS. For these frameworks, use a **skip-remove-run-reskip** cycle at
+each verification phase:
+
+- **Phase 1**: Write the test with `t.Skip("known bug: ...")`. Run the
+  test to confirm it is skipped.
+- **Phase 2**: Temporarily remove `t.Skip`. Run the test — it MUST fail
+  for the right reason. Restore `t.Skip`.
+- **Phase 3**: Apply the fix. Temporarily remove `t.Skip`. Run the
+  test — it MUST pass. Restore `t.Skip`.
+- **Phase 4**: Stash the fix. Remove `t.Skip`. Run the test — it MUST
+  fail again. Restore `t.Skip`. Pop the stash.
+- **Phase 5**: Remove `t.Skip` permanently.
+
+The diff gates and three-commit structure apply identically.
 
 4. Identify the test file glob patterns for this project (used by diff gates):
    - Common patterns: `**/test_*`, `**/*_test.*`, `**/tests/**`, `**/__tests__/**`, `**/*.test.*`, `**/*.spec.*`
@@ -153,20 +168,23 @@ This phase produces no commit. It is a verification-only checkpoint.
    - Jest `it.failing`: test reports as failed (because it passed)
    - Vitest `it.fails`: same as Jest
    - Rust `#[should_panic]`: test reports as failed (no panic)
-4. Run all quality gates
+4. Run non-test quality gates (formatter, linter, type checker). The full
+   test suite is not run at this phase — the XPASS(strict) failure is
+   expected and confirms the fix works.
 
 ### Gate 3: zero-diff on test files
 
-Before committing, verify no test files were modified:
+Using the test file patterns identified in Phase 0, verify no test files
+were modified. Example using common patterns:
 
 ```
-git diff --stat HEAD -- '**/test_*' '**/*_test.*' '**/tests/**' '**/__tests__/**' '**/*.test.*' '**/*.spec.*'
+git diff --stat HEAD -- <test-file-patterns>
 ```
 
 This must produce empty output. If test files were modified, unstage them
 and move those changes to Phase 5.
 
-5. **Commit** the fix using the project's commit format. Include the root cause explanation.
+Do **not** commit yet — Phase 4 must verify fix isolation first.
 
 ---
 
@@ -175,7 +193,7 @@ and move those changes to Phase 5.
 **Goal**: Prove the fix is what resolved the test, not an unrelated change.
 
 **Actions**:
-1. Stash the fix: `git stash`
+1. Stash the fix: `git stash -u`
 2. Run the xfail test — it must xfail again (the bug is back)
 3. Restore the fix: `git stash pop`
 4. Run the xfail test — it must XPASS again (the fix works)
@@ -185,7 +203,8 @@ and move those changes to Phase 5.
 If the test does not return to xfail when the fix is stashed, the fix is
 not what resolved the test. Investigate what else changed.
 
-This phase produces no commit. It is a verification-only checkpoint.
+5. **Commit** the fix using the project's commit format. Include the root
+   cause explanation.
 
 ---
 
@@ -203,10 +222,11 @@ code changes in this commit.
 
 ### Gate 5: zero-diff on source files
 
-Before committing, verify no source files (non-test) were modified:
+Using the test file patterns identified in Phase 0, verify no source
+files (non-test) were modified. Example using common patterns:
 
 ```
-git diff --stat HEAD -- . ':!**/test_*' ':!**/*_test.*' ':!**/tests/**' ':!**/__tests__/**' ':!**/*.test.*' ':!**/*.spec.*'
+git diff --stat HEAD -- . ':!<test-file-patterns>'
 ```
 
 This must produce empty output. If source files were modified, unstage
@@ -278,7 +298,7 @@ verification. Push after each commit phase:
 | After | Expected CI result | Why |
 |-------|-------------------|-----|
 | Phase 1 commit | Green | xfail = expected failure, suite passes |
-| Phase 3 commit | Red | `strict=True` makes XPASS a failure |
+| Phase 4 commit | Red | `strict=True` makes XPASS a failure (expected) |
 | Phase 5 commit | Green | xfail removed, test passes normally |
 
 If CI is not available or the user prefers local-only verification, the
@@ -312,6 +332,10 @@ AGENTS.md/CLAUDE.md. Common gates include:
 
 ALL gates must pass. A commit with failing tests or lint errors is not
 acceptable.
+
+**Exception**: Phase 3 runs non-test gates only. The XPASS(strict)
+result is the expected proof that the fix works; the full test suite
+passes after Phase 5 removes the xfail marker.
 
 ---
 
