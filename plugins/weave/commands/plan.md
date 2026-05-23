@@ -22,6 +22,8 @@ If plan mode is unavailable (e.g., headless `claude -p` invocation), proceed nor
 
 Do NOT call `ExitPlanMode` — the user reviews the plan file and approves execution via the UI.
 
+Emit to chat: `Plan mode active — drafting implementation plan…`
+
 ---
 
 ## Phase 1: Gather Context
@@ -579,85 +581,17 @@ Launch an independent Task agent (`subagent_type: "general-purpose"`) to challen
 
 Write the critic's findings to `$SESSION_DIR/pass-NNNN/critic.md` (via sub-agent). Incorporate valid findings into the final output — verify each critic finding against the codebase before accepting it.
 
-### Write the Final Plan
+### Present the plan
 
-After synthesis and critic review, produce the final plan in this format:
+Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 
-```markdown
-# Implementation Plan
-
-**Task**: <task description>
-
-## Architecture Decision
-
-<Chosen approach and why, referencing existing codebase patterns>
-
-## Implementation Steps
-
-Each step is one atomic commit. Run the project's quality gates (lint,
-format, type-check, and fast tests as defined in CLAUDE.md/AGENTS.md)
-before committing. All gates must pass.
-
-### Step 1: <description>
-- **Files**: `path/to/file`
-- **Changes**: <specific changes>
-- **Depends on**: (none / Step N)
-- **Commit**: `<scope(type): concise description>`
-- **Verify**: <which quality gates to run, or "all">
-
-### Step 2: <description>
-- **Files**: `path/to/file`
-- **Changes**: <specific changes>
-- **Depends on**: Step 1
-- **Commit**: `<scope(type): concise description>`
-- **Verify**: <which quality gates to run, or "all">
-
-... (continue for all steps)
-
-## Test Strategy
-
-- **Extend**: existing test files using the project's test patterns
-- **New test**: for new functionality following project conventions
-
-## Risks and Mitigations
-
-1. **Risk**: <description>
-   - **Mitigation**: <approach>
-
----
-
-## Scores
-
-| Dimension | A | B | C |
-|-----------|---|---|---|
-| Correctness (3×) | /10 | /10 | /10 |
-| Completeness (2×) | /10 | /10 | /10 |
-| Convention adherence (2×) | /10 | /10 | /10 |
-| Risk awareness (1×) | /10 | /10 | /10 |
-| Scope discipline (1×) | /10 | /10 | /10 |
-| **Weighted total** | | | |
-
-## Verification Summary
-
-**Verified claims**: <count> | **Plausible-unverified**: <count> | **False**: <count>
-
-## Adjudication
-
-**Agreed**: <key points all plans concurred on>
-**Conflicts resolved**: <disagreements and which was correct, with code references>
-**Rejected approaches**: <approach — rejected because reason with code reference>
-
-## Critic Findings
-
-<Deltas from critic pass, or "No issues found">
-
-## Attribution
-
-**Label mapping**: A = <model>, B = <model>, C = <model>
-**Models participated**: Claude, Gemini, GPT (or subset)
-**Models unavailable/failed**: (if any)
-**Session artifacts**: $SESSION_DIR
-```
+- `RESULT_KIND` = `plan`
+- `ARTIFACT_PATH` = `$SESSION_DIR/pass-0001/synthesis.md`
+- `SESSION_DIR` = `$SESSION_DIR`
+- `PASS_COUNT` = 1 (or the resolved pass count if multi-pass)
+- `IN_PLAN_MODE` = true
+- `MODELS` = the models that participated
+- `LABEL_MAP_PATH` = `$SESSION_DIR/pass-0001/label-map.json`
 
 **Step 6: Deslop, write to plan file, and persist artifacts**
 
@@ -693,6 +627,8 @@ plan-file write — the plan must land clean.
    ```
 
    The full audit lives at `$SESSION_DIR/deslop-report.md`.
+
+Emit to chat: `Plan ready for review.`
 
 5. **Persist remaining session artifacts** via sub-agent:
 
