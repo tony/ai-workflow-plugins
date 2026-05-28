@@ -234,20 +234,20 @@ The agent must:
 1. Read the variant prompt from
    `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
 2. Run the resolved Gemini command with output redirection.
-   **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate
-   rogue writes from the repository (see `docs/repo-guard-protocol.md`
+   **Repo Guard**: invoke the CLI in its native read-only sandbox — it
+   reads the repo but cannot write it (see `docs/repo-guard-protocol.md`
    Layer 1).
 
    **Native (`gemini` CLI)**:
 
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
 
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
 3. **Repo Guard** post-CLI verification: immediately after the CLI
@@ -290,20 +290,20 @@ GPT model. Same dispatch shape as Gemini, with these command
 replacements. Include `$REPO_TOPLEVEL` and `$REPO_FINGERPRINT` in the
 agent prompt for post-CLI verification.
 
-**Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate
-rogue writes from the repository (see `docs/repo-guard-protocol.md`
+**Repo Guard**: invoke the CLI in its native read-only sandbox — it
+reads the repo but cannot write it (see `docs/repo-guard-protocol.md`
 Layer 1).
 
 **Native (`codex` CLI)**:
 
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
 ```
 
 **Fallback (`agent` CLI)**:
 
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gpt-5.4-high "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
 ```
 
 **Repo Guard** post-CLI verification: immediately after the CLI
@@ -407,8 +407,8 @@ Launch one judge per available model **in the same turn**:
   protocol as Phase 3 GPT variants. Writes to
   `$SESSION_DIR/refine/pass-0001/judges/gpt.md`.
 
-**Repo Guard**: Gemini and GPT judge CLIs must use the same
-`(cd "$SESSION_DIR" && ...)` wrapping as Phase 3 variant dispatches
+**Repo Guard**: Gemini and GPT judge CLIs must use the same native
+read-only sandbox invocation as Phase 3 variant dispatches
 (see `docs/repo-guard-protocol.md` Layer 1). After each judge CLI
 returns, run the post-CLI repo state verification — capture
 `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"`,

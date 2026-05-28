@@ -412,15 +412,15 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to r
 >
 > **Native (`gemini` CLI)**:
 > ```bash
-> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
 > ```
 >
 > **Fallback (`agent` CLI)**:
 > ```bash
-> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
 > ```
 >
-> **Note**: Both commands run inside `(cd "$SESSION_DIR" && ...)` to ensure the external CLI's working directory is the session directory, not the repository root. This is part of the Repo Guard Protocol — external CLIs must never run from inside the repository.
+> **Note**: Each command runs in its native read-only sandbox (`codex -s read-only`, `gemini --approval-mode plan`, `agent --mode plan`) pointed at `$REPO_TOPLEVEL`, so the CLI can read the repo but not write it. The `(cd "$SESSION_DIR" && ...)` wrapper is a backstop that keeps any escaped write out of the repository. See the Repo Guard Protocol, Layer 1.
 >
 > **Retry and fallback protocol**:
 > 1. Record exit code, stderr, elapsed time
@@ -454,17 +454,17 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to r
 >
 > **Native (`codex` CLI)**:
 > ```bash
-> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec \
+> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null \
 >     -c model_reasoning_effort=medium \
 >     "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
 > ```
 >
 > **Fallback (`agent` CLI)**:
 > ```bash
-> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+> (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gpt-5.4-high "<prompt>" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
 > ```
 >
-> **Note**: Both commands run inside `(cd "$SESSION_DIR" && ...)` to ensure the external CLI's working directory is the session directory, not the repository root. This is part of the Repo Guard Protocol — external CLIs must never run from inside the repository.
+> **Note**: Each command runs in its native read-only sandbox (`codex -s read-only`, `gemini --approval-mode plan`, `agent --mode plan`) pointed at `$REPO_TOPLEVEL`, so the CLI can read the repo but not write it. The `(cd "$SESSION_DIR" && ...)` wrapper is a backstop that keeps any escaped write out of the repository. See the Repo Guard Protocol, Layer 1.
 >
 > **Retry and fallback protocol**:
 > 1. Record exit code, stderr, elapsed time
@@ -701,7 +701,7 @@ For each pass from 2 to `pass_count`:
 
 ## Rules
 
-- Never modify project files — this is project-read-only planning. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run from `$SESSION_DIR` (not the repo root), post-CLI verification reverts rogue writes, and session-end verification catches anything that slipped through.
+- Never modify project files — this is project-read-only planning. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - Do not exit plan mode — the plan file is the final output.
 - All Bash, Write (non-plan-file), and Edit operations must go through sub-agents spawned with `mode: "default"`.
 - Session-end: persist synthesis and update session metadata via sub-agent; write the plan to the plan file directly.

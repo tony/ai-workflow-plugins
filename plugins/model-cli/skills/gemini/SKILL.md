@@ -39,7 +39,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 **Resolution** (priority order):
 
-1. `gemini` found → use `gemini -m gemini-3.1-pro-preview -y -p`
+1. `gemini` found → use `gemini -m gemini-3-pro-preview -y --skip-trust -p`
 2. Else `agent` found → use `agent -p -f --model gemini-3.1-pro`
 3. Else → report both CLIs unavailable and stop
 
@@ -71,7 +71,7 @@ If `mode:plan` was detected, prepend this preamble to the prompt content:
 **Native (`gemini` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> gemini -m gemini-3.1-pro-preview -y -p "$(cat "$TMPFILE")" 2>/tmp/mc-stderr-gemini.txt
+<timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y --skip-trust -p "$(cat "$TMPFILE")" 2>/tmp/mc-stderr-gemini.txt
 ```
 
 **Fallback (`agent` CLI)**:
@@ -87,7 +87,7 @@ Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>
 1. **Record**: exit code, stderr (from `/tmp/mc-stderr-gemini.txt`), elapsed time
 2. **Classify**: timeout → retry with 1.5× timeout; rate-limit → retry after 10s delay; **credit-exhausted → skip retry, escalate to agent fallback immediately**; crash → stop; empty output → retry once. Detect credit-exhaustion via stderr patterns: `RESOURCE_EXHAUSTED`, `quota exceeded`, `quota_exceeded`, `insufficient_quota`, `exceeded your current quota`, `billing`, `capacity exhausted`, `usage limit`, or HTTP 429 with "daily limit".
 3. **Retry**: max 1 retry with the same backend (skipped for credit-exhausted)
-4. **Agent fallback**: if retry fails (or credit-exhausted) AND native `gemini` was used AND `agent` is available, re-run using `agent -p -f --model gemini-3.1-pro` (1 attempt, same timeout). Emit: `"Gemini v1 failed — gemini-3.1-pro-preview capacity exhausted. Relaunching with agent --model gemini-3.1-pro."` Note the backend switch in the output.
+4. **Agent fallback**: if retry fails (or credit-exhausted) AND native `gemini` was used AND `agent` is available, re-run using `agent -p -f --model gemini-3.1-pro` (1 attempt, same timeout). Emit: `"Gemini v1 failed — gemini-3-pro-preview capacity exhausted. Relaunching with agent --model gemini-3.1-pro."` Note the backend switch in the output.
 4b. **Lesser fallback**: if agent is also credit-exhausted or unavailable, re-run using `gemini -m gemini-3-flash-preview` (1 attempt, same timeout). Emit: `"agent failed — gemini-3.1-pro capacity exhausted. Relaunching with gemini-3-flash-preview lesser fallback."`
 5. **After all retries exhausted**: report failure with stderr details from all backends
 

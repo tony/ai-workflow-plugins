@@ -71,24 +71,25 @@ the full specification.
 
 | Layer | Defense | Scope |
 |-------|---------|-------|
-| 1 | CLI working directory isolation (`cd "$SESSION_DIR"`) | Read-only commands |
+| 1 | Native CLI read-only sandbox (`-s read-only` / `--approval-mode plan`) | Read-only commands |
 | 2 | Pre-session repo fingerprint (HEAD + `git status`) | All commands |
 | 3 | Post-CLI repo state verification + auto-revert | All commands |
 | 4 | Prompt hardening ("CRITICAL: Do NOT write files") | All commands |
 | 5 | Session-end verification against fingerprint | All commands |
 
-**Read-only commands** run external CLIs from `$SESSION_DIR` instead of
-the repo root — rogue writes land in the session directory, not the
-repository. **Write commands** run external CLIs in isolated worktrees
+**Read-only commands** run external CLIs in their native read-only
+sandbox (codex `-s read-only`, gemini `--approval-mode plan`, agent
+`--mode plan`) pointed at the repo, so models can read but not write;
+the `cd "$SESSION_DIR"` wrapper is a backstop. **Write commands** run
+external CLIs in isolated worktrees
 and verify the main tree is unchanged after diff capture. All commands
 verify the repo is unchanged at session end.
 
-The guard was introduced because external CLIs (especially Gemini with
-`-y` auto-approve) have known issues with unexpectedly modifying
-project files. The protocol provides defense-in-depth: working
-directory isolation prevents most rogue writes, post-CLI verification
-catches writes to absolute paths, and session-end verification is the
-final safety net.
+The guard was introduced because external CLIs have known issues with
+unexpectedly modifying project files. The protocol provides
+defense-in-depth: the native read-only sandbox blocks writes, post-CLI
+verification catches writes to absolute paths, and session-end
+verification is the final safety net.
 
 ### Read-Only Commands
 
@@ -512,7 +513,7 @@ via the built-in alias chain.
 downgrading to 2.5 Pro due to missing preview access):
 
 ```console
-gemini -m gemini-3-pro-preview -y -p "Report your exact model ID and thinking level."
+gemini -m gemini-3-pro-preview --approval-mode plan --skip-trust -p "Report your exact model ID and thinking level."
 ```
 
 **Optional: pin to 3.1 with HIGH thinking.** If you prefer the newer
