@@ -8,18 +8,45 @@ repository).
 
 ---
 
-## Layer 1: CLI Working Directory Isolation
+## Layer 1: Native CLI Read-Only Sandbox
 
-Wrap ALL external CLI invocations in a `cd "$SESSION_DIR"` subshell so that
-rogue file writes land in the session directory, not the repository. All
-prompt input and output paths use absolute paths, so this is transparent.
+Read-only commands run each external CLI in **its own read-only sandbox** so the
+model can read the repository but cannot modify it. Each CLI is still launched
+from a `cd "$SESSION_DIR"` subshell as a backstop (any write that bypassed the
+sandbox would land in the session directory, not the repo), and the repository
+is exposed read-only through each CLI's own flags. All prompt input and output
+paths are absolute, so the working directory does not affect I/O.
+
+`$REPO_TOPLEVEL` is captured in Layer 2 and passed to every sub-agent.
 
 **Read-only commands** (brainstorm, refine, brainstorm-and-refine,
-serene-bliss, ask, plan, review):
+serene-bliss, ask, plan, review).
+
+gemini — `--approval-mode plan` is read-only mode, `--include-directories` grants
+repo reads, `--skip-trust` clears the untrusted-folder gate (plain `-y` does not):
 
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gemini.md" 2>"$SESSION_DIR/.../stderr.txt")
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gemini.md" 2>"$SESSION_DIR/.../stderr.txt")
 ```
+
+codex — `-s read-only` blocks writes, `-C` roots it in the repo,
+`--skip-git-repo-check` lets it start outside a checked-out repo, `</dev/null`
+prevents the stdin-wait hang:
+
+```bash
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gpt.md" 2>"$SESSION_DIR/.../stderr.txt")
+```
+
+agent fallback — `--mode plan` is read-only mode, `--workspace` grants repo reads
+(never `-f`/`--force`, which enables writes and shell):
+
+```bash
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model <model> "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gpt.md" 2>"$SESSION_DIR/.../stderr.txt")
+```
+
+The native read-only sandbox is the primary write defense; the
+`cd "$SESSION_DIR"` working directory and the fingerprint/revert checks
+(Layers 2–5) are backstops.
 
 **Write commands** (execute, prompt, architecture) already wrap external CLIs
 in `(cd "$WORKTREE_PATH" && ...)` — no change needed for external model
@@ -94,9 +121,9 @@ continues normally after reverting.
 
 **Concurrency note**: Multiple sub-agents run external CLIs in parallel.
 If two rogue writes happen concurrently, one sub-agent's verification may
-partially observe the other's changes. Layer 1 (working directory isolation)
-is the primary defense — it prevents writes from reaching the repo at all.
-Layer 3 is a safety net for writes to absolute paths; the race window is
+partially observe the other's changes. Layer 1 (native read-only sandbox)
+is the primary defense — the CLIs cannot write the repo at all. Layer 3 is a
+safety net for any write that bypasses the sandbox; the race window is
 acceptable because the worst case is a redundant revert.
 
 For **write commands**: this verification runs on the main tree only (not
