@@ -39,7 +39,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 
 **Resolution** (priority order):
 
-1. `codex` found → use `codex exec --yolo -c model_reasoning_effort=medium`
+1. `codex` found → use `codex exec --yolo --skip-git-repo-check -c model_reasoning_effort=medium` (with `</dev/null` to avoid a stdin-wait hang)
 2. Else `agent` found → use `agent -p -f --model gpt-5.4-high`
 3. Else → report both CLIs unavailable and stop
 
@@ -71,7 +71,7 @@ If `mode:plan` was detected, prepend this preamble to the prompt content:
 **Native (`codex` CLI)**:
 
 ```bash
-<timeout_cmd> <timeout_seconds> codex exec --yolo -c model_reasoning_effort=medium "$(cat "$TMPFILE")" 2>/tmp/mc-stderr-codex.txt
+<timeout_cmd> <timeout_seconds> codex exec --yolo --skip-git-repo-check -c model_reasoning_effort=medium "$(cat "$TMPFILE")" </dev/null 2>/tmp/mc-stderr-codex.txt
 ```
 
 **Fallback (`agent` CLI)**:

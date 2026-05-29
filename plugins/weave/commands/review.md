@@ -436,16 +436,16 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to e
 The agent must:
 
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
-2. Run the resolved Gemini command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes:
+2. Run the resolved Gemini command with output redirection. **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`gemini` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
 3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
@@ -479,18 +479,18 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to e
 The agent must:
 
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
-2. Run the resolved GPT command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes:
+2. Run the resolved GPT command with output redirection. **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`codex` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec \
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null \
        -c model_reasoning_effort=medium \
        "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
 3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
@@ -755,7 +755,7 @@ After presenting the report:
 
 ## Rules
 
-- Never modify project code — this is project-read-only review. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run from `$SESSION_DIR` (not the repo root), post-CLI verification reverts rogue writes, and session-end verification catches anything that slipped through.
+- Never modify project code — this is project-read-only review. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - Always attempt to run all available reviewers, even if one fails
 - Always clearly attribute which reviewer(s) found each issue
 - Consensus issues take priority over single-reviewer issues
