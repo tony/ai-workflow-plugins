@@ -426,16 +426,16 @@ The agent must:
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
 2. Run the resolved Gemini command with output redirection:
 
-   **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes from the repository (see `docs/repo-guard-protocol.md` Layer 1)
+   **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1)
 
    **Native (`gemini` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gemini.md" 2>>"$SESSION_DIR/pass-0001/stderr/gemini.txt")
    ```
 
 3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
@@ -468,18 +468,18 @@ The agent must:
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
 2. Run the resolved GPT command with output redirection:
 
-   **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes from the repository (see `docs/repo-guard-protocol.md` Layer 1)
+   **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1)
 
    **Native (`codex` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec \
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null \
        -c model_reasoning_effort=medium \
        "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
 3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
@@ -651,12 +651,12 @@ The judge prompt structure:
 
 **Gemini as judge** (native CLI):
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-gemini.txt")
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-gemini.txt")
 ```
 
 **GPT as judge** (native CLI):
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-gpt.txt")
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null -c model_reasoning_effort=medium "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-gpt.txt")
 ```
 
 Use the same fallback and retry protocol as participation dispatch (see Phase 3). If the native CLI fails, fall back to `agent --model <model>`.
@@ -824,7 +824,7 @@ After the reference returns, finalize the session:
 
 ## Rules
 
-- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run from `$SESSION_DIR` (not the repo root), post-CLI verification reverts rogue writes, and session-end verification catches anything that slipped through.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - The woven version MUST go back to ALL models for each subsequent pass — do not let the judge refine alone. The judge picks the winner and weaves, but all models must critique and improve the woven result in the next pass.
 - Each model's output MUST clearly separate Critique, Improved Version, and Rationale sections. If a model's output does not follow this structure, parse it best-effort and note the formatting issue in the judge's assessment.
 - `--judge=round-robin` rotates judging across available models. The rotation order is Claude → Gemini → GPT (skipping unavailable models). External model judges produce scores and pick winners via the External Judge Protocol; the host agent always weaves. If an external judge's output cannot be parsed, the host judges that pass as fallback. Record the actual judge and any fallback in `judge.md` and `events.jsonl`.

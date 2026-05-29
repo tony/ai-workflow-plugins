@@ -426,16 +426,16 @@ For each Gemini variant (1 through `variant_count`), launch a separate Task agen
 The agent must:
 
 1. Read the variant prompt from `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
-2. Run the resolved Gemini command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes from the repository:
+2. Run the resolved Gemini command with output redirection. **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`gemini` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview -y -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
    ```
 
 3. **Repo Guard**: After the CLI command completes, verify the repository was not modified:
@@ -478,18 +478,18 @@ For each GPT variant (1 through `variant_count`), launch a separate Task agent (
 The agent must:
 
 1. Read the variant prompt from `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
-2. Run the resolved GPT command with output redirection. **Repo Guard**: run inside `(cd "$SESSION_DIR" && ...)` to isolate rogue writes from the repository:
+2. Run the resolved GPT command with output redirection. **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`codex` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec \
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> codex exec -s read-only -C "$REPO_TOPLEVEL" --skip-git-repo-check </dev/null \
        -c model_reasoning_effort=medium \
        "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gpt-5.4-high "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gpt-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gpt-v<N>.txt")
    ```
 
 3. **Repo Guard**: After the CLI command completes, verify the repository was not modified:
@@ -903,7 +903,7 @@ After the reference returns, finalize the session:
 
 ## Rules
 
-- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run from `$SESSION_DIR` (not the repo root), post-CLI verification reverts rogue writes, and session-end verification catches anything that slipped through.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - Each brainstorm variant MUST receive a separate, independent prompt invocation to prevent anchoring. Never combine multiple variants in a single model call.
 - When `--variants=1`, omit the variant label from brainstorm output headers (just "Claude", not "Claude — Variant 1").
 - The woven version MUST go back to ALL models for each subsequent refinement pass — do not let the judge refine alone.
