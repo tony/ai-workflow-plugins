@@ -95,7 +95,7 @@ Example:
 /model-cli:gemini refactor the database layer mode:plan
 ```
 
-The `mode:plan` trigger works with all five skills (agy, codex, gpt, gemini, cursor).
+The `mode:plan` trigger works with all skills (agy, codex, gpt, gemini, cursor).
 
 ## Comparison with weave
 

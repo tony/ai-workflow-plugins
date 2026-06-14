@@ -518,7 +518,7 @@ invocations produce noticeably shallower output.
 **Diagnostic**: to confirm the active backend and model:
 
 ```console
-agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p "Report your exact model ID and reasoning level."
+agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p "Report your exact model ID and reasoning level." </dev/null
 ```
 
 ## Shell Resilience

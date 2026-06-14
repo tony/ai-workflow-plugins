@@ -145,8 +145,7 @@ architecture, serene-bliss` — apply uniformly:
 `(cd "$WORKTREE" … --add-dir "$WORKTREE")`, `agy` writes inside that worktree and
 the main tree's `git status` is byte-identical before and after; the read-only
 disposable-worktree pattern was verified the same way. `agent` remains the write
-fallback if `agy` is unavailable. (The earlier `-p`-first probes mis-parsed because
-`-p` must be the last flag — see the agy skill.)
+fallback if `agy` is unavailable.
 
 ## Out of scope / intentionally untouched
 
@@ -155,7 +154,3 @@ fallback if `agy` is unavailable. (The earlier `-p`-first probes mis-parsed beca
 - No rename of the Claude or GPT lanes.
 - `agy`'s multi-model capability (it can also run Claude/GPT-OSS) is not exposed;
   the lane stays pinned to Gemini models.
-
-## Deliverable flow
-
-Spec (this file, committed) → writing-plans → implementation → verification.
