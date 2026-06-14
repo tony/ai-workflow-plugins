@@ -1,7 +1,7 @@
 # Design: `agy` (Antigravity) as the preferred Google backend
 
 **Date:** 2026-06-13
-**Status:** Approved (design phase)
+**Status:** Implemented
 **Scope:** `plugins/model-cli`, `plugins/weave`
 
 ## Why
@@ -16,14 +16,15 @@ shutdown.
 
 ## Verified `agy` behavior
 
-Confirmed empirically on this machine (signed in, current auth):
+Confirmed empirically during implementation (signed in, current auth):
 
 | Fact | Detail |
 |------|--------|
-| Non-interactive run | `agy -p --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions "<prompt>" </dev/null` returns text, exit 0 |
+| Non-interactive run | `agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p "<prompt>" </dev/null` returns text, exit 0 |
+| Flag order | `-p`/`--print` is a Go-style value-flag: it must come **last**, after every other flag, or it swallows the next flag as the prompt |
 | Stdin | `</dev/null` required to avoid a stdin-wait hang (same as `codex`) |
 | Model string | `--model "Gemini 3.1 Pro (High)"` (a display name from `agy models`) is accepted |
-| Read-only guarantee | Print mode **without** `--dangerously-skip-permissions` does not write files — no approval path exists non-interactively |
+| Write behavior | Print mode reads **and** writes even without `--dangerously-skip-permissions`; read-only isolation comes from a disposable `HEAD` worktree (Repo Guard Layer 1), not from withholding the flag |
 | Plan mode | No `--approval-mode plan` equivalent to `gemini`'s |
 | `--sandbox` | Requires a **separate** Google OAuth login (different scopes); intentionally avoided |
 | Workspace | `--add-dir <path>` (repeatable) sets the workspace; `agy` also prints a harmless `Shell cwd was reset to <repo>` line to stderr and has its own cwd notion |
@@ -46,14 +47,14 @@ backend resolution differs.
   CLI; detects `agy`, falls back to `gemini`, then `agent --model gemini-3.1-pro`.
 - **Step 1 — Detect CLI:** check `agy`, then `gemini`, then `agent`.
 - **Resolution (priority order):**
-  1. `agy` → `agy -p --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions "$(cat "$TMPFILE")" </dev/null`
+  1. `agy` → `agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p "$(cat "$TMPFILE")" </dev/null`
   2. else `gemini` → `gemini -m gemini-3-pro-preview -y --skip-trust -p`
   3. else `agent` → `agent -p -f --model gemini-3.1-pro`
   4. else → report all unavailable and stop
 - **stderr file:** `/tmp/mc-stderr-agy.txt`.
 - **Step 5 — Failure handling:** same classification as the gemini skill. On `agy`
   failure (or credit-exhaustion) escalate to `gemini`, then to `agent`. Lesser
-  fallback: `agy -p --model "Gemini 3.5 Flash (High)"`, then `gemini -m
+  fallback: `agy --model "Gemini 3.5 Flash (High)" --dangerously-skip-permissions -p`, then `gemini -m
   gemini-3-flash-preview`. Reuse the gemini skill's credit-exhaustion stderr
   patterns (`RESOURCE_EXHAUSTED`, `quota exceeded`, `insufficient_quota`,
   `billing`, HTTP 429, …).
@@ -108,13 +109,13 @@ architecture, serene-bliss` — apply uniformly:
    → fallback `gemini` (`gemini-3-pro-preview`) → `agent --model gemini-3.1-pro`.
 3. **Invocation snippets:**
    - **Read-only commands** (`ask, plan, review, brainstorm,
-     brainstorm-and-refine, refine`, incl. judge invocations) — primary:
-     `(cd "$SESSION_DIR" && <timeout> agy -p --model "Gemini 3.1 Pro (High)" --add-dir "$REPO_TOPLEVEL" "$(cat …)" </dev/null >…/agy.md 2>…/agy.txt)`.
-     No `--dangerously-skip-permissions` → read-only. Keep the `(cd "$SESSION_DIR")`
-     backstop. gemini and agent fallbacks retain their existing read-only flags
-     (`--approval-mode plan` / `--mode plan`).
+     brainstorm-and-refine, refine`, incl. judge invocations) — agy has no
+     read-only mode, so the primary runs in a disposable `HEAD` worktree (any write
+     lands in the throwaway worktree, removed after); gemini/agent fallbacks keep
+     their native read-only flags (`--approval-mode plan` / `--mode plan`):
+     `(AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat …)" </dev/null >…/agy.md 2>…/agy.txt); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT")`.
    - **Write command** (`execute`) — primary:
-     `(cd "$WORKTREE" && <timeout> agy -p --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions --add-dir "$WORKTREE" "$(cat …)" </dev/null >…/agy.md 2>…/agy.txt)`,
+     `(cd "$WORKTREE" && <timeout> agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions --add-dir "$WORKTREE" -p "$(cat …)" </dev/null >…/agy.md 2>…/agy.txt)`,
      where `$WORKTREE = $REPO_TOPLEVEL/../$REPO_SLUG-weave-agy`.
 4. **Lesser-model note:** `gemini-3-flash-preview for Gemini` → `Gemini 3.5 Flash
    (High) via agy, then gemini-3-flash-preview`.
@@ -127,9 +128,9 @@ architecture, serene-bliss` — apply uniformly:
   row (Antigravity CLI), and the **"Gemini reasoning depth"** section — rewrite to
   describe `agy`'s `--model "Gemini 3.1 Pro (High)"` selection, keeping a short note
   about the `gemini` fallback alias.
-- `docs/repo-guard-protocol.md`: replace the gemini read-only example with the
-  `agy` read-only invocation (`--add-dir` + no skip-permissions + `(cd
-  "$SESSION_DIR")` backstop); update the "Gemini/GPT sub-agent" wording.
+- `docs/repo-guard-protocol.md`: document the `agy` read-only invocation as a
+  disposable `HEAD` worktree (Layer 1) with `--add-dir` scoped to the worktree,
+  removed after; update the "Gemini/GPT sub-agent" wording to "Antigravity/GPT".
 - `commands/fix-review.md`, `skills/brainstorm/SKILL.md`,
   `skills/serene-bliss/SKILL.md`, `.claude-plugin/plugin.json` + root
   `marketplace.json` weave entry: replace "Gemini" with "Antigravity" in
@@ -138,13 +139,14 @@ architecture, serene-bliss` — apply uniformly:
   label to Antigravity (agy has no plan mode; it is a host plan-mode hint, so keep
   the generic Cursor/Codex guidance).
 
-### Open verification item (implementation-time)
+### Verification (resolved)
 
-`agy`'s cwd-reset vs. worktree isolation in `execute` is **unconfirmed** — in
-probes `agy -p` chatted instead of writing, so where it writes under `--add-dir` +
-a worktree `cd` is not yet observed. Before finalizing `execute.md`, verify against
-a throwaway worktree that `agy` writes inside the worktree (not the main repo). If
-`agy` proves unreliable for the write lane, `agent` remains the write fallback.
+`agy`'s worktree isolation was confirmed against the live repo: launched with
+`(cd "$WORKTREE" … --add-dir "$WORKTREE")`, `agy` writes inside that worktree and
+the main tree's `git status` is byte-identical before and after; the read-only
+disposable-worktree pattern was verified the same way. `agent` remains the write
+fallback if `agy` is unavailable. (The earlier `-p`-first probes mis-parsed because
+`-p` must be the last flag — see the agy skill.)
 
 ## Out of scope / intentionally untouched
 
