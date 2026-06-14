@@ -1,13 +1,13 @@
 ---
 name: brainstorm-and-refine
 description: >-
-  Use when the user wants to generate multiple original ideas from different
-  AI models then iteratively judge, weave, and refine them into the best
-  possible result across multiple passes. Triggers on phrases like
-  "brainstorm and refine", "generate ideas then improve", "explore options
-  then synthesize", or "brainstorm then polish"
+  Use when the user wants both broad idea generation and convergent refinement
+  in a single run — not just raw ideas (brainstorm) and not just polishing an
+  existing draft (refine), but generate-then-synthesize into one best result.
+  Triggers on phrases like "brainstorm and refine", "generate ideas then
+  improve", "explore options then synthesize", or "brainstorm then polish"
 user-invocable: true
-argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...]"
+argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Brainstorm & Refine

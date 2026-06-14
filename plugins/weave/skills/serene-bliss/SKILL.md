@@ -5,14 +5,12 @@ description: >-
   documentation, or tooling UX work through a "serene DX" aesthetic lens
   — three fixed variants that sweep across DX Bliss (frictionless),
   DX Serenity (calm clarity), and DX Sublimity (showcase-grade novelty).
-  Triggers on phrases like "serene bliss", "DX bliss", "DX serenity",
-  "DX sublimity", "reader happiness", "make this serene", "serene
-  developer experience", or "serene DX". Runs the /weave:serene-bliss
-  command, which dispatches three lens variants across all available
-  models in parallel and judges each refine pass with a multi-model
-  panel (Claude + Antigravity + GPT, peer-only averaging).
+  A locked DX preset of brainstorm-and-refine. Triggers on phrases like
+  "serene bliss", "DX bliss", "DX serenity", "DX sublimity", "reader
+  happiness", "make this serene", "serene developer experience", or
+  "serene DX".
 user-invocable: true
-argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
+argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Serene Bliss
@@ -45,10 +43,9 @@ compare against.
 | 2 | **DX Serenity** | Calm, unhurried, information-architectural clarity | "Make this feel like a quiet library. Does the reader's eye rest naturally?" |
 | 3 | **DX Sublimity** | Awe-inducing, showcase-grade, novel | "Make this feel like a first. Would this be memorable enough to screenshot?" |
 
-The lenses are exhaustive for serene-DX work — pick one aesthetic per
-invocation, not all four of the source-skill quality keywords. "Reader
-happiness" collapses into Serenity here; use it as a trigger phrase, not
-a fourth slot.
+The three lenses are exhaustive for serene-DX work — pick one aesthetic
+per invocation. "Reader happiness" collapses into Serenity here; use it
+as a trigger phrase, not a separate lens.
 
 ## How to Invoke
 
@@ -57,11 +54,11 @@ Run the `/weave:serene-bliss` command. It is a locked preset of
 preamble mapping each variant slot to one of the three lenses.
 
 ```
-/weave:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]
+/weave:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]
 ```
 
-The command locks `--variants` and `--preamble`; do not override
-either. For the canonical compound preamble text and the delegation
+The command locks `--variants`, `--preamble`, and `--judge=panel`; do not
+override them. For the canonical compound preamble text and the delegation
 contract, see `plugins/weave/commands/serene-bliss.md`.
 
 ## Context Packet Expectations
