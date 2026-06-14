@@ -1,7 +1,7 @@
 {
   "name": "weave",
   "description": "Weave prompts across Claude, Antigravity, and GPT in parallel — brainstorm, refine, plan, execute, architect, review, and synthesize the best of all models",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"
