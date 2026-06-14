@@ -1,12 +1,13 @@
 ---
 name: refine
 description: >-
-  Use when the user has an existing draft, text, code, or artifact and wants
-  it iteratively improved through multi-model critique and weaving across
-  multiple passes. Triggers on phrases like "refine this", "improve this",
-  "make this better", "iterate on this", or "polish this"
+  Use when the user has an existing draft, text, code, or artifact and wants it
+  iteratively improved into a stronger version — requires existing input (unlike
+  brainstorm-and-refine, which generates first). Triggers on phrases like
+  "refine this", "improve this", "make this better", "iterate on this", or
+  "polish this"
 user-invocable: true
-argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
+argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Refine

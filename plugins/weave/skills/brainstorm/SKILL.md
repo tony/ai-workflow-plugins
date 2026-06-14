@@ -3,8 +3,9 @@ name: brainstorm
 description: >-
   Use when the user wants multiple independent ideas, alternatives, or
   approaches from different AI models for a creative prompt, design question,
-  or open-ended problem. Triggers on phrases like "brainstorm", "give me
-  ideas", "multiple approaches", "what are my options", or "explore
+  or open-ended problem — raw ideas only, no synthesis or refinement (use
+  brainstorm-and-refine for convergence). Triggers on phrases like "brainstorm",
+  "give me ideas", "multiple approaches", "what are my options", or "explore
   alternatives"
 user-invocable: true
 argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...]"
