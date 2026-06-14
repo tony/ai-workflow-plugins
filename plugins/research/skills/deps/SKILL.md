@@ -1,12 +1,10 @@
 ---
-name: study-deps
+name: deps
 description: >
-  Clone and study your project's dependencies at the exact versions you use.
-  Scans manifest files (package.json, pyproject.toml, Cargo.toml, go.mod, etc.),
-  resolves official source repositories, clones them to ~/study/<language>/, and
-  creates version-pinned git worktrees. Use when the user wants to read upstream
-  source code, understand how a dependency works, or study a library at the
-  exact version their project depends on.
+  Use when the user wants to read upstream source code, understand how a
+  dependency works, or study a library at the exact pinned version their project
+  depends on — across package.json, pyproject.toml, Cargo.toml, go.mod, and other
+  manifests. Clones dependency source repositories at their pinned versions.
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "WebSearch", "AskUserQuestion"]
 argument-hint: <package-name|"all"|category> [--lang <language>] [--no-worktree]

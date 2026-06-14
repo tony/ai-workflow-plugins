@@ -1,5 +1,5 @@
 ---
-name: tailwind-spacing-audit
+name: spacing-audit
 description: >-
   This skill should be used when the user mentions uneven spacing, alignment
   issues, inconsistent gaps between elements, mixed margin/gap strategies,
