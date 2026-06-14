@@ -373,7 +373,7 @@ The agent must:
 
    **Primary (`agy` CLI, disposable worktree)**:
    ```bash
-   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>"$SESSION_DIR/pass-0001/stderr/agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
+   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" </dev/null >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>"$SESSION_DIR/pass-0001/stderr/agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
    ```
 
    **Fallback (`gemini` CLI)**:

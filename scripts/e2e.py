@@ -356,6 +356,56 @@ def _test_static_weave_stderr_redirects() -> list[TestCase]:
     return tests
 
 
+def _test_static_agy_invocations() -> list[TestCase]:
+    """Verify agy invocations put -p last and weave commands add </dev/null."""
+    tests: list[TestCase] = []
+    weave_commands_dir = REPO_ROOT / "plugins" / "weave" / "commands"
+    flag_order_files = [
+        REPO_ROOT / "plugins" / "model-cli" / "README.md",
+        REPO_ROOT / "plugins" / "model-cli" / "skills" / "agy" / "SKILL.md",
+        *sorted(weave_commands_dir.glob("*.md")),
+    ]
+    # agy's -p/--print/--prompt is a Go-style value-flag: it must come last, or it
+    # swallows the next flag as the prompt. Flag a print-flag right after `agy`, or a
+    # print-flag immediately followed by another `--flag`.
+    bad_order = re.compile(r"agy\s+(?:-p|--print|--prompt)\b|(?:-p|--print|--prompt)\s+--")
+
+    def _check_flag_order() -> None:
+        offenders: list[str] = []
+        for path in flag_order_files:
+            if not path.is_file():
+                continue
+            lines = path.read_text(encoding="utf-8").splitlines()
+            for num, line in enumerate(lines, 1):
+                if "agy " in line and " --model" in line and bad_order.search(line):
+                    offenders.append(f"{path.relative_to(REPO_ROOT)}:{num}")
+        _assert(
+            not offenders,
+            f"agy -p/--print must come after every other flag: {', '.join(offenders)}",
+        )
+
+    def _check_stdin_guard() -> None:
+        offenders: list[str] = []
+        if weave_commands_dir.is_dir():
+            for cmd_file in sorted(weave_commands_dir.glob("*.md")):
+                lines = cmd_file.read_text(encoding="utf-8").splitlines()
+                for num, line in enumerate(lines, 1):
+                    if (
+                        "agy --model" in line
+                        and '>"$SESSION_DIR' in line
+                        and "</dev/null" not in line
+                    ):
+                        offenders.append(f"{cmd_file.relative_to(REPO_ROOT)}:{num}")
+        _assert(
+            not offenders,
+            f"weave agy invocations missing </dev/null stdin guard: {', '.join(offenders)}",
+        )
+
+    tests.append(("agy flag order (-p last)", _check_flag_order))
+    tests.append(("agy stdin guard (</dev/null)", _check_stdin_guard))
+    return tests
+
+
 # ---------------------------------------------------------------------------
 # Test case builders
 # ---------------------------------------------------------------------------
@@ -568,6 +618,7 @@ def main(
     static_tests.extend(_test_static_marketplace_json())
     static_tests.extend(_test_static_weave_timeouts())
     static_tests.extend(_test_static_weave_stderr_redirects())
+    static_tests.extend(_test_static_agy_invocations())
     static_passed = sum(_run_test(name, fn) for name, fn in static_tests)
     static_total = len(static_tests)
 
