@@ -1,9 +1,9 @@
 ---
 name: gpt
 description: >
-  Use when running a prompt through OpenAI GPT directly. An alternative invocation
-  point for /model-cli:codex — both use the same backend (codex binary or agent
-  --model gpt-5.4-high fallback). Use this or /model-cli:codex interchangeably.
+  Use when running a prompt through OpenAI GPT directly. An alternative entry
+  point for /model-cli:codex — both route to the same backend; use either
+  interchangeably.
 user-invocable: true
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
