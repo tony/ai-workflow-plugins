@@ -417,9 +417,29 @@ def _test_static_agy_invocations() -> list[TestCase]:
             f'agy wrappers must preserve exit status (rc=$?; exit "$rc"): {", ".join(offenders)}',
         )
 
+    def _check_gpt_lane_fallback() -> None:
+        # The agy → gemini → agent fallback chain belongs to the Antigravity lane.
+        # A GPT sub-agent section must not route failures through it (that would
+        # land a Google result in outputs/gpt.md); GPT falls back to agent.
+        offenders: list[str] = []
+        if weave_commands_dir.is_dir():
+            for cmd_file in sorted(weave_commands_dir.glob("*.md")):
+                heading = ""
+                lines = cmd_file.read_text(encoding="utf-8").splitlines()
+                for num, line in enumerate(lines, 1):
+                    if line.startswith("### "):
+                        heading = line
+                    elif "GPT" in heading and "agy → gemini → agent" in line:
+                        offenders.append(f"{cmd_file.relative_to(REPO_ROOT)}:{num}")
+        _assert(
+            not offenders,
+            f"GPT sections must not use the agy fallback chain: {', '.join(offenders)}",
+        )
+
     tests.append(("agy flag order (-p last)", _check_flag_order))
     tests.append(("agy stdin guard (</dev/null)", _check_stdin_guard))
     tests.append(("agy exit-status preserved", _check_exit_status))
+    tests.append(("GPT lane fallback (not agy chain)", _check_gpt_lane_fallback))
     return tests
 
 
