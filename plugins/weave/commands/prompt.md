@@ -462,7 +462,7 @@ The agent must:
    (cd "$REPO_TOPLEVEL/../$REPO_SLUG-weave-gpt" && <timeout_cmd> <timeout_seconds> agent -p -f --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
-3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back down the chain (agy → gemini → agent) if a native CLI was used; if all are credit-exhausted or unavailable, use lesser model (`Gemini 3.5 Flash (High)` via agy for Antigravity; gpt-5.4-mini via agent for GPT)
+3. On failure: classify (timeout → retry with 1.5× timeout; rate-limit → retry after 10s; credit-exhausted → skip retry, escalate to agent CLI immediately; crash → not retryable; empty → retry once), retry max once with same backend, then fall back to agent CLI if native was used; if agent is also credit-exhausted or unavailable, use lesser model (gpt-5.4-mini via agent for GPT)
 4. Return: exit code, elapsed time, retry count, output file path
 
 ### Artifact Capture
