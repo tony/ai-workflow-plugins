@@ -434,7 +434,7 @@ The agent must:
 
    **Primary (`agy` CLI, disposable worktree)**:
    ```bash
-   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" </dev/null >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>"$SESSION_DIR/pass-0001/stderr/agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
+   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" </dev/null >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>"$SESSION_DIR/pass-0001/stderr/agy.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
    ```
 
    **Fallback (`gemini` CLI)**:
@@ -660,7 +660,7 @@ The judge prompt structure:
 
 **Antigravity as judge** — primary (`agy` CLI, disposable worktree). `agy` has no native read-only mode, so isolate it in a disposable git worktree checked out at `HEAD`, in a SEPARATE worktree from any model-pass run so the two never collide (see `docs/repo-guard-protocol.md` Layer 1):
 ```bash
-(AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-judge"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" </dev/null >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
+(AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-judge"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" </dev/null >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-agy.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
 ```
 
 **Antigravity as judge** — fallback (`gemini` CLI):

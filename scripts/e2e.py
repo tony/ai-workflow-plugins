@@ -401,8 +401,25 @@ def _test_static_agy_invocations() -> list[TestCase]:
             f"weave agy invocations missing </dev/null stdin guard: {', '.join(offenders)}",
         )
 
+    def _check_exit_status() -> None:
+        # The disposable-worktree wrapper appends `git worktree remove` after agy;
+        # without capturing the run's status it would mask agy's exit code. Every
+        # wrapper must therefore capture `rc=$?` and `exit "$rc"` after cleanup.
+        offenders: list[str] = []
+        if weave_commands_dir.is_dir():
+            for cmd_file in sorted(weave_commands_dir.glob("*.md")):
+                lines = cmd_file.read_text(encoding="utf-8").splitlines()
+                for num, line in enumerate(lines, 1):
+                    if 'worktree add -q --detach "$AGY_RO_WT"' in line and 'exit "$rc"' not in line:
+                        offenders.append(f"{cmd_file.relative_to(REPO_ROOT)}:{num}")
+        _assert(
+            not offenders,
+            f'agy wrappers must preserve exit status (rc=$?; exit "$rc"): {", ".join(offenders)}',
+        )
+
     tests.append(("agy flag order (-p last)", _check_flag_order))
     tests.append(("agy stdin guard (</dev/null)", _check_stdin_guard))
+    tests.append(("agy exit-status preserved", _check_exit_status))
     return tests
 
 
