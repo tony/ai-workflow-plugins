@@ -247,7 +247,7 @@ The agent must:
    **Primary (`agy` CLI, disposable worktree)**:
 
    ```bash
-   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-v<N>"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/agy-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/agy-v<N>.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
+   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-v<N>"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" </dev/null >"$SESSION_DIR/brainstorm/outputs/agy-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/agy-v<N>.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
    ```
 
    **Fallback (`gemini` CLI)**:
@@ -424,7 +424,7 @@ Launch one judge per available model **in the same turn**:
   **Primary (`agy` CLI, disposable worktree)**:
 
   ```bash
-  (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-judge"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/refine/pass-0001/panel-prompt.md")" >"$SESSION_DIR/refine/pass-0001/judges/agy.md" 2>"$SESSION_DIR/refine/pass-0001/judges/judge-agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
+  (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-judge"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/refine/pass-0001/panel-prompt.md")" </dev/null >"$SESSION_DIR/refine/pass-0001/judges/agy.md" 2>"$SESSION_DIR/refine/pass-0001/judges/judge-agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
   ```
 
   **Fallback (`gemini` CLI)**:

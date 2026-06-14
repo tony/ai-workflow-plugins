@@ -421,7 +421,7 @@ The agent must:
 
    **Primary (`agy` CLI)**:
    ```bash
-   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-weave-agy" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$REPO_TOPLEVEL/../$REPO_SLUG-weave-agy" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>"$SESSION_DIR/pass-0001/stderr/agy.txt")
+   (cd "$REPO_TOPLEVEL/../$REPO_SLUG-weave-agy" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$REPO_TOPLEVEL/../$REPO_SLUG-weave-agy" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-0001/prompt.md")" </dev/null >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>"$SESSION_DIR/pass-0001/stderr/agy.txt")
    ```
 
    **Fallback (`gemini` CLI)**:
