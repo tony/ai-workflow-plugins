@@ -12,7 +12,7 @@ argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced
 
 # Weave Brainstorm
 
-Generate independent original responses from Claude, Gemini, and GPT in parallel. Each model produces its own unique take — no synthesis, no judging, just raw creative output.
+Generate independent original responses from Claude, Antigravity, and GPT in parallel. Each model produces its own unique take — no synthesis, no judging, just raw creative output.
 
 ## When to Use
 

@@ -11,23 +11,41 @@ repository).
 ## Layer 1: Native CLI Read-Only Sandbox
 
 Read-only commands run each external CLI in **its own read-only sandbox** so the
-model can read the repository but cannot modify it. Each CLI is still launched
-from a `cd "$SESSION_DIR"` subshell as a backstop (any write that bypassed the
-sandbox would land in the session directory, not the repo), and the repository
-is exposed read-only through each CLI's own flags. All prompt input and output
-paths are absolute, so the working directory does not affect I/O.
+model can read the repository but cannot modify it. Each native-sandbox CLI is
+launched from a `cd "$SESSION_DIR"` subshell as a backstop (any write that
+bypassed the sandbox would land in the session directory, not the repo), and the
+repository is exposed read-only through each CLI's own flags. All prompt input
+and output paths are absolute, so the working directory does not affect I/O.
+
+The `agy` (Antigravity) CLI is the exception: it has **no native read-only
+mode** — its print mode reads *and* writes — so it is isolated in a **disposable
+git worktree** rather than a native sandbox (see the `agy` block below).
 
 `$REPO_TOPLEVEL` is captured in Layer 2 and passed to every sub-agent.
 
 **Read-only commands** (brainstorm, refine, brainstorm-and-refine,
 serene-bliss, ask, plan, review).
 
-gemini — `--approval-mode plan` is read-only mode, `--include-directories` grants
-repo reads, `--skip-trust` clears the untrusted-folder gate (plain `-y` does not):
+agy (Antigravity, the Google lane's primary) — no native read-only mode, so it
+runs in a disposable worktree checked out at `HEAD`. agy reads the snapshot; any
+stray write lands in the throwaway worktree, which is removed afterward, never
+touching the main repo. `--add-dir` scopes its workspace to that worktree:
 
 ```bash
-(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gemini.md" 2>"$SESSION_DIR/.../stderr.txt")
+(AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/...")" </dev/null >"$SESSION_DIR/.../agy.md" 2>"$SESSION_DIR/.../agy.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
 ```
+
+gemini (the Google lane's fallback) — `--approval-mode plan` is read-only mode,
+`--include-directories` grants repo reads, `--skip-trust` clears the
+untrusted-folder gate (plain `-y` does not):
+
+```bash
+(cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../agy.md" 2>"$SESSION_DIR/.../stderr.txt")
+```
+
+When multiple `agy` read-only lanes run concurrently (e.g. brainstorm variants),
+each gets a uniquely-suffixed worktree (`...-weave-agy-ro-v<N>`, `...-weave-agy-ro-judge`)
+so parallel runs never share a worktree path.
 
 codex — `-s read-only` blocks writes, `-C` roots it in the repo,
 `--skip-git-repo-check` lets it start outside a checked-out repo, `</dev/null`
@@ -44,9 +62,9 @@ agent fallback — `--mode plan` is read-only mode, `--workspace` grants repo re
 (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model <model> "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gpt.md" 2>"$SESSION_DIR/.../stderr.txt")
 ```
 
-The native read-only sandbox is the primary write defense; the
-`cd "$SESSION_DIR"` working directory and the fingerprint/revert checks
-(Layers 2–5) are backstops.
+The native read-only sandbox — or, for `agy`, the disposable worktree — is the
+primary write defense; the `cd "$SESSION_DIR"` working directory and the
+fingerprint/revert checks (Layers 2–5) are backstops.
 
 **Write commands** (execute, prompt, architecture) already wrap external CLIs
 in `(cd "$WORKTREE_PATH" && ...)` — no change needed for external model
@@ -92,10 +110,10 @@ initialization work.
 
 ## Layer 3: Post-CLI Repo State Verification
 
-After each external CLI command (gemini, codex, agent) returns, the sub-agent
+After each external CLI command (agy, gemini, codex, agent) returns, the sub-agent
 that invoked the CLI must immediately verify the repository is unchanged.
 
-Add these steps to each Gemini/GPT sub-agent's instructions, after the CLI
+Add these steps to each Antigravity/GPT sub-agent's instructions, after the CLI
 invocation and before returning. The sub-agent must receive `$REPO_TOPLEVEL`
 and `$REPO_FINGERPRINT` (captured in Layer 2) as part of its prompt.
 
