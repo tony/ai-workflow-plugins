@@ -1,11 +1,9 @@
 ---
 name: codex
 description: >
-  Delegate a task to OpenAI's GPT via the Codex CLI. Use this skill when the user
-  explicitly asks to use Codex, GPT, or OpenAI for a task, or when you determine
-  that GPT would provide better results for a specific task (e.g., tasks requiring
-  OpenAI-specific strengths). Detects the codex binary, falls back to agent --model
-  gpt-5.4-high if unavailable.
+  Use when the user explicitly asks to use Codex, GPT, or OpenAI for a task, or
+  when GPT would give better results for a specific task. Delegates a prompt to
+  OpenAI's GPT via the Codex CLI.
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 argument-hint: <prompt> [timeout:<seconds>]

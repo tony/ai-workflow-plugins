@@ -1,11 +1,8 @@
 ---
 name: gemini
 description: >
-  Use when running a prompt through Google's Gemini directly. A manual invocation
-  point for /model-cli:agy — the Antigravity (agy) CLI supersedes the standalone
-  gemini CLI (Google retires it on 2026-06-18), so both entry points resolve
-  through the same backend chain: agy, then the gemini CLI, then agent --model
-  gemini-3.1-pro.
+  Use when running a prompt through Google's Gemini directly. A manual alias for
+  /model-cli:agy — both entry points route through the same backend chain.
 user-invocable: true
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
