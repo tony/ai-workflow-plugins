@@ -1,11 +1,9 @@
 ---
 name: xfail
 description: >-
-  TDD xfail workflow with hermetic reproduction guards — reproduce a bug
-  as a strictly-expected-to-fail test, verify the reproduction is genuine,
-  apply a fix with diff-gate enforcement, and remove the xfail marker.
-  Use when fixing bugs that need strict proof the test fails for the right
-  reason, not because a mock is misconfigured. Triggers on "xfail",
+  Use when fixing a bug that needs strict proof the test fails for the right
+  reason — not because a mock is misconfigured. A hermetic xfail TDD workflow
+  with diff-gate guards (distinct from a plain TDD fix). Triggers on "xfail",
   "strict xfail", "hermetic TDD", "reproduce with xfail", or "expected
   failure workflow".
 user-invocable: true
