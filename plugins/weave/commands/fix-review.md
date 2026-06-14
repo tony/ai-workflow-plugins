@@ -70,7 +70,7 @@ with the default priority ordering below.
 2. **Extract each finding** into a numbered list with:
    - **Consensus level**: how many reviewers flagged it (3, 2, or 1)
    - **Severity**: Critical / Important / Suggestion (after consensus promotion)
-   - **Reviewers**: which models flagged it (Claude, Gemini, GPT)
+   - **Reviewers**: which models flagged it (Claude, Antigravity, GPT)
    - **File and line**: location in the codebase
    - **Description**: what the issue is
    - **Recommendation**: suggested fix
