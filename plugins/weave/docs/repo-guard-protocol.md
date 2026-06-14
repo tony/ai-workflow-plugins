@@ -32,7 +32,7 @@ stray write lands in the throwaway worktree, which is removed afterward, never
 touching the main repo. `--add-dir` scopes its workspace to that worktree:
 
 ```bash
-(AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/...")" </dev/null >"$SESSION_DIR/.../agy.md" 2>"$SESSION_DIR/.../agy.txt"); git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null)
+(AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/...")" </dev/null >"$SESSION_DIR/.../agy.md" 2>"$SESSION_DIR/.../agy.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
 ```
 
 gemini (the Google lane's fallback) — `--approval-mode plan` is read-only mode,
