@@ -43,7 +43,7 @@ Each skill follows a 6-step workflow:
 
 | Skill | Primary CLI | Fallback chain | Agent model |
 |-------|------------|----------------|-------------|
-| `agy` / `gemini` | `agy -p --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions` | `gemini -m gemini-3-pro-preview` → `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
+| `agy` / `gemini` | `agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p` | `gemini -m gemini-3-pro-preview` → `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | `codex` / `gpt` | `codex` | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
 | `cursor` | `agent` | none | — |
 
