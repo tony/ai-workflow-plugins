@@ -75,7 +75,7 @@
     },
     {
       "name": "model-cli",
-      "description": "Run prompts through individual AI CLIs — codex/GPT, gemini, and cursor/agent with fallback support",
+      "description": "Run prompts through individual AI CLIs — Antigravity/agy (Gemini), codex/GPT, and cursor/agent with fallback support",
       "version": "0.0.1",
       "author": {
         "name": "Tony Narlock",

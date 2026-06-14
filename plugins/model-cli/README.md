@@ -1,6 +1,6 @@
 # model-cli
 
-Run prompts through individual AI CLIs — codex/GPT, gemini, and cursor/agent with fallback support.
+Run prompts through individual AI CLIs — Antigravity/agy (Gemini), codex/GPT, and cursor/agent with fallback support.
 
 ## Installation
 
@@ -20,12 +20,13 @@ Install the plugin:
 
 | Skill | Slash command | Description |
 |-------|--------------|-------------|
+| Antigravity CLI | `/model-cli:agy` | Run a prompt through the Antigravity (`agy`) CLI for Gemini, fall back to gemini then agent |
 | Codex CLI | `/model-cli:codex` | Run a prompt through the Codex CLI (OpenAI GPT), fall back to agent |
 | GPT CLI | `/model-cli:gpt` | Alias for codex — same backend, same fallback |
-| Gemini CLI | `/model-cli:gemini` | Run a prompt through the Gemini CLI, fall back to agent |
+| Gemini CLI | `/model-cli:gemini` | Alias for agy — Antigravity supersedes the gemini CLI; same backend chain |
 | Cursor Agent CLI | `/model-cli:cursor` | Run a prompt through Cursor's agent CLI directly |
 
-The codex, gemini, and cursor skills are auto-invoked by Claude when it determines delegation to another model is appropriate. The gpt skill is user-invocable only (`disable-model-invocation: true`) to avoid duplicate auto-triggering with codex.
+The agy, codex, and cursor skills are auto-invoked by Claude when it determines delegation to another model is appropriate. The gpt and gemini skills are user-invocable only (`disable-model-invocation: true`) to avoid duplicate auto-triggering — gpt with codex, and gemini with agy.
 
 ## How It Works
 
@@ -40,10 +41,10 @@ Each skill follows a 6-step workflow:
 
 ### Fallback Resolution
 
-| Skill | Primary CLI | Fallback | Agent model |
-|-------|------------|----------|-------------|
+| Skill | Primary CLI | Fallback chain | Agent model |
+|-------|------------|----------------|-------------|
+| `agy` / `gemini` | `agy -p --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions` | `gemini -m gemini-3-pro-preview` → `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | `codex` / `gpt` | `codex` | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
-| `gemini` | `gemini -m gemini-3-pro-preview -y --skip-trust -p` | `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 | `cursor` | `agent` | none | — |
 
 ### Timeout
@@ -56,9 +57,16 @@ Install at least one external CLI:
 
 | CLI | Model | Install |
 |-----|-------|---------|
+| `agy` | Gemini (via Antigravity) | [Antigravity CLI](https://antigravity.google/product/antigravity-cli) |
 | `codex` | GPT | [Codex CLI](https://github.com/openai/codex) |
-| `gemini` | Gemini | [Gemini CLI](https://github.com/google-gemini/gemini-cli) |
+| `gemini` | Gemini (fallback; gemini CLI retired 2026-06-18) | [Gemini CLI](https://github.com/google-gemini/gemini-cli) |
 | `agent` | Cursor (also used as fallback) | [Agent CLI](https://cursor.com/cli) |
+
+Install the Antigravity CLI with the vendor script:
+
+```console
+curl -fsSL https://antigravity.google/cli/install.sh | bash
+```
 
 ### macOS timeout support
 
@@ -87,7 +95,7 @@ Example:
 /model-cli:gemini refactor the database layer mode:plan
 ```
 
-The `mode:plan` trigger works with all four skills (codex, gpt, gemini, cursor).
+The `mode:plan` trigger works with all five skills (agy, codex, gpt, gemini, cursor).
 
 ## Comparison with weave
 
