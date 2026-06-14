@@ -13,11 +13,11 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | Plugin | Category | Description |
 |--------|----------|-------------|
 | [commit](plugins/commit/) | Development | Create git commits following project conventions with format enforcement and safety checks |
-| [weave](plugins/weave/) | Development | Weave prompts across Claude, Gemini, and GPT in parallel — brainstorm, refine, plan, execute, architect, review, and synthesize the best of all models |
+| [weave](plugins/weave/) | Development | Weave prompts across Claude, Antigravity, and GPT in parallel — brainstorm, refine, plan, execute, architect, review, and synthesize the best of all models |
 | [rebase](plugins/rebase/) | Development | Automated rebase onto trunk with conflict prediction, resolution, and quality gate verification |
 | [changelog](plugins/changelog/) | Productivity | Generate categorized changelog entries from branch commits and PR context |
 | [tdd](plugins/tdd/) | Testing | TDD bug-fix workflow — reproduce bugs as failing tests, find root cause, fix, and verify |
-| [model-cli](plugins/model-cli/) | Development | Run prompts through individual AI CLIs — codex/GPT, gemini, and cursor/agent with fallback support |
+| [model-cli](plugins/model-cli/) | Development | Run prompts through individual AI CLIs — Antigravity/agy (Gemini), codex/GPT, and cursor/agent with fallback support |
 | [pr](plugins/pr/) | Development | Generate and review gold-standard PR descriptions; detect AI slop, brittle counts, and verbose commit messages on branch commits and resolve via fixup commits and autosquash with quality-gate checks |
 | [research](plugins/research/) | Learning | Clone and study your project's dependencies at the exact versions you use — source repos with version-pinned git worktrees |
 | [slop](plugins/slop/) | Development | Scan repo tracked files for AI slop, brittle counts, and verbose noise; resolve each finding as an atomic forward-going commit with quality-gate verification |

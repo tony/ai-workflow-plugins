@@ -10,7 +10,7 @@ description: >-
   developer experience", or "serene DX". Runs the /weave:serene-bliss
   command, which dispatches three lens variants across all available
   models in parallel and judges each refine pass with a multi-model
-  panel (Claude + Gemini + GPT, peer-only averaging).
+  panel (Claude + Antigravity + GPT, peer-only averaging).
 user-invocable: true
 argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
 ---

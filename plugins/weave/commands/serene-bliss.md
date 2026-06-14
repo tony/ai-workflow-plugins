@@ -11,7 +11,7 @@ developer-experience, documentation, and tooling-UX design work. Three
 variant slots are fixed to three serene-DX aesthetic lenses — **DX
 Bliss**, **DX Serenity**, and **DX Sublimity** — and dispatched across
 all available models in parallel. Each refine pass is judged by a
-**multi-model panel** (Claude + Gemini + GPT in parallel), with verdicts
+**multi-model panel** (Claude + Antigravity + GPT in parallel), with verdicts
 merged via **peer-only averaging** to neutralize self-favoritism.
 
 This is the only weave command that uses panel judging. For host or
@@ -114,7 +114,7 @@ this is load-bearing.
 Follow Phase 2 (Configuration and Model Detection) of
 `plugins/weave/commands/brainstorm-and-refine.md` — flag parsing,
 mode/timeout/passes resolution, model
-detection (Claude, Gemini, GPT), session directory setup — with these
+detection (Claude, Antigravity, GPT), session directory setup — with these
 **serene-bliss overrides** applied after the standard parsing:
 
 - `variant_count = 3` (forced; override any `--variants` from
@@ -220,11 +220,11 @@ with `subagent_type: "general-purpose"`:
 Each Claude variant agent writes its output to
 `$SESSION_DIR/brainstorm/outputs/claude-v<N>.md`.
 
-### Gemini Variants (sub-agents)
+### Antigravity Variants (sub-agents)
 
-For each Gemini variant N (1 through 3), launch a separate Task agent
+For each Antigravity variant N (1 through 3), launch a separate Task agent
 (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the
-Gemini model. Include in the agent prompt: the resolved backend
+Antigravity (agy) model. Include in the agent prompt: the resolved backend
 command and timeout from Phase 2, the `$SESSION_DIR` path, the
 `$REPO_TOPLEVEL` path and `$REPO_FINGERPRINT` value, the variant
 number, and the prompt with the compound preamble.
@@ -233,21 +233,33 @@ The agent must:
 
 1. Read the variant prompt from
    `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
-2. Run the resolved Gemini command with output redirection.
-   **Repo Guard**: invoke the CLI in its native read-only sandbox — it
-   reads the repo but cannot write it (see `docs/repo-guard-protocol.md`
-   Layer 1).
+2. Run the resolved Antigravity command with output redirection.
+   **Repo Guard**: `agy` has no native read-only mode (its print mode
+   reads *and* writes), so isolate it in a disposable git worktree
+   checked out at `HEAD` — agy reads the snapshot while any stray write
+   lands in the throwaway worktree, never the main repo (see
+   `docs/repo-guard-protocol.md` Layer 1). Because multiple variants
+   can run concurrently, each variant's worktree path carries its
+   variant number (`-v<N>`) so parallel runs never share a worktree.
+   The `gemini` and `agent` fallbacks keep their own native read-only
+   modes.
 
-   **Native (`gemini` CLI)**:
+   **Primary (`agy` CLI, disposable worktree)**:
 
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-v<N>"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" </dev/null >"$SESSION_DIR/brainstorm/outputs/agy-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/agy-v<N>.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
+   ```
+
+   **Fallback (`gemini` CLI)**:
+
+   ```bash
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/agy-v<N>.md" 2>"$SESSION_DIR/brainstorm/stderr/agy-v<N>.txt")
    ```
 
    **Fallback (`agent` CLI)**:
 
    ```bash
-   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/gemini-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/gemini-v<N>.txt")
+   (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/brainstorm/prompts/variant-<N>.md")" >"$SESSION_DIR/brainstorm/outputs/agy-v<N>.md" 2>>"$SESSION_DIR/brainstorm/stderr/agy-v<N>.txt")
    ```
 
 3. **Repo Guard** post-CLI verification: immediately after the CLI
@@ -269,24 +281,26 @@ The agent must:
    ```
 
    ```bash
-   printf '{"event":"repo_guard_violation","timestamp":"%s","model":"gemini","reverted":true}\n' \
+   printf '{"event":"repo_guard_violation","timestamp":"%s","model":"agy","reverted":true}\n' \
      "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
      >>"$SESSION_DIR/guard-events.jsonl"
    ```
 
 4. On failure: classify (timeout → retry with 1.5x timeout; rate-limit
-   → retry after 10s; credit-exhausted → skip retry, escalate to agent
-   CLI immediately; crash → not retryable; empty → retry once), retry
-   max once with same backend, then fall back to agent CLI if native
-   was used; if agent is also credit-exhausted or unavailable, use
-   lesser model (gemini-3-flash-preview).
+   → retry after 10s; credit-exhausted → skip retry, escalate to the
+   next backend immediately; crash → not retryable; empty → retry
+   once), retry max once with same backend, then fall back down the
+   chain (agy → gemini → agent) if a native CLI was used; if all are
+   credit-exhausted or unavailable, use the lesser model
+   (`Gemini 3.5 Flash (High)` via agy for Antigravity, then
+   `gemini-3-flash-preview`).
 5. Return: exit code, elapsed time, retry count, output file path.
 
 ### GPT Variants (sub-agents)
 
 For each GPT variant N (1 through 3), launch a separate Task agent
 (`subagent_type: "general-purpose"`, `mode: "default"`) to execute the
-GPT model. Same dispatch shape as Gemini, with these command
+GPT model. Same dispatch shape as Antigravity, with these command
 replacements. Include `$REPO_TOPLEVEL` and `$REPO_FINGERPRINT` in the
 agent prompt for post-CLI verification.
 
@@ -329,7 +343,7 @@ printf '{"event":"repo_guard_violation","timestamp":"%s","model":"gpt","reverted
   >>"$SESSION_DIR/guard-events.jsonl"
 ```
 
-Same retry/fallback classification as Gemini. Lesser model fallback:
+Same retry/fallback classification as Antigravity. Lesser model fallback:
 gpt-5.4-mini via agent.
 
 ### Execution Strategy
@@ -398,17 +412,41 @@ Launch one judge per available model **in the same turn**:
 - **Claude judge**: Task agent with `subagent_type: "general-purpose"`
   receiving the panel-prompt content directly. Writes assessment to
   `$SESSION_DIR/refine/pass-0001/judges/claude.md`.
-- **Gemini judge**: sub-agent dispatching the gemini CLI (or agent
-  fallback) with the shared prompt as input. Same retry/fallback
-  protocol as Phase 3 Gemini variants. Writes to
-  `$SESSION_DIR/refine/pass-0001/judges/gemini.md`.
+- **Antigravity judge**: sub-agent dispatching the `agy` CLI primary
+  (or `gemini`/`agent` fallback) with the shared prompt as input. Same
+  retry/fallback protocol as Phase 3 Antigravity variants. `agy` has no
+  native read-only mode, so isolate it in a disposable git worktree
+  named `${REPO_TOPLEVEL}-weave-agy-ro-judge` (a SEPARATE worktree from
+  any model-pass run so the two never collide; see
+  `docs/repo-guard-protocol.md` Layer 1). Writes to
+  `$SESSION_DIR/refine/pass-0001/judges/agy.md`.
+
+  **Primary (`agy` CLI, disposable worktree)**:
+
+  ```bash
+  (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-judge"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/refine/pass-0001/panel-prompt.md")" </dev/null >"$SESSION_DIR/refine/pass-0001/judges/agy.md" 2>"$SESSION_DIR/refine/pass-0001/judges/judge-agy.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
+  ```
+
+  **Fallback (`gemini` CLI)**:
+
+  ```bash
+  (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> gemini -m gemini-3-pro-preview --approval-mode plan --include-directories "$REPO_TOPLEVEL" --skip-trust -p "$(cat "$SESSION_DIR/refine/pass-0001/panel-prompt.md")" >"$SESSION_DIR/refine/pass-0001/judges/agy.md" 2>"$SESSION_DIR/refine/pass-0001/judges/judge-agy.txt")
+  ```
+
+  **Fallback (`agent` CLI)**:
+
+  ```bash
+  (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/refine/pass-0001/panel-prompt.md")" >"$SESSION_DIR/refine/pass-0001/judges/agy.md" 2>>"$SESSION_DIR/refine/pass-0001/judges/judge-agy.txt")
+  ```
+
 - **GPT judge**: sub-agent dispatching the codex CLI (or agent
   fallback) with the shared prompt as input. Same retry/fallback
   protocol as Phase 3 GPT variants. Writes to
   `$SESSION_DIR/refine/pass-0001/judges/gpt.md`.
 
-**Repo Guard**: Gemini and GPT judge CLIs must use the same native
-read-only sandbox invocation as Phase 3 variant dispatches
+**Repo Guard**: the GPT judge CLI must use the same native read-only
+sandbox invocation as Phase 3 variant dispatches, and the Antigravity
+judge must run inside its `-judge` disposable worktree as above
 (see `docs/repo-guard-protocol.md` Layer 1). After each judge CLI
 returns, run the post-CLI repo state verification — capture
 `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"`,
@@ -454,7 +492,7 @@ include the full host judgment inline.
 ### Step 4: Merge via peer-only averaging
 
 For each successfully-parsed judge, the input is a scores table where
-each row is one original (e.g., `claude-v1`, `gemini-v2`, `gpt-v3`)
+each row is one original (e.g., `claude-v1`, `agy-v2`, `gpt-v3`)
 and each column is a dimension score (0-10).
 
 **Peer-only averaging algorithm** (described in prose; the host
@@ -463,8 +501,8 @@ implements this directly):
 For each original `O` in the pass's review set:
 
 1. Identify the **producer model** for `O` from its label
-   (e.g., `claude-v2` → producer = Claude; `gemini-v1` → producer =
-   Gemini).
+   (e.g., `claude-v2` → producer = Claude; `agy-v1` → producer =
+   Antigravity).
 2. For each successfully-parsed judge `J`:
    - If `J` is the same as the producer: **exclude** this judge's
      score for `O` (peer-only rule).
@@ -492,18 +530,18 @@ Write the merged assessment to
 
 ```markdown
 # Panel Assessment — Pass 1
-**Judged by**: Panel (Claude + Gemini + GPT, peer-only averaging)
-**Judges succeeded**: 3/3   <!-- or "2/3 (gemini parse failed)" etc. -->
+**Judged by**: Panel (Claude + Antigravity + GPT, peer-only averaging)
+**Judges succeeded**: 3/3   <!-- or "2/3 (agy parse failed)" etc. -->
 
 ## Individual Scores
-| Original   | Claude | Gemini | GPT  | Merged (peer-only) |
-|------------|--------|--------|------|---------------------|
-| claude-v1  |   —    |  33    |  31  |  32 / 40            |
-| claude-v2  |   —    |  28    |  35  |  31 / 40            |
-| gemini-v1  |  34    |   —    |  30  |  32 / 40            |
-| gemini-v2  |  31    |   —    |  29  |  30 / 40            |
-| gpt-v1     |  32    |  30    |   —  |  31 / 40            |
-| ...        |  ...   |  ...   | ...  |  ...                |
+| Original   | Claude | Antigravity | GPT  | Merged (peer-only) |
+|------------|--------|-------------|------|---------------------|
+| claude-v1  |   —    |  33         |  31  |  32 / 40            |
+| claude-v2  |   —    |  28         |  35  |  31 / 40            |
+| agy-v1     |  34    |   —         |  30  |  32 / 40            |
+| agy-v2     |  31    |   —         |  29  |  30 / 40            |
+| gpt-v1     |  32    |  30         |   —  |  31 / 40            |
+| ...        |  ...   |  ...        | ...  |  ...                |
 
 (em-dashes mark self-scores excluded by the peer-only rule)
 
@@ -521,7 +559,7 @@ Write the merged assessment to
 
 ## Individual Judge Summaries
 - **Claude**: picked <label>; emphasized <one-line rationale>
-- **Gemini**: picked <label>; emphasized <one-line rationale>
+- **Antigravity**: picked <label>; emphasized <one-line rationale>
 - **GPT**: picked <label>; emphasized <one-line rationale>
 
 ## Merge Notes
@@ -598,7 +636,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 - `LABEL_MAP_PATH` = `$SESSION_DIR/refine/pass-NNNN/label-map.json`
 
 In the presentation, include one additional line: "Judged by: Panel
-(Claude + Gemini + GPT, peer-only averaging) across N pass(es)."
+(Claude + Antigravity + GPT, peer-only averaging) across N pass(es)."
 
 After the reference returns, finalize the session: repo guard, session.json,
 events.jsonl, latest symlink.

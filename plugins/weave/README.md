@@ -1,6 +1,6 @@
 # weave
 
-Weave prompts across Claude, Gemini, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
+Weave prompts across Claude, Antigravity, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
 
 ## Installation
 
@@ -48,7 +48,7 @@ Skills provide auto-discovery — they trigger when the user's intent matches th
 The orchestration commands follow consistent multi-phase workflows. The original six (ask, plan, prompt, execute, architecture, review) use **targeted conflict resolution** for multi-pass — subsequent passes only address unresolved conflicts. The new three (brainstorm, refine, brainstorm-and-refine) use **expansive weaving** — each pass is a full judge-pick-best-incorporate-strengths-address-weaknesses cycle. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
 
 1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
-2. **Detect models** — Check for `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available, fall back to the `agent` CLI with `--model` flags.
+2. **Detect models** — Check for `agy`, `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available; the Google lane prefers `agy` (Antigravity) and falls back to `gemini`, then the `agent` CLI with `--model` flags.
 3. **Run in parallel** — Execute the task across all available models simultaneously.
 4. **Synthesize** — Compare outputs, verify claims against the codebase, and combine the best elements.
 5. **Refine** (multi-pass) — Optionally re-run all models with the prior synthesis as context for deeper results.
@@ -71,7 +71,7 @@ the full specification.
 
 | Layer | Defense | Scope |
 |-------|---------|-------|
-| 1 | Native CLI read-only sandbox (`-s read-only` / `--approval-mode plan`) | Read-only commands |
+| 1 | Native read-only sandbox (`-s read-only` / `--approval-mode plan`), or a disposable HEAD worktree for `agy` (no native read-only mode) | Read-only commands |
 | 2 | Pre-session repo fingerprint (HEAD + `git status`) | All commands |
 | 3 | Post-CLI repo state verification + auto-revert | All commands |
 | 4 | Prompt hardening ("CRITICAL: Do NOT write files") | All commands |
@@ -80,16 +80,20 @@ the full specification.
 **Read-only commands** run external CLIs in their native read-only
 sandbox (codex `-s read-only`, gemini `--approval-mode plan`, agent
 `--mode plan`) pointed at the repo, so models can read but not write;
-the `cd "$SESSION_DIR"` wrapper is a backstop. **Write commands** run
+the `cd "$SESSION_DIR"` wrapper is a backstop. The `agy` (Antigravity)
+CLI has no native read-only mode — its print mode reads *and* writes —
+so its read-only lanes run in a disposable git worktree checked out at
+`HEAD`, which is discarded afterward; any stray write lands in the
+throwaway worktree, never the main repo. **Write commands** run
 external CLIs in isolated worktrees
 and verify the main tree is unchanged after diff capture. All commands
 verify the repo is unchanged at session end.
 
 The guard was introduced because external CLIs have known issues with
 unexpectedly modifying project files. The protocol provides
-defense-in-depth: the native read-only sandbox blocks writes, post-CLI
-verification catches writes to absolute paths, and session-end
-verification is the final safety net.
+defense-in-depth: the native read-only sandbox (or disposable worktree
+for `agy`) blocks writes, post-CLI verification catches writes to
+absolute paths, and session-end verification is the final safety net.
 
 ### Read-Only Commands
 
@@ -171,7 +175,7 @@ enabling true parallel dispatch when the host supports it.
 | Role | Agent type | Mode | Purpose |
 |------|-----------|------|---------|
 | Claude model | `general-purpose` | default | Reads codebase, produces response |
-| Gemini model | `general-purpose` | default | Runs `gemini`/`agent` CLI via Bash |
+| Antigravity model | `general-purpose` | default | Runs `agy`/`gemini`/`agent` CLI via Bash |
 | GPT model | `general-purpose` | default | Runs `codex`/`agent` CLI via Bash |
 | Critic | `general-purpose` | default | Challenges synthesized result |
 | Context gather | `general-purpose` | default | Runs git commands (plan mode only) |
@@ -213,14 +217,14 @@ and brainstorm-and-refine commands only).
 `--judge=host` (default): The host agent (Claude) judges every pass. This is the most
 reliable mode since the host can read session files and parse varied output formats.
 
-`--judge=round-robin`: Judging rotates across available models — Claude, then Gemini,
+`--judge=round-robin`: Judging rotates across available models — Claude, then Antigravity,
 then GPT, cycling back. External models receive a structured judge prompt with all
 model outputs inline and produce scores, winner selection, and runner-up analysis.
 The host agent always weaves regardless of who judged. If an external judge's output
 is unparseable, that pass falls back to host judging.
 
-The rotation is built from available models only. If only Claude and Gemini are
-detected, the rotation is Claude → Gemini → Claude → Gemini. Pass 1 always starts
+The rotation is built from available models only. If only Claude and Antigravity are
+detected, the rotation is Claude → Antigravity → Claude → Antigravity. Pass 1 always starts
 with Claude (index 0).
 
 ### Interactive Configuration
@@ -318,10 +322,10 @@ $AI_AIP_ROOT/
             │       │   ├── synthesis.md
             │       │   ├── outputs/
             │       │   │   ├── claude.md
-            │       │   │   ├── gemini.md
+            │       │   │   ├── agy.md
             │       │   │   └── gpt.md
             │       │   └── stderr/
-            │       │       ├── gemini.txt
+            │       │       ├── agy.txt
             │       │       └── gpt.txt
             │       └── pass-0002/
             │           └── ...
@@ -345,7 +349,7 @@ $AI_AIP_ROOT/
             │       ├── prompt.md
             │       ├── outputs/
             │       │   ├── claude-v1.md
-            │       │   ├── gemini-v1.md
+            │       │   ├── agy-v1.md
             │       │   └── gpt-v1.md
             │       └── stderr/
             ├── refine/
@@ -384,12 +388,12 @@ pass-0001/
 ├── quality-gates.md
 ├── diffs/
 │   ├── claude.diff
-│   ├── gemini.diff
+│   ├── agy.diff
 │   └── gpt.diff
 └── files/
     ├── claude/
     │   └── <repo-relative paths of changed files>
-    ├── gemini/
+    ├── agy/
     │   └── ...
     └── gpt/
         └── ...
@@ -425,7 +429,7 @@ Each session directory contains a `session.json` that tracks session state. Upda
   "status": "in_progress",
   "branch": "feature/add-auth",
   "ref": "abc1234",
-  "models": ["claude", "gemini", "gpt"],
+  "models": ["claude", "agy", "gpt"],
   "completed_passes": 0,
   "prompt_summary": "How does the authentication middleware work?",
   "created_at": "2026-02-10T14:30:22Z",
@@ -455,11 +459,11 @@ The session is updated after each pass (`completed_passes` incremented, `updated
 Each session directory contains an `events.jsonl` file with one JSON object per line:
 
 ```json
-{"event":"session_start","timestamp":"2026-02-10T14:30:22Z","command":"ask","models":["claude","gemini","gpt"]}
+{"event":"session_start","timestamp":"2026-02-10T14:30:22Z","command":"ask","models":["claude","agy","gpt"]}
 ```
 
 ```json
-{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"models_completed":["claude","gemini","gpt"]}
+{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"models_completed":["claude","agy","gpt"]}
 ```
 
 Refine and brainstorm-and-refine commands include additional fields in `pass_complete`:
@@ -480,7 +484,8 @@ At minimum, Claude (this agent) is always available. For weave functionality, in
 
 | CLI | Model | Install |
 |-----|-------|---------|
-| `gemini` | Gemini | [Gemini CLI](https://github.com/google-gemini/gemini-cli) |
+| `agy` | Gemini (via Antigravity) | [Antigravity CLI](https://antigravity.google/product/antigravity-cli) |
+| `gemini` | Gemini (fallback; gemini CLI retired 2026-06-18) | [Gemini CLI](https://github.com/google-gemini/gemini-cli) |
 | `codex` | GPT | [Codex CLI](https://github.com/openai/codex) |
 | `agent` | Any (fallback) | [Agent CLI](https://cursor.com/cli) |
 
@@ -497,49 +502,23 @@ If neither `timeout` nor `gtimeout` is found, commands run without a time limit.
 
 If no external CLIs are available, commands fall back to Claude-only mode with a note about the limitation.
 
-### Gemini reasoning depth
+### Model selection and reasoning depth
 
-Weave invokes `gemini -m gemini-3-pro-preview` rather than
-`gemini-3.1-pro-preview`. This is deliberate: in the installed `gemini-cli`
-bundle, only `gemini-3-pro-preview` extends the built-in `chat-base-3` alias
-that sets `thinkingLevel: HIGH`. The `3.1` variant exists but has no alias
-linking it to HIGH thinking, so one-shot `-p` invocations produce noticeably
-shallower output.
+The Antigravity lane invokes `agy --model "Gemini 3.1 Pro (High)"` — the
+strongest Gemini Pro option reported by `agy models`. The `(High)` suffix
+selects HIGH reasoning depth directly, so no alias configuration is needed.
 
-No user configuration is required — the model ID alone forces HIGH thinking
-via the built-in alias chain.
+When `agy` is unavailable, the lane falls back to the `gemini` CLI with
+`gemini -m gemini-3-pro-preview` rather than `gemini-3.1-pro-preview`. This is
+deliberate: in the installed `gemini-cli` bundle, only `gemini-3-pro-preview`
+extends the built-in `chat-base-3` alias that sets `thinkingLevel: HIGH`. The
+`3.1` variant has no alias linking it to HIGH thinking, so one-shot `-p`
+invocations produce noticeably shallower output.
 
-**Diagnostic**: to confirm weave is hitting a Gemini 3 model (and not silently
-downgrading to 2.5 Pro due to missing preview access):
+**Diagnostic**: to confirm the active backend and model:
 
 ```console
-gemini -m gemini-3-pro-preview --approval-mode plan --skip-trust -p "Report your exact model ID and thinking level."
-```
-
-**Optional: pin to 3.1 with HIGH thinking.** If you prefer the newer
-`gemini-3.1-pro-preview` model, add a custom alias to `~/.gemini/settings.json`
-and change the weave commands locally to use it. This is opt-in; weave will never
-write to your `~/.gemini/` directory:
-
-```json
-{
-  "modelConfigs": {
-    "customAliases": {
-      "gemini-3.1-pro-high": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemini-3.1-pro-preview",
-          "generateContentConfig": {
-            "thinkingConfig": {
-              "thinkingLevel": "HIGH",
-              "includeThoughts": true
-            }
-          }
-        }
-      }
-    }
-  }
-}
+agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p "Report your exact model ID and reasoning level." </dev/null
 ```
 
 ## Shell Resilience
