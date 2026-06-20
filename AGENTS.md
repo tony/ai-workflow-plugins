@@ -31,14 +31,15 @@ Format commit messages as:
 Scope(type[detail]) concise description
 
 why: Explanation of necessity or impact.
+
 what:
 - Specific technical changes made
 - Focused on a single topic
 ```
 
-Line wrapping: wrap body lines at **72 characters**. Let URLs, file
-paths, commit hashes, and long identifiers overflow rather than
-breaking mid-token.
+Keep the subject ≤50 chars (excluding any trailing `(#NN)` PR ref); wrap
+body lines at ≤72 chars. Separate the `why:` and `what:` blocks with a
+blank line.
 
 Common commit types:
 - **feat**: New features or enhancements
@@ -79,6 +80,7 @@ Examples:
 ai(claude[skill/commit]) Add heredoc formatting for multi-line messages
 
 why: Commit messages with body text need preserved newlines
+
 what:
 - Add heredoc template to commit skill prompt
 - Include why/what body format in instructions
@@ -88,6 +90,7 @@ what:
 ai(claude[hooks]) Add PreToolUse validation for Bash commands
 
 why: Prevent accidental destructive shell commands
+
 what:
 - Add PreToolUse hook to intercept Bash tool calls
 - Block rm -rf and git push --force without confirmation
@@ -97,6 +100,7 @@ what:
 ai(rules) Add project-specific commit component conventions
 
 why: Claude Code plugins need distinct component prefixes
+
 what:
 - Add ai(claude[...]) naming scheme for plugins, commands, skills, hooks
 - Include examples for single and multi-component changes
@@ -117,6 +121,7 @@ git commit -m "$(cat <<'EOF'
 feat(Component[method]) add feature description
 
 why: Explanation of the change.
+
 what:
 - First change
 - Second change
