@@ -19,16 +19,16 @@ jobs:
         run: uv sync --group dev
 
       - name: Ruff check
-        run: uv run ruff check scripts/
+        run: uv run ruff check scripts/ plugins/
 
       - name: Ruff format
-        run: uv run ruff format --check scripts/
+        run: uv run ruff format --check scripts/ plugins/
 
       - name: Type check
-        run: uv run basedpyright scripts/
+        run: uv run basedpyright scripts/ plugins/
 
       - name: Tests
-        run: uv run pytest scripts/ -q
+        run: uv run pytest scripts/ plugins/ -q
 
       - name: Marketplace lint
         run: uv run scripts/marketplace.py lint
