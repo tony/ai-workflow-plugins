@@ -26,7 +26,8 @@ re-benchmark ids already recorded.
 
 Read `baseline.json` (noise band, test command, capabilities) and
 `hypotheses.json` from the resolved memory directory. If either is missing, tell
-the user to run `/pytest-optimizer:00-scan` first. Skip any hypothesis whose
+the user to run `/pytest-optimizer:00-scan` first. Substitute that resolved test
+command wherever this file writes `pytest`. Skip any hypothesis whose
 (content-derived) id already has a benchmark recorded **against the current
 baseline token**, unless `--force`; a re-baseline after `03-execute` re-opens all
 candidates for fresh measurement.

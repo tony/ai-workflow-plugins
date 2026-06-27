@@ -40,7 +40,7 @@ For each plan item not yet applied:
    plan lists for this item.
 2. **Verify green.** Run the project quality checks (formatter, linter, type
    checker) and the test suite, as declared in the project's `AGENTS.md`/
-   `CLAUDE.md`:
+   `CLAUDE.md` — substitute that command wherever this file writes `pytest`:
 
    ```bash
    pytest -p no:cacheprovider -q
