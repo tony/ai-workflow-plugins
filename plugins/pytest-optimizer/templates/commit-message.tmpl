@@ -1,0 +1,18 @@
+# pytest-optimizer commit template -- ONE speedup per commit.
+# Adapt the type(scope) prefix to THIS project's convention (read its AGENTS.md /
+# CLAUDE.md). Lines beginning with '#' are stripped by git.
+#
+# Subject <= 50 chars. Body wrapped at <= 72. Keep one blank line between why and
+# what. State the MEASURED problem and the MEASURED result -- not a narration of
+# the diff.
+
+<type>(<scope>) <imperative summary of the single change>
+
+why: <the measured problem this fixes -- what was slow and by how much, e.g.
+     "make_config ran 40x at function scope (~0.3s each, ~12s of setup)">
+
+what:
+- <the single change applied>
+- <measured delta: suite X.Xs -> Y.Ys (-Z%), above the k*MAD noise band>
+
+Refs: pytest-optimizer <heuristic-id>

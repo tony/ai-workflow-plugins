@@ -1,0 +1,18 @@
+{
+  "name": "pytest-optimizer",
+  "description": "Profile, benchmark, and safely speed up a pytest suite through a resumable four-phase pipeline (scan, benchmark, plan, execute) driven by a weighted safety rubric and a versioned heuristic catalog. Detects the installed pytest version to gate capabilities, separates slow test bodies from slow fixture setup/teardown, finds unused and mis-scoped fixtures, migrates parametrize to the typed NamedTuple + test_id convention, and applies each speedup as its own verified commit.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  },
+  "homepage": "https://github.com/tony/ai-workflow-plugins",
+  "license": "MIT",
+  "keywords": [
+    "pytest",
+    "testing",
+    "performance",
+    "profiling",
+    "fixtures"
+  ]
+}
