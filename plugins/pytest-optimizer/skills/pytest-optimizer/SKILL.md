@@ -160,16 +160,17 @@ chooses to commit it.
 
 ## Graceful degradation
 
-- **No plan mode** — keep the phase order; never edit the suite during `00-scan`,
-  `01-benchmark`, or `02-plan`.
+- **No plan mode** — keep the phase order; never touch the working tree during
+  `00-scan`, `01-benchmark`, or `02-plan` (`01-benchmark` measures only on an
+  isolated throwaway copy).
 - **Old pytest** — gate features via the version matrix; widen the noise band when
   duration precision is coarser (pre-6.0 used `time.time()`, not `perf_counter`).
 - **No xdist / randomly / deadfixtures** — fall back to serial runs, manual
   reversed-order isolation checks, and the built-in `--fixtures` vs
   `--fixtures-per-test` diff.
 - **Dirty working tree** — refuse to run `03-execute` until clean (one commit per
-  speedup requires a clean base); `00-scan` and `01-benchmark` are read-only and
-  may run anyway.
+  speedup requires a clean base); `00-scan` and `01-benchmark` leave the working
+  tree untouched (`01-benchmark` works on an isolated copy) and may run anyway.
 
 ## References
 
