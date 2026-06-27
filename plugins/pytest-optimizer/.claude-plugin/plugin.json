@@ -5,14 +5,5 @@
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"
-  },
-  "homepage": "https://github.com/tony/ai-workflow-plugins",
-  "license": "MIT",
-  "keywords": [
-    "pytest",
-    "testing",
-    "performance",
-    "profiling",
-    "fixtures"
-  ]
+  }
 }
