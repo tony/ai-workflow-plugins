@@ -137,6 +137,19 @@
       "category": "design",
       "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/tailwind",
       "license": "MIT"
+    },
+    {
+      "name": "pytest-optimizer",
+      "description": "Profile a pytest suite, rank safe speedups with a safety-first rubric, and apply each as its own verified commit",
+      "version": "0.1.0",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/pytest-optimizer",
+      "category": "testing",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/pytest-optimizer",
+      "license": "MIT"
     }
   ]
 }
