@@ -18,10 +18,20 @@ Install the plugin:
 
 ## Components
 
-| Component | Description |
-|-----------|-------------|
-| `/tdd:fix` | Standard xfail-driven TDD bug-fix loop |
-| `/tdd:xfail` | Hermetic xfail workflow with diff gates, mock contamination guards, and CI checkpoints |
+| Component | Type | Description |
+|-----------|------|-------------|
+| `/tdd:fix` | Command | Standard xfail-driven TDD bug-fix loop |
+| `/tdd:xfail` | Skill | Hermetic xfail workflow with diff gates, mock contamination guards, and CI checkpoints |
+
+## Skills
+
+The `xfail` skill provides auto-discovery — it triggers when the user's intent
+matches its description, in addition to manual `/tdd:xfail` invocation. `/tdd:fix`
+is a command (manual invocation only).
+
+| Skill | Triggers on |
+|-------|-------------|
+| `xfail` | "xfail", "strict xfail", "hermetic TDD", "reproduce with xfail", "expected failure workflow" |
 
 ## `/tdd:fix` — 6-Phase Workflow
 

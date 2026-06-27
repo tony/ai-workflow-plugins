@@ -1,11 +1,9 @@
 ---
 name: codex
 description: >
-  Delegate a task to OpenAI's GPT via the Codex CLI. Use this skill when the user
-  explicitly asks to use Codex, GPT, or OpenAI for a task, or when you determine
-  that GPT would provide better results for a specific task (e.g., tasks requiring
-  OpenAI-specific strengths). Detects the codex binary, falls back to agent --model
-  gpt-5.4-high if unavailable.
+  Use when the user explicitly asks to use Codex, GPT, or OpenAI for a task, or
+  when GPT would give better results for a specific task. Delegates a prompt to
+  OpenAI's GPT via the Codex CLI.
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 argument-hint: <prompt> [timeout:<seconds>]
@@ -85,7 +83,7 @@ Replace `<timeout_cmd>` with the resolved timeout command and `<timeout_seconds>
 ## Step 5: Handle Failure
 
 1. **Record**: exit code, stderr (from `/tmp/mc-stderr-codex.txt`), elapsed time
-2. **Classify**: timeout → retry with 1.5× timeout; rate-limit → retry after 10s delay; **credit-exhausted → skip retry, escalate to agent fallback immediately**; crash → stop; empty output → retry once. Detect credit-exhaustion via stderr patterns: `insufficient_quota`, `exceeded your current quota`, `billing`, `capacity exhausted`, `usage limit`, or HTTP 429 with "daily limit".
+2. **Classify**: timeout → retry with 1.5× timeout; rate-limit → retry after 10s delay; **credit-exhausted → skip retry, escalate to agent fallback immediately**; crash → stop; empty output → retry once. Detect credit-exhaustion via stderr patterns: `insufficient_quota`, `quota exceeded`, `exceeded your current quota`, `billing`, `capacity exhausted`, `usage limit`, or HTTP 429 with "daily limit".
 3. **Retry**: max 1 retry with the same backend (skipped for credit-exhausted)
 4. **Agent fallback**: if retry fails (or credit-exhausted) AND native `codex` was used AND `agent` is available, re-run using `agent -p -f --model gpt-5.4-high` (1 attempt, same timeout). Emit: `"Codex v1 failed — capacity exhausted. Relaunching with agent --model gpt-5.4-high."` Note the backend switch in the output.
 4b. **Lesser fallback**: if agent is also credit-exhausted or unavailable, re-run using `agent -p -f --model gpt-5.4-mini` (1 attempt, same timeout). Emit: `"agent failed — gpt-5.4-high capacity exhausted. Relaunching with gpt-5.4-mini lesser fallback."`

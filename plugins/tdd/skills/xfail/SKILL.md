@@ -1,11 +1,9 @@
 ---
 name: xfail
 description: >-
-  TDD xfail workflow with hermetic reproduction guards — reproduce a bug
-  as a strictly-expected-to-fail test, verify the reproduction is genuine,
-  apply a fix with diff-gate enforcement, and remove the xfail marker.
-  Use when fixing bugs that need strict proof the test fails for the right
-  reason, not because a mock is misconfigured. Triggers on "xfail",
+  Use when fixing a bug that needs strict proof the test fails for the right
+  reason — not because a mock is misconfigured. A hermetic xfail TDD workflow
+  with diff-gate guards (distinct from a plain TDD fix). Triggers on "xfail",
   "strict xfail", "hermetic TDD", "reproduce with xfail", or "expected
   failure workflow".
 user-invocable: true
@@ -255,66 +253,19 @@ Apply a minimal fix and re-run from Phase 3.
 
 ---
 
-## Recovery Protocol
+## Recovery, CI, and Cross-Dependency Protocols
 
-### A. Reproduction is not genuine (Phase 2 fails)
+When a gate fails, when pushing to CI, or when the bug spans a dependency,
+follow the matching protocol in
+[references/recovery-and-ci.md](references/recovery-and-ci.md):
 
-The test fails, but not because of the bug.
-
-**Action**: Delete the test entirely. Return to Phase 1. Do not adjust
-mocks to produce the "right" failure — that is the mock contamination
-the protocol is designed to prevent.
-
-### B. Fix does not resolve the test (Phase 3 fails)
-
-The xfail test still xfails after applying the fix.
-
-**Action**: Revert the fix. Return to root cause analysis. Re-examine
-whether the test exercises the code path you fixed.
-
-### C. Fix is not isolated (Phase 4 fails)
-
-The test does not return to xfail when the fix is stashed.
-
-**Action**: Something else resolved the test. Investigate: stale build
-cache, unrelated change in the working tree, dependency update. Identify
-the true cause before proceeding.
-
-### D. Loop limit
-
-After 3 failed attempts at any phase, stop and present findings:
-- What was tried
-- What the test output shows
-- What the suspected issue is
-- Ask for guidance
-
----
-
-## CI Integration (Optional)
-
-When the project has CI, the three-commit sequence provides additional
-verification. Push after each commit phase:
-
-| After | Expected CI result | Why |
-|-------|-------------------|-----|
-| Phase 1 commit | Green | xfail = expected failure, suite passes |
-| Phase 4 commit | Red | `strict=True` makes XPASS a failure (expected) |
-| Phase 5 commit | Green | xfail removed, test passes normally |
-
-If CI is not available or the user prefers local-only verification, the
-diff gates and stash round-trip provide equivalent confidence.
-
----
-
-## Cross-Dependency Workflow
-
-When the bug involves both this project and a dependency:
-
-1. Fix the dependency first using the same hermetic protocol
-2. Commit in the dependency using its conventions
-3. Verify the dependency's test suite passes
-4. Update this project's dependency reference to the fixed local source
-5. Then run the protocol in this project
+- **Recovery** (A–D) — a reproduction that is not genuine (Phase 2), a fix
+  that does not resolve the test (Phase 3), a fix that is not isolated
+  (Phase 4), and the 3-attempt loop limit.
+- **CI Integration** — expected green/red/green results for the three commit
+  pushes under `strict=True`.
+- **Cross-Dependency Workflow** — fixing a dependency first under the same
+  hermetic protocol before fixing this project.
 
 ---
 
