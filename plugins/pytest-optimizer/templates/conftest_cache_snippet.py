@@ -74,23 +74,25 @@ def _build_expensive_artifact() -> dict[str, t.Any]:
 @pytest.fixture(scope="session")
 def expensive_artifact(request: pytest.FixtureRequest) -> dict[str, t.Any]:
     """Build the artifact once, reuse across runs while its inputs are unchanged."""
-    cache = request.config.cache
-    assert cache is not None  # cacheprovider is enabled by default
+    # cacheprovider may be off (the optimizer measures with `-p no:cacheprovider`);
+    # fall back to building uncached when no cache is available.
+    cache = getattr(request.config, "cache", None)
 
     # TODO(you): the files this artifact derives from (drives invalidation).
     inputs: list[pathlib.Path] = []
     token = _invalidation_token(inputs) if inputs else "no-inputs"
 
-    stored = cache.get(CACHE_KEY, None)
-    if stored is not None and stored.get("token") == token:
-        return stored["value"]
+    if cache is not None:
+        stored = cache.get(CACHE_KEY, None)
+        if stored is not None and stored.get("token") == token:
+            return stored["value"]
 
     value = _build_expensive_artifact()
 
     # xdist write-guard: write only on serial runs. Workers carry workerinput,
     # so under -n they skip the write (no concurrent writers); see the module
     # docstring for a FileLock single-writer if you want caching under xdist too.
-    if not hasattr(request.config, "workerinput"):
+    if cache is not None and not hasattr(request.config, "workerinput"):
         cache.set(CACHE_KEY, {"token": token, "value": value})
 
     return value
