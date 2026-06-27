@@ -1,0 +1,57 @@
+"""Typed parametrize template (NamedTuple + test_id).
+
+Render this for a requirement-10 migration. Replace ``Thing``/``Length`` and the
+fields with the real case shape. Keep ``test_id`` as the first field so it serves
+as both a test parameter (Style A) and the case id.
+
+See references/parametrize-convention.md for the rules and anti-patterns.
+"""
+
+from __future__ import annotations
+
+import typing as t
+
+import pytest
+
+
+class LengthFixture(t.NamedTuple):
+    """One parametrized case for ``test_length``."""
+
+    test_id: str  # human-readable id AND, in Style A, a test parameter
+    given: str
+    expected: int
+
+
+LENGTH_FIXTURES: list[LengthFixture] = [
+    LengthFixture(test_id="empty", given="", expected=0),
+    LengthFixture(test_id="single-word", given="hi", expected=2),
+    LengthFixture(test_id="multibyte", given="漢", expected=1),
+]
+
+
+# --- Style A: unpack every field into a test parameter -----------------------
+# `list(LengthFixture._fields)` derives the argnames from the type, so adding a
+# field wires it into the signature automatically -- no comma-joined string to
+# drift out of sync.
+@pytest.mark.parametrize(
+    list(LengthFixture._fields),
+    LENGTH_FIXTURES,
+    ids=[case.test_id for case in LENGTH_FIXTURES],
+)
+def test_length_style_a(
+    test_id: str,
+    given: str,
+    expected: int,
+) -> None:
+    assert _measure(given) == expected
+
+
+# --- Style B: pass one case object (tolerates any field order) ---------------
+@pytest.mark.parametrize("case", LENGTH_FIXTURES, ids=lambda c: c.test_id)
+def test_length_style_b(case: LengthFixture) -> None:
+    assert _measure(case.given) == case.expected
+
+
+def _measure(value: str) -> int:
+    """Replace with the unit under test."""
+    return len(value)
