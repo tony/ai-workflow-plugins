@@ -49,10 +49,9 @@ def pytest_fixture_setup(
     works on pytest 6 through 9.
     """
     start = time.perf_counter()
-    outcome = yield
+    yield
     elapsed = time.perf_counter() - start
     _TIMINGS[(fixturedef.argname, str(fixturedef.scope))].append(elapsed)
-    del outcome  # the fixture value is not needed here; only its setup time is
 
 
 def pytest_terminal_summary(
