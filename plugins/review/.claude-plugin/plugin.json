@@ -1,0 +1,9 @@
+{
+  "name": "review",
+  "description": "Address code-review findings on the current branch — provenance-gated to changes the branch introduced, one finding per commit, simplest pragmatic fix, with quality gates before every commit and prompted history rewrites",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}
