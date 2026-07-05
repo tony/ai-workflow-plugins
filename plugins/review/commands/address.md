@@ -141,7 +141,7 @@ This rewrites history, so:
 1. Read `AGENTS.md` / `CLAUDE.md` / `.github/CONTRIBUTING.md` for
    quality checks, commit format, and conventions.
 2. Resolve the five gate buckets and the CI-coverage split per
-   [references/verification-gates.md](../references/verification-gates.md).
+   `${CLAUDE_PLUGIN_ROOT}/references/verification-gates.md`.
 3. Confirm a clean working tree (a dirty tree halts: ask to stash,
    proceed on top, or abort) and detect trunk + push state
    (`git status -sb`, `git log origin/<branch>..HEAD` when a remote

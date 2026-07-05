@@ -87,7 +87,7 @@ Before writing any code:
    quality checks, commit format, and test conventions.
 2. Resolve the five gate buckets (`format`, `lint`, `typecheck`,
    `test`, `build`) and the CI-coverage split per
-   [references/verification-gates.md](../references/verification-gates.md).
+   `${CLAUDE_PLUGIN_ROOT}/references/verification-gates.md`.
 3. Record the working tree state. A dirty tree halts here: ask the
    user whether to stash their work first, spike on top of it, or
    abort — never mix the spike with uncommitted user work silently.
