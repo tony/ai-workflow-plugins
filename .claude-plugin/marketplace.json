@@ -153,7 +153,7 @@
     },
     {
       "name": "spike",
-      "description": "Prove a path fast in a no-commit spike/blitz, exit through the project's quality gates into a stash, and hand back a neat commit-by-commit implementation plan",
+      "description": "Prove a path fast in a no-commit spike — a single probe or a bakeoff of competing strategies in git worktrees — exit through the project's quality gates into stashes, and hand back a commit-by-commit implementation plan",
       "version": "0.0.1",
       "author": {
         "name": "Tony Narlock",

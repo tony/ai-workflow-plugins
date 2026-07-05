@@ -22,7 +22,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [research](plugins/research/) | Learning | Clone and study your project's dependencies at the exact versions you use — source repos with version-pinned git worktrees |
 | [slop](plugins/slop/) | Development | Scan repo tracked files for AI slop, brittle counts, and verbose noise; resolve each finding as an atomic forward-going commit with quality-gate verification |
 | [tailwind](plugins/tailwind/) | Design | Detect and fix inconsistent spacing in Tailwind CSS layouts — container fragmentation, margin/gap mixing, padding asymmetry, and more |
-| [spike](plugins/spike/) | Development | Prove a path fast in a no-commit spike/blitz, exit through the project's quality gates into a stash, and hand back a neat commit-by-commit implementation plan |
+| [spike](plugins/spike/) | Development | Prove a path fast in a no-commit spike — a single probe or a bakeoff of competing strategies in git worktrees — exit through the project's quality gates into stashes, and hand back a commit-by-commit implementation plan |
 | [review](plugins/review/) | Development | Address code-review findings on the current branch — provenance-gated to changes the branch introduced, one finding per commit, simplest pragmatic fix, with quality gates before every commit and prompted history rewrites |
 
 ## Installation

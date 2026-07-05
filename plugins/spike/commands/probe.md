@@ -1,24 +1,33 @@
 ---
 description: >-
   Use when the user wants to prove out a feature or fix fast before
-  committing to an implementation — a spike, blitz, sprint, MVP pass,
-  or proof-of-concept that must not land as commits. Triggers on
-  phrases like "spike into", "do a spike", "blitz it", "spike blitz",
-  "do a sprint to handle this without committing", "quick spike",
-  "prove it works, then plan", "MVP this then clean it up", or "get it
-  working before my meeting". Ends with the working tree stashed and a
+  committing to an implementation — a spike, probe, blitz, sprint,
+  bolt, speedrun, MVP pass, or proof-of-concept that mutates the
+  working tree but must not land as commits. Triggers on phrases like
+  "probe it", "quick probe", "spike into", "do a spike", "blitz it",
+  "bolt through it", "speedrun the fix", "do a sprint to handle this
+  without committing", "take a stab at it", "prove it works, then
+  plan", "MVP this then clean it up", "probe those review items", or
+  "get it working before my meeting". The goal may be typed or
+  inferred from conversation context (review findings, a failing
+  test under discussion). Ends with the working tree stashed and a
   commit-by-commit plan to land the work through the project's
   quality gates.
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
-argument-hint: "<goal> [--branch=<name>] [--keep-tree] [--replay]"
+argument-hint: "[<goal>] [--branch=<name>] [--keep-tree] [--replay]"
 ---
 
-# `/spike:blitz`
+# `/spike:probe`
 
-Rapid spike harness. Blitz the goal in the working tree with the
+Rapid spike harness. Probe the goal in the working tree with the
 lightest verification that proves the path, exit through the project's
 fast quality gates, stash everything with a recovery ref, and hand back
 a neat commit-by-commit plan — optionally replaying it immediately.
+
+A probe **mutates the working tree freely** — mutation is the point;
+the code is the sensing instrument. What it never touches is history:
+like an attached kprobe, it patches the live system to take its
+measurement and detaches without a trace in `git log`.
 
 This is a slash command, not a model-invocable skill: it mutates the
 working tree and (in `--replay`) creates commits, so it must be
@@ -27,19 +36,19 @@ user-explicit, not router-inferred.
 ## Core thesis
 
 A spike answers "does this path work?" — it is **evidence, not a
-deliverable**. The spike's value survives as (a) a stash you can
+deliverable**. The probe's value survives as (a) a stash you can
 reapply and (b) decisions the plan records. Committing spike code
 converts unreviewed exploration into history.
 
 Three disciplines:
 
-1. **Zero commits during the spike.** The spike ends in a stash and a
+1. **Zero commits during the spike.** The probe ends in a stash and a
    plan, never in `git commit`.
-2. **Right-sized verification.** During the blitz, run only what
+2. **Right-sized verification.** During the probe, run only what
    proves the path (a smoke test, a scoped test run). At spike exit,
    run the project's fast gates once so the plan starts from
    known-green knowledge. Defer what CI covers to CI.
-3. **The plan is the product.** Every spike ends with a numbered
+3. **The plan is the product.** Every probe ends with a numbered
    commit sequence mapping stash contents to commits, with the
    discovered gate commands attached to each.
 
@@ -59,7 +68,7 @@ time, each behind a green gate).
 |---|---|
 | "The owner said 'we'll clean it up later' — commit now, clean later" | "Later" is this command's Phase 5. A commit *is* the cleanup being deferred; stash instead. |
 | "They need it before a meeting — a commit is the fastest handoff" | A stash plus the plan is the same speed and leaves history clean. Show the demo from the working tree. |
-| "It's all green, so it's safe to commit" | Green ≠ reviewed. The spike skipped naming, API, and scope decisions on purpose; the plan surfaces them first. |
+| "It's all green, so it's safe to commit" | Green ≠ reviewed. The probe skipped naming, API, and scope decisions on purpose; the plan surfaces them first. |
 | "One commit is easier to undo than a stash" | A stash with a recorded ref is exactly as recoverable and never entangles trunk or the branch. |
 | "I'll commit on a scratch branch, that doesn't count" | It counts. Scratch branches leak into PRs and get merged. Stash. |
 
@@ -70,12 +79,30 @@ to commit to it. All of these mean: stash and write the plan.
 
 ## `$ARGUMENTS` contract
 
-If `$ARGUMENTS` is empty, ask what to spike into before touching
-anything. Non-flag text is the spike goal.
+Non-flag text is the probe goal. Resolve the goal by this ladder:
+
+1. **Typed goal wins.** Non-flag `$ARGUMENTS` text is the goal,
+   verbatim. Conversation context may enrich it (file paths, error
+   messages already discussed) but never overrides it.
+2. **Empty → mine the conversation.** Candidate goals are review
+   findings just presented, a failing test under discussion, a pasted
+   stack trace, or a suggestion the user agreed with.
+   - Exactly one strong candidate: adopt it and proceed to Phase 1 —
+     the brief there is the confirmation gate.
+   - Several candidates: `AskUserQuestion` (multi-select), one option
+     per candidate plus "all of them".
+   - None: ask what to probe before touching anything.
+3. **Record provenance.** The Phase 1 brief states where the goal
+   came from — typed, or inferred from which part of the
+   conversation.
+
+When the inferred goal is a set of review findings, note the boundary
+in the brief: a probe explores fixes with zero commits; landing fixes
+commit-by-commit is `/review:address`.
 
 | Flag | Default | Effect |
 |---|---|---|
-| `--branch=<name>` | off | Run the spike on a new scratch branch from the current HEAD instead of the current branch's tree. Still zero commits; the branch only isolates the working tree. |
+| `--branch=<name>` | off | Run the probe on a new scratch branch from the current HEAD instead of the current branch's tree. Still zero commits; the branch only isolates the working tree. |
 | `--keep-tree` | off | Skip the stash at spike exit; leave changes in the working tree for the user to inspect. The plan is still produced. |
 | `--replay` | off | After the plan is approved, immediately implement it: apply the stash, land plan items one commit at a time, each behind a green gate. |
 
@@ -89,10 +116,10 @@ Before writing any code:
    `test`, `build`) and the CI-coverage split per
    `${CLAUDE_PLUGIN_ROOT}/references/verification-gates.md`.
 3. Record the working tree state. A dirty tree halts here: ask the
-   user whether to stash their work first, spike on top of it, or
-   abort — never mix the spike with uncommitted user work silently.
+   user whether to stash their work first, probe on top of it, or
+   abort — never mix the probe with uncommitted user work silently.
 4. Locate the code the goal touches (existing modules, tests,
-   fixtures) — enough to blitz in the project's idiom, no more.
+   fixtures) — enough to work in the project's idiom, no more.
 
 ## Phase 1: Orchestration plan
 
@@ -101,9 +128,10 @@ Cursor / Codex / Gemini: `/plan` or `Shift+Tab`) and present a
 **short** spike brief — the full brief format is defined right here;
 no external convention document is required:
 
-1. The goal, restated in one line.
+1. The goal, restated in one line, with its provenance (typed, or
+   inferred from what).
 2. What "proven" means — the demo command or smoke check that ends
-   the blitz.
+   the probe.
 3. Files expected to change; scratch branch name if `--branch`.
 4. Discovered gate commands (per bucket: command or `unset`) and the
    local-vs-CI split.
@@ -112,9 +140,9 @@ no external convention document is required:
 Wait for approval, then exit plan mode. If plan mode is unavailable,
 present the same brief inline and proceed on confirmation. In a
 non-interactive run (CI, subagent), record the brief in the report
-and proceed. Keep this to seconds, not minutes — it is a blitz.
+and proceed. Keep this to seconds, not minutes — it is a probe.
 
-## Phase 2: The blitz
+## Phase 2: The probe
 
 Code the shortest path to "proven". During this phase:
 
@@ -124,7 +152,7 @@ Code the shortest path to "proven". During this phase:
   iterating.
 - Mark shortcuts as you take them (a `SPIKE:` comment on hardcoded
   values, skipped edge cases, undecided semantics). These become plan
-  items, not debt to fix during the blitz.
+  items, not debt to fix during the probe.
 - Stay inside the goal. Adjacent problems you notice go in the plan's
   "observed, not addressed" list.
 
