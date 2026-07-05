@@ -1,0 +1,9 @@
+{
+  "name": "spike",
+  "description": "Prove a path fast in a no-commit spike/blitz, exit through the project's quality gates into a stash, and hand back a neat commit-by-commit implementation plan",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}
