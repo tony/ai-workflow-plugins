@@ -73,6 +73,9 @@ Only `in-branch` findings proceed to fixes by default. `pre-existing`
 and `disputed` findings go in the report with a recommendation, and the
 plan's `AskUserQuestion` panel offers per-finding choices: fix at
 branch tip anyway (explicit opt-in), file a follow-up, or leave it.
+A `mixed` finding is split at the same boundary: the part this branch
+introduced proceeds as `in-branch`; the pre-existing remainder follows
+the `pre-existing` path, and the plan names both halves.
 
 | Rationalization | Reality |
 |---|---|
@@ -107,6 +110,7 @@ Non-flag text is treated as the findings list.
 | `in-branch`, legitimate | Address in the **simplest way possible** — pragmatic beats thorough; minimal diff; a regression test only when the finding is a behavioral bug. |
 | Code-comment / docstring findings, even low-severity | Address; maximum concision — **the fewer lines the better**. Rewrites shrink comments, never grow them. |
 | Typos (code, comments, docs) | Fix. Trivial and causal commit is in-branch and unpushed → offer `fixup!` + autosquash. Anything else → forward commit, or prompt (see below). A typo fix that shares a commit with a non-typo finding takes the **forward-commit** shape — fixup defaults apply only to pure typo-class commits. |
+| `mixed` | Split: fix the in-branch portion; the pre-existing remainder follows the `pre-existing` row. |
 | `pre-existing` | Do not fix by default. Report + per-finding decision panel. |
 | `disputed` / factually wrong | Do not fix to appease. Report with the evidence and a suggested reviewer reply. |
 | Style opinions contradicting project conventions | The project's AGENTS.md / CLAUDE.md wins; report the conflict rather than churning code. |
