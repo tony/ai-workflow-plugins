@@ -1,14 +1,16 @@
 # Verification-Gate & CI Discovery
 
 > **Lockstep note**: this file is identical to
-> `plugins/spike/references/verification-gates.md`. When you change
-> discovery behavior in one copy, mirror the change in the other in the
-> same PR. It extends the four-bucket algorithm shared by `/pr:deslop`
-> and `/slop:scan` (`plugins/pr/references/quality-gates.md`) with a
-> `build` bucket and a CI-coverage pass.
+> `plugins/spike/references/verification-gates.md` and
+> `plugins/action/references/verification-gates.md`. When you change
+> discovery behavior in one copy, mirror the change in the others in
+> the same PR. It extends the four-bucket algorithm shared by
+> `/pr:deslop` and `/slop:scan`
+> (`plugins/pr/references/quality-gates.md`) with a `build` bucket and
+> a CI-coverage pass.
 
-How `/spike:probe`, `/spike:bakeoff`, and `/review:address` learn, at
-runtime, which
+How `/spike:probe`, `/spike:bakeoff`, `/review:address`,
+`/action:worktree`, and `/action:worktrees` learn, at runtime, which
 verification the project expects — and how much of it to run locally
 versus observe in CI after pushing. Language-agnostic, never hardcoded.
 

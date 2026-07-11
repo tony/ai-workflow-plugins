@@ -176,6 +176,19 @@
       "category": "development",
       "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/review",
       "license": "MIT"
+    },
+    {
+      "name": "action",
+      "description": "Take tickets to branches in isolated git worktrees — resolve Linear/GitHub issues strictly read-only, name branches by the team's own conventions, land gated commits, and fan out multiple tickets in parallel",
+      "version": "0.0.1",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/action",
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/action",
+      "license": "MIT"
     }
   ]
 }
