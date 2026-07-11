@@ -163,25 +163,29 @@ Start point: the remote trunk head — `git fetch origin`, then
 `origin/<trunk>` — falling back to the local trunk, then `HEAD`; the
 plan states which.
 
-Resolve **idempotently**, first match wins:
+Resolve **idempotently**, first match wins — collision checks come
+before any attach or create:
 
-1. **Branch exists and is checked out in a worktree** — reuse it:
-   `git worktree list --porcelain` gives the path. Resume there and
-   report "resumed", not "created".
-2. **Branch exists, no worktree** — attach one:
+1. **Branch already checked out in a worktree** —
+   `git worktree list --porcelain` names its path (which may differ
+   from the computed target; honor the existing one). **Resume**:
+   inspect its state (`git -C <path> status --short`, commits ahead
+   of the start point) and continue from the first incomplete phase —
+   uncommitted changes → resume Phase 4; green commits present →
+   continue to Phase 6; primer only → start Phase 4 (or report no-op
+   under `--setup-only`). Report "resumed", not "created".
+2. **Directory collision** — the computed path exists on disk but is
+   *not* a worktree of this branch (unregistered directory, or
+   registered to a different branch) — halt with `AskUserQuestion`:
+   pick another path, let the user clear it, or abort. Never delete
+   or overwrite a directory this command did not create.
+3. **Branch exists, no worktree** — attach one:
 
 ```
 git worktree add <path> <branch>
 ```
 
-3. **Path exists and is the expected worktree** (listed in
-   `git worktree list` for this repo, on the expected branch) —
-   resume there.
-4. **Path exists and is anything else** — halt with
-   `AskUserQuestion`: pick another path, let the user clear it, or
-   abort. Never delete or overwrite a directory this command did not
-   create.
-5. **Neither exists** — create both:
+4. **Fresh** — create both:
 
 ```
 git worktree add -b <branch> <path> <start-point>
