@@ -9,7 +9,7 @@ description: >-
   and groups tickets strictly read-only, confirms the grouping at a
   plan gate, then drives each unit through /action:worktree's
   procedure — one subagent per worktree where the host supports it,
-  sequential otherwise. Mutates the repo — invoke explicitly.
+  sequential otherwise.
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<ticket>...] [--groups=\"a b; c\"] [--sequential] [--local|--temp] [--push|--pr|--setup-only]"
 ---
@@ -43,7 +43,9 @@ Three disciplines:
 1. **Delegate, don't duplicate.** The per-unit procedure lives in
    `${CLAUDE_PLUGIN_ROOT}/commands/worktree.md` and the shared
    references — this file never paraphrases it. If the two files ever
-   disagree, `worktree.md` wins.
+   disagree, `worktree.md` wins; if `worktree.md` cannot be read at
+   runtime, stop and say so — never reconstruct its procedure from
+   memory.
 2. **Group by evidence, confirm at the gate.** Default 1:1
    ticket-to-branch; propose a group only when tickets clearly
    overlap; every grouping is confirmed at the plan gate.
@@ -92,7 +94,8 @@ that needs different axes.
 
 ## Phase 0: Situational awareness
 
-As `/action:worktree` Phase 0 — conventions files, the five gate
+As `/action:worktree` Phase 0 (Situational awareness) — conventions
+files, the five gate
 buckets and CI split per
 `${CLAUDE_PLUGIN_ROOT}/references/verification-gates.md`, ticket
 tooling inventory, trunk and remote detection — plus plural-specific
@@ -166,8 +169,8 @@ present:
    loop; implement → gates → commit → exit per unit.
 
 Wait for approval, then exit plan mode. This gate also stands in for
-each unit's own plan gate (`/action:worktree` Phase 2): units run
-non-interactively and must not re-prompt. If plan mode is
+each unit's own plan gate (`/action:worktree` Phase 2, Orchestration
+plan): units run non-interactively and must not re-prompt. If plan mode is
 unavailable, present the plan inline and proceed on confirmation. In
 a non-interactive run, record the plan in the report and proceed
 with **1:1 grouping only** — never apply inferred groups without a
@@ -192,9 +195,9 @@ human at the gate.
    `git fetch`, `git stash`, or `git worktree` subcommands; never
    touch paths outside your worktree.*
 3. **Contain failures.** A unit that cannot reach green exits with a
-   failure note (`/action:worktree` Phase 5 red path): it never
-   blocks other units, and its worktree stays in place for
-   inspection.
+   failure note (`/action:worktree` Phase 5, Gates & commit — red
+   path): it never blocks other units, and its worktree stays in
+   place for inspection.
 4. **Serialize the exit axis.** Remote operations are excluded from
    subagent scope: after the units report, run each green unit's
    `/action:worktree` Phase 6 (Exit axis — push, PR) one unit at a

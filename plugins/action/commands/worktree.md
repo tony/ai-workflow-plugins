@@ -9,8 +9,7 @@ description: >-
   the ticket strictly read-only (never assigns, comments, or
   transitions), names the branch by the team's own conventions,
   implements through the project's discovered quality gates, and never
-  pushes or opens a PR unless the flags say so. Mutates the repo —
-  invoke explicitly.
+  pushes or opens a PR unless the flags say so.
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<ticket>...] [--branch=<name>] [--local|--temp] [--push|--pr|--setup-only]"
 ---
@@ -32,6 +31,11 @@ worktrees and branches, modifies files, and creates commits, so it
 must be user-explicit, not router-inferred. To land review findings
 on the *current* branch, use `/review:address`; this command starts
 ticket work on a *new* branch.
+
+`/action:worktrees` delegates to this file's phases by name and
+number. When renaming, renumbering, or reordering phases here, update
+that file's references in the same change; on any disagreement
+between the two files, this one wins.
 
 ## Core thesis
 
@@ -59,12 +63,13 @@ Three disciplines:
 TICKETS ARE READ-ONLY
 ```
 
-The full invariant — forbidden operations and the zero-blowback
-rationale — lives in
+Neither resolution nor any later phase writes to a ticket — no
+assign, no comment, no state transition, no label, no estimate, no
+`gh issue develop`; every tracker operation is a read. Linking rides
+on names, server-side, so an abandoned branch unwinds with nothing to
+undo. The full forbidden-operations list and rationale:
 `${CLAUDE_PLUGIN_ROOT}/references/ticket-detection.md` § The
-read-only invariant. Short form: no assign, no comment, no state
-transition, no `gh issue develop`. Linking rides on names,
-server-side, so an abandoned branch unwinds with nothing to undo.
+read-only invariant.
 
 | Rationalization | Reality |
 |---|---|
@@ -89,16 +94,19 @@ rather than invent.
 | Flag | Default | Effect |
 |---|---|---|
 | `--branch=<name>` | off | Use this branch name verbatim (rung 1 of the precedence ladder). |
-| `--local` | **on** | Placement: visible sibling worktree at `{repo_path}-{sanitized_branch}/`. |
+| `--local` | **on** | Placement: visible sibling worktree at `{repo_path}-{sanitized_branch}/` — the branch name with `/` flattened to `-` in the directory name only. |
 | `--temp` | off | Placement: the host's native temp-worktree mechanism when one exists, else a temp root outside the repo. |
 | `--push` | off | Exit: after the gated commit(s), push the branch to the remote. |
-| `--pr` | off | Exit: push, then open a PR whose title/body link the tickets. Implies `--push`. |
+| `--pr` | off | Exit: push, then open a PR whose title/body link the tickets. Implies `--push` — the pair together is redundant but legal. |
 | `--setup-only` | off | Exit: stop after worktree + branch + the ticket primer — no implementation. |
 
 Two axes: placement is `--local` xor `--temp`; exit escalates
-(commit only → `--push` → `--pr`), and `--setup-only` short-circuits
-the exit axis entirely. Path derivations for both placements are in
-ticket-detection.md § Worktree placement & path sanitization.
+(commit only → `--push` → `--pr`). `--setup-only` short-circuits the
+exit axis — combining it with `--push` or `--pr` is a contradiction:
+ask, don't pick. Full path derivations for both placements are in
+ticket-detection.md § Worktree placement & path sanitization; when
+that reference cannot be read at runtime, derive from the summaries
+in this file and name the gap in the report.
 
 ## Phase 0: Situational awareness
 
@@ -143,7 +151,10 @@ present:
 2. The branch name and the ladder rung that produced it, naming any
    observed-norms adjustment; the theme slug, for confirmation, when
    multi-ticket.
-3. The worktree path, placement axis, and start point (Phase 3).
+3. The worktree path, placement axis, start point, and the
+   idempotency prediction — fresh / resume / attach / collision —
+   probed read-only (`git worktree list --porcelain`, branch
+   existence) ahead of Phase 3.
 4. The implementation shape: acceptance criteria restated as the
    definition of done, files expected to change, planned commit
    subject(s) in the project's format.
