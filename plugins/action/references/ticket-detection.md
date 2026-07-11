@@ -57,10 +57,23 @@ guessed one.
 
 ## Ticket systems
 
+| System | ID pattern | Examples | Disambiguation |
+|---|---|---|---|
+| Linear | `[A-Z][A-Z0-9]*-\d+` | `TEA-123`, `OPS2-7` | Linear MCP tools present, or a linear.app URL |
+| GitHub | `#\d+`, issue URL | `#482` | `gh` CLI + GitHub remote |
+| Jira | `[A-Z][A-Z0-9]*-\d+` | `PROJ-42` | Jira CLI/MCP present, or an atlassian.net URL |
+| GitLab | `#\d+`, `!\d+`, issue URL | `#17` | GitLab remote |
+| Other | whatever the tool exposes | — | generic fallback below |
+
+Linear and Jira share the `KEY-123` shape. When both integrations
+are present and the prompt gives no URL, try the Linear MCP lookup
+first (cheaper, structured); if the ID is unknown there, try the
+other system; if both claim it, ask.
+
 ### Linear (first-class)
 
-- **ID pattern**: `[A-Z]+-\d+` (e.g. `TEA-123`). Match
-  case-insensitively in prompts; display uppercased.
+- **ID pattern**: per the table above. Match case-insensitively in
+  prompts; display uppercased.
 - **Fetch**: the Linear MCP server's read tools, when available —
   pull title, description, acceptance criteria, and the issue's
   `gitBranchName` field.
@@ -99,6 +112,16 @@ gh issue view <num> --json number,title,body,labels,url
   …), read-only subcommands only. When none exists, ask the user to
   paste the ticket body rather than skipping context.
 - **Branch name**: generic kebab slug — `<id-lowercased>-<kebab-title>`.
+
+### Kebab-slug algorithm
+
+Wherever a `<kebab-title-slug>` is called for:
+
+1. Lowercase the title.
+2. Replace every non-alphanumeric run with a single `-`.
+3. Trim leading/trailing `-`.
+4. Truncate at a word boundary to keep the whole branch name ≤ 60
+   characters.
 
 ## Branch-name precedence ladder
 
