@@ -1,8 +1,8 @@
 # Verification-Gate & CI Discovery
 
 > **Lockstep note**: this file is identical to
-> `plugins/review/references/verification-gates.md` and
-> `plugins/action/references/verification-gates.md`. When you change
+> `plugins/spike/references/verification-gates.md` and
+> `plugins/review/references/verification-gates.md`. When you change
 > discovery behavior in one copy, mirror the change in the others in
 > the same PR. It extends the four-bucket algorithm shared by
 > `/pr:deslop` and `/slop:scan`
