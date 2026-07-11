@@ -1,11 +1,10 @@
 # Ticket Detection, Branch Naming & Worktree Placement
 
 How `/action:worktree` and `/action:worktrees` resolve tickets into
-branch names and worktree paths at runtime. Shared by both commands —
-via `${CLAUDE_PLUGIN_ROOT}/references/ticket-detection.md` — so the
-singular and plural procedures cannot drift. Language-agnostic and
-tracker-agnostic: Linear and GitHub are first-class, everything else
-degrades gracefully.
+branch names and worktree paths at runtime. Shared by both commands
+so the singular and plural procedures cannot drift. Language-agnostic
+and tracker-agnostic: Linear and GitHub are first-class, everything
+else degrades gracefully.
 
 ## The read-only invariant (zero ticket write-back)
 
