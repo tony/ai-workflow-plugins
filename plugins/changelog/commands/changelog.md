@@ -12,6 +12,52 @@ Additional context from user: $ARGUMENTS
 
 ---
 
+## Core Constraint: A Branch Is Not a Release
+
+**This command documents changes; it does not ship them.** Every run is
+release-agnostic unless the user explicitly says otherwise (see *The one
+exception* below). Regardless of what the branch is named, what the commits
+contain, or how release-shaped the work looks:
+
+- **Never create, rename, or date a version heading** (`## v1.53.0`,
+  `## [1.2.3] - YYYY-MM-DD`). Entries land in the **unreleased** section.
+- **Never state or predict which version the changes will land in** — not in
+  entry text, not in headings, not in the commit message, not in the summary
+  shown to the user. The next version isn't knowable from a branch: other work
+  may land first, the size of the bump depends on what else ships, and the
+  maintainer decides when to cut.
+- **Never derive a version from the commits.** A breaking change in the diff
+  does not make this `2.0.0`; a `feat` does not make it a minor bump. Do not
+  reason about SemVer at all.
+- **Never edit version files** (`pyproject.toml`, `package.json`, `Cargo.toml`,
+  `__about__.py`, `version.*`, …), create tags, or convert an existing
+  `Unreleased` / placeholder heading into a version heading.
+
+If the changelog has no unreleased section, ask the user what to call it —
+mirroring the project's own convention — and create *that*, never a version
+heading.
+
+### The one exception
+
+Cut or prepare a release **only** when the user explicitly asks for one and the
+version is settled — e.g. "cut v1.53.0", "prepare the 2.0 release", "this
+branch is the release branch for 0.9.4, date the heading".
+
+These are **not** explicit requests, and none of them authorize touching a
+version heading:
+
+- A branch named `release/1.2`, `rc-3`, or `v2`.
+- A milestone, label, or PR title mentioning a version.
+- A version bump already present in the branch's diff.
+- A commit message that references an upcoming release.
+
+If the ask is ambiguous ("update the changelog for the release"), **ask which
+version and confirm the intent** before touching any heading. When in doubt,
+stay in the unreleased section: the cost of asking is one question; the cost of
+guessing is a changelog that promises a release that never shipped.
+
+---
+
 ## Phase 1: Gather Context
 
 **Goal**: Collect all information needed to generate changelog entries.
@@ -54,7 +100,7 @@ Additional context from user: $ARGUMENTS
 6. **Analyze the changelog format** — this is the homogeneity step; the existing file is the source of truth for shape:
    - **Heading format**: Detect the pattern used for release headings (e.g., `## v1.2.3`, `## [1.2.3]`, `## project v1.2.3`, `## 1.2.3 (YYYY-MM-DD)`)
    - **Unreleased section**: Look for an "unreleased" heading or a placeholder comment (e.g., `<!-- END PLACEHOLDER`, `## [Unreleased]`, `## Unreleased`)
-   - **Insertion point**: Determine where new entries go — after a placeholder comment, under an unreleased heading, or at the top of the file
+   - **Insertion point**: Determine where new entries go — after a placeholder comment, under an unreleased heading, or at the top of the file. It is **never** a versioned release heading. If the topmost heading is a released version, the entries go *above* it, in an unreleased block (create one by asking the user for the project's preferred wording — see *Core Constraint*).
    - **Section headings, order, and capitalization**: Look at the most recent populated release. Record the exact section names (`Features` vs. `What's new`, `Bug fixes` vs. `Bug Fixes`), their sequence, and any sections the project uses that aren't in the default list. Mirror this exactly when generating new entries.
    - **Entry shape and proportionality**: Note whether the project uses plain bullets, `####` sub-section headings, paragraph-per-entry, etc., and the typical entry length. Match it.
 
@@ -197,6 +243,7 @@ These patterns belong in autodoc, source, and the linked PR — never in CHANGES
 - **Implementation flags or constants** — `_TIMEOUT_GRACE_SECONDS`, internal env vars, feature toggles invisible to consumers.
 - **Numeric tallies** — file counts, line counts, test counts, commit counts ("across N commits", "in N changes", "adds N tests"). Brittle, and duplicate the diff.
 - **Git refs** — SHAs, commit hashes, branch names, tag names, line numbers. Break when history is rebased or tags move.
+- **Version predictions** — "new in v1.53", "landing in 2.0", "as of the next release", "since 1.4". The entry sits in the unreleased section; the version is assigned when the maintainer cuts the release, not when the entry is written. This holds even when the branch looks release-shaped (see *Core Constraint*). Exception: referring to a version that has **already shipped** is fine (e.g., "restores the behaviour removed in 1.2").
 - **Non-user-visible work** — refactors that don't change behaviour, type-only annotations, internal renames, lint cleanups, CI tweaks, test-infra changes, dev-tooling bumps. The diff and commit log are the right home.
 - **Phantom fixes** — `### Fixes` entries (or "no longer raises / fails / errors / crashes" phrasings) for behavior that did not exist in any published release. Apply the Published-Release Test (`AGENTS.md` § *The Published-Release Test*): did users of the most recently published release ever experience this bug? If no, the entry belongs in the design-description paragraph of the feature that introduced the contract, not under `### Fixes`.
 - **Section-heading repetition.** Don't repeat the section heading in the entry text.
@@ -265,7 +312,13 @@ Changelog entries describe the **net shipped result** of the branch, not its int
    ```
    Insert after: <identified insertion point from Phase 1>
    Before: <next section or release heading>
+   Target: unreleased section — no version assigned, no release cut
    ```
+
+   The `Target` line is not decorative: it is the user's chance to catch a run
+   that has drifted toward cutting a release. If it says anything other than
+   the unreleased section, the user explicitly asked for a release (see *The one
+   exception*) — otherwise stop and re-read the *Core Constraint*.
 
 4. **Ask the user**: "Insert these entries into <changelog-file>? You can also ask me to modify them first."
 
@@ -283,15 +336,20 @@ Changelog entries describe the **net shipped result** of the branch, not its int
 
 1. **Find the insertion point** identified in Phase 1
 
-2. **Check for existing unreleased section headings**:
+2. **Leave every release heading untouched.** Do not add, rename, date, or
+   uncomment a version heading; do not move entries under one; do not edit
+   version files. The edit is confined to the unreleased block. (Unless the user
+   explicitly asked to cut a release — see *The one exception*.)
+
+3. **Check for existing unreleased section headings**:
    - If the changelog already has a matching section heading in the unreleased block, **append** to the existing section rather than creating a duplicate heading
    - If the section doesn't exist yet, insert the full section with heading
 
-3. **Insert the entries**:
+4. **Insert the entries**:
    - Use the Edit tool to insert at the identified insertion point
    - Ensure consistent blank line spacing matching the existing file style
 
-4. **Show the result**:
+5. **Show the result**:
    - After editing, read the modified region of the changelog file and display it so the user can verify
    - Note: this command does NOT commit — the user decides when to stage and commit the changelog update
 
@@ -309,7 +367,7 @@ When the user asks to commit the CHANGES update, the commit message follows a ti
    - Specific technical changes made
    ```
 
-   with 72-character body wrapping. Use the project's `type` for docs edits (typically `docs`), the project's component-detail style (e.g., `docs(CHANGES)`), and the project's body structure. The body should say *why* the changelog was updated (e.g., "Document help-on-empty CLI and sync --all flag for v1.53") and *what* it adds (a bulleted recap of the new sections), wrapped to the prescribed width.
+   with 72-character body wrapping. Use the project's `type` for docs edits (typically `docs`), the project's component-detail style (e.g., `docs(CHANGES)`), and the project's body structure. The body should say *why* the changelog was updated (e.g., "Document help-on-empty CLI and sync --all flag") and *what* it adds (a bulleted recap of the new sections), wrapped to the prescribed width.
 
 2. **Fallback when no convention is documented.** Use `docs(CHANGES) <description>` as the subject with no body.
 
@@ -319,7 +377,10 @@ When the user asks to commit the CHANGES update, the commit message follows a ti
    - **The subject describes *what the changelog covers*, not that a changelog was added.**
      - **Good**: `docs(CHANGES) Help-on-empty CLI and sync --all flag`
      - **Bad**: `docs(CHANGES) Add changelog entry for help-on-empty CLI`
-   - **No version sub-component.** Avoid `docs(CHANGES[v1.53.x]) ...` — the target release version isn't known at commit time.
+   - **No version anywhere in the message.** Not as a sub-component
+     (`docs(CHANGES[v1.53.x]) ...`), not in the subject, not in the body
+     ("...for the 1.53 release"). The target version isn't known at commit
+     time, and a documenting commit doesn't decide it. See *Core Constraint*.
 
 ### Edge case: merging with existing entries
 

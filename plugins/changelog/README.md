@@ -30,6 +30,17 @@ Install the plugin:
 4. **Present for review** — Show proposed entries and insertion point, wait for user approval
 5. **Insert** — Apply approved entries to the changelog file
 
+## A Branch Is Not a Release
+
+Entries always land in the unreleased section. The command will not create or date
+a version heading, guess which version the work ships in, reason about SemVer from
+the commits, edit version files, or create tags — a release-shaped branch name,
+milestone, or version bump in the diff changes none of this.
+
+Cutting a release is a separate, explicit act: the command does it only when you ask
+for it and name the version ("cut v1.53.0", "this is the release branch for 0.9.4").
+Ambiguous asks get a clarifying question, not a guess.
+
 ## Supported Changelog Formats
 
 The command auto-detects the changelog format from the existing file:
