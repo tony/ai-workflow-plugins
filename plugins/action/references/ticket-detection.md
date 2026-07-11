@@ -132,6 +132,16 @@ git log --merges --oneline -50
 5. **Kebab-slug fallback** — a kebab slug of the goal, when no
    ticket, no convention, and no norms exist.
 
+Whatever rung wins, validate the name before deriving paths from it:
+
+```
+git check-ref-format --branch <name>
+```
+
+An invalid name from a slugged title (illegal characters, trailing
+dot, `..`) is re-slugged and re-validated; an invalid explicit name
+(rung 1) is a question back to the user, never a silent rewrite.
+
 **Multi-ticket (crosscutting) branches** skip rung 3: no single
 ticket's name should claim a branch that carries several. Propose a
 **theme slug** instead (e.g. `auth-error-handling` for three auth
@@ -160,18 +170,24 @@ Two placements — the placement axis:
   `feat/tea-123-login`.
 
 - **`--temp`** — the host's native temp-worktree mechanism when one
-  exists (e.g. Claude Code's worktree isolation for subagents);
-  otherwise a temp root outside the repo:
+  exists (e.g. Claude Code's worktree isolation for subagents) —
+  **but only if it can put the work on the computed branch name**.
+  Branch naming is load-bearing (it is how Linear auto-attaches); a
+  mechanism that cannot honor it is disqualified. Otherwise a temp
+  root outside the repo:
 
 ```
 ${TMPDIR:-/tmp}/action-worktrees/<repo-name>/<sanitized-branch>/
 ```
 
-  Same sanitization rule for `<sanitized-branch>`.
+  Same sanitization rule for `<sanitized-branch>`. The path is
+  deterministic, so `--temp` re-runs land on the same worktree and
+  resume per the idempotency ladder.
 
-Branch names are already git-valid (`git check-ref-format` enforced
-that at creation), so `/` is the only character that needs
-flattening — do not otherwise rewrite the name.
+Branch names are git-valid before they reach this section
+(`git check-ref-format` runs at the end of the precedence ladder), so
+`/` is the only character that needs flattening — do not otherwise
+rewrite the name.
 
 ## Server-side linking (how zero write-back still links)
 
