@@ -105,6 +105,9 @@ checks:
    verify.
 3. Detect subagent support (Task tool or host equivalent); without
    it, plan for sequential main-loop execution.
+4. More than 4 units → flag the fan-out size for explicit
+   confirmation at the plan gate; a dozen worktrees is rarely what
+   anyone wants.
 
 ## Phase 1: Ticket discovery
 
@@ -166,7 +169,9 @@ Wait for approval, then exit plan mode. This gate also stands in for
 each unit's own plan gate (`/action:worktree` Phase 2): units run
 non-interactively and must not re-prompt. If plan mode is
 unavailable, present the plan inline and proceed on confirmation. In
-a non-interactive run, record the plan in the report and proceed.
+a non-interactive run, record the plan in the report and proceed
+with **1:1 grouping only** — never apply inferred groups without a
+human at the gate.
 
 ## Phase 4: Fan-out
 
@@ -179,15 +184,23 @@ a non-interactive run, record the plan in the report and proceed.
    subagent (Task) where supported, the main loop otherwise — the
    unit's parameters (tickets and primer content, branch, worktree
    path, exit axis, resolved gate commands) plus the per-unit
-   procedure: `/action:worktree` Phases 4–6 (Implement; Gates &
-   commit; Exit axis) and its Iron Rule, read from
+   procedure: `/action:worktree` Phases 4–5 (Implement; Gates &
+   commit) and its Iron Rule, read from
    `${CLAUDE_PLUGIN_ROOT}/commands/worktree.md` and quoted to the
-   executor — not paraphrased from memory.
+   executor — not paraphrased from memory — with this standing
+   instruction: *work inside your assigned worktree only; never run
+   `git fetch`, `git stash`, or `git worktree` subcommands; never
+   touch paths outside your worktree.*
 3. **Contain failures.** A unit that cannot reach green exits with a
    failure note (`/action:worktree` Phase 5 red path): it never
    blocks other units, and its worktree stays in place for
    inspection.
-4. **Serialize teardown decisions.** No worktree is removed in this
+4. **Serialize the exit axis.** Remote operations are excluded from
+   subagent scope: after the units report, run each green unit's
+   `/action:worktree` Phase 6 (Exit axis — push, PR) one unit at a
+   time in the main loop. In sequential degradation, Phase 6 folds
+   into each unit's turn instead — nothing is concurrent there.
+5. **Serialize teardown decisions.** No worktree is removed in this
    phase; removal is offered in the closing panel and executed in
    the main loop.
 
