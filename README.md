@@ -26,6 +26,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [spike](plugins/spike/) | Development | Prove a path fast in a no-commit spike — a single probe or a bakeoff of competing strategies in git worktrees — exit through the project's quality gates into stashes, and hand back a commit-by-commit implementation plan |
 | [review](plugins/review/) | Development | Address code-review findings on the current branch — provenance-gated to changes the branch introduced, one finding per commit, simplest pragmatic fix, with quality gates before every commit and prompted history rewrites |
 | [action](plugins/action/) | Development | Take tickets to branches in isolated git worktrees — resolve Linear/GitHub issues strictly read-only, name branches by the team's own conventions, land gated commits, and fan out multiple tickets in parallel |
+| [lean](plugins/lean/) | Development | Write tight, slop-free prose and code, and tighten existing files in place with no commits — a model-invocable writing discipline plus a working-tree cleanup command |
 
 ## Installation
 
