@@ -162,6 +162,11 @@ patterns:
   robust, seamless, production-ready, leverage, delve, tapestry,* and
   *best practices* with concrete descriptions of behavior,
   constraints, or trade-offs.
+- **Coded Labels:** Write rules, options, and findings as plain
+  imperatives. Don't tag them with codes like `[R1]`, `A1`, or
+  `Option B` in artifacts a human reads — the reader shouldn't have to
+  decode an index. Internal agent bookkeeping may use ids; shipped text
+  may not.
 
 ### Preservation & Context
 
@@ -214,6 +219,29 @@ to identify which commits this branch actually introduced. Then:
 - **Scope guard:** If cleaning prior slop would touch a colleague's
   work or expand the branch beyond its stated goal, stay in lane:
   protect the current goal and leave prior slop alone.
+
+### Change Discipline
+
+- Make the smallest coherent change that solves the verified problem;
+  keep unrelated cleanup out of it.
+- Reuse an existing file, component, helper, API, or test before adding
+  a new one. Modify in place when the change fits the file's
+  responsibility.
+- Keep new APIs private until a caller outside the module needs them.
+- Add a file only for a durable boundary — a distinct responsibility,
+  independent reuse, or splitting an oversized high-touch module — not
+  for a single-use helper or a one-line re-export.
+
+### Keep Instructions Lean
+
+Treat this file like code and prune it.
+
+- Delete a line whose removal would not cause a mistake.
+- Move multi-step procedures into skills, path-specific rules into
+  nested AGENTS.md files, and hard limits into hooks or CI.
+- Keep only non-obvious, broadly applicable defaults here. Anything a
+  reader can infer from the code, a manifest, or a linter does not
+  belong.
 
 ## Plugin Quality Standards
 
@@ -351,7 +379,7 @@ Each component type has specific frontmatter requirements:
 Plugins in this repository are designed to work with **any** programming language or
 framework. Commands discover project-specific tooling by reading AGENTS.md / CLAUDE.md
 at runtime rather than assuming a particular ecosystem. When listing examples of tools
-or frameworks, present them as illustrative examples (e.g., in tables or lists), never
+or frameworks, present them as illustrative examples (e.g., in lists or short prose), never
 as hardcoded instructions.
 
 ### Orchestration Plan Convention
@@ -387,8 +415,12 @@ pattern, extract the template into a portable reference file.
    composing a follow-up command. Skip the panel only when the command
    is already running inside plan mode.
 
-### Accessible Code Blocks
+### Accessible Formatting
 
+- **Prefer prose and nested sections over tables** — reach for a table
+  only when the data is genuinely matrix-shaped and stable. Repeated
+  semantic headings (e.g., "Use when / Avoid when / Tradeoff") diff,
+  wrap, and edit more cleanly than a table.
 - **One command per code block** — never combine multiple commands in a single
   fenced block; use separate blocks with explanatory text between them
 - **No comments inside code blocks** — explanatory text goes outside as

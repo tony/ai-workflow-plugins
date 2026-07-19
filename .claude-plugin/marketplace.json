@@ -189,6 +189,19 @@
       "category": "development",
       "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/action",
       "license": "MIT"
+    },
+    {
+      "name": "lean",
+      "description": "Write tight, slop-free prose and code, and tighten existing files in place with no commits — a model-invocable writing discipline plus a working-tree cleanup command",
+      "version": "0.0.1",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/lean",
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/lean",
+      "license": "MIT"
     }
   ]
 }
