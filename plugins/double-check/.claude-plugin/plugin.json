@@ -1,0 +1,9 @@
+{
+  "name": "double-check",
+  "description": "Make verification requests return the re-derived answer instead of a diff against the agent's prior turn — an ambient skill for 'double check' / 'are you sure' moments plus an /align command to repair a chat where the diff already happened",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}
