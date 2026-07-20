@@ -63,3 +63,9 @@ Same shape the original request implied, as if answering for the
 first time. No "what changed" section, no verdict legend, no
 *as noted above*. A reader who never saw the first answer must lose
 nothing.
+
+When a narrow request ("are you sure about X?") scopes the answer to
+X, still append anything material you discovered while re-deriving —
+as a standalone fact about the subject ("the ADR also permits Y"),
+never as a correction of your prior answer. Scoping down the answer
+must not scope down what the user learns.
