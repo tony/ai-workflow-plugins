@@ -9,6 +9,7 @@ description: >-
   a standalone artifact; with an argument, re-anchors on a narrower
   question and drops the old scaffolding entirely.
 argument-hint: "[topic or question to re-anchor on]"
+allowed-tools: ["Read", "Grep", "Glob", "Bash"]
 ---
 
 # `/double-check:align`
