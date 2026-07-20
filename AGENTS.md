@@ -155,6 +155,14 @@ patterns:
   states, abandoned approaches, or "no longer" behavior unless users
   of a published release actually experienced the old state (**The
   Published-Release Test**).
+- **Revision-History Leakage:** When asked to double-check, verify,
+  or re-examine prior analysis, deliver the re-derived answer —
+  standalone, rebuilt from source, in the original request's shape.
+  Verdicts about your own prior claims (*overstated*, *still holds*)
+  are diff narration against a baseline the reader never adopted; put
+  confidence on the claim, not the revision. Exception: if the user
+  acted on a prior claim (committed, filed, sent), state that
+  correction explicitly, once.
 - **Low-Value Scaffolding:** Remove ownerless TODOs (`TODO: revisit`),
   unused future-proofing, debug artifacts, and defensive wrappers that
   do not protect a currently reachable failure mode.
