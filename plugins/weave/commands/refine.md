@@ -748,18 +748,28 @@ mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $NEXT_PASS)/outputs" "$SESSIO
 > **Weaknesses addressed**:
 > - <weakness 1 and how it was fixed>
 >
+> **Residual focus** — unresolved items from this pass:
+> - <residual item and what evidence would settle it>
+>
 > ---
 >
 > Critique this woven version further and produce an improved version. Use the same three-section format:
 >
 > ## Critique
-> What is strong? What is weak? What is missing? Be specific.
+> Address ONLY the residual-focus items plus any new defect the weave itself introduced. Do not re-litigate settled points. Be specific.
 >
 > ## Improved Version
 > Produce your complete improved version. This must be a full replacement.
 >
 > ## Rationale
 > Explain why you made each change.
+
+Fill the residual-focus block from `$SESSION_DIR/pass-NNNN/residuals.md`,
+extracted per `${CLAUDE_PLUGIN_ROOT}/references/ensemble-techniques.md`
+(Technique 2) from: critique points the woven version left unaddressed,
+runner-up strengths the weave could not reconcile, and any judge
+override or split judgment. If the ledger is empty, that satisfies
+early-stop Condition 2 (Step 5).
 
 Write this prompt to `$SESSION_DIR/pass-NEXT/prompt.md`.
 
