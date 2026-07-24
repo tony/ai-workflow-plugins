@@ -57,7 +57,8 @@ For each PR in order:
 1. **Readiness gate** — apply the gate from the reference. Failing
    CI, draft state, or `CHANGES_REQUESTED` halts the run with a
    report of what landed and what remains.
-2. **Bring up to date** — after any earlier merge, trunk has moved:
+2. **Bring up to date** — when the PR is `BEHIND` or `DIRTY`, or an
+   earlier merge in this run moved trunk:
    follow the reference's rebase procedure (for a stacked child,
    `git rebase --onto` the new trunk so the parent's merged commits
    drop out), resolve conflicts — asking on any conflict that forces
