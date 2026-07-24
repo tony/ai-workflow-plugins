@@ -1,7 +1,7 @@
 ---
 description: Rebase out the branch's earlier changelog commits and regenerate its entries fresh; commits only with --commit
 argument-hint: "[--commit] [optional additional context about the changes]"
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit"]
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 ---
 
 # Recut Changelog Entries

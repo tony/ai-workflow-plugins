@@ -1,7 +1,7 @@
 ---
 description: Rewrite an existing PR description from scratch against the branch's current net change, carrying forward context that still matters
 argument-hint: "[PR number or URL, and/or a template path or hint]"
-allowed-tools: ["Bash", "Read", "Write"]
+allowed-tools: ["Bash", "Read", "Write", "AskUserQuestion"]
 ---
 
 # Recut PR Description

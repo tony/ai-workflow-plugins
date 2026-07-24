@@ -1,7 +1,7 @@
 ---
 description: Update the branch's own changelog entries to match its current net change; commits only with --commit
 argument-hint: "[--commit] [optional additional context about the changes]"
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit"]
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 ---
 
 # Refresh Changelog Entries
