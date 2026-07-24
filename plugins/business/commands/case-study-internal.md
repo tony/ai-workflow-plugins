@@ -64,7 +64,8 @@ Anonymize individuals to roles. Team and repo names stay.
 ## Output
 
 Open with a one-line hero (`✓ Case study: <one-line outcome with
-tag>` or `⚠ Refused: <reason>`), then exactly these sections:
+tag>`, `✓ Evidence report: <supported claim, unknowns named>`, or
+`⚠ Refused: <reason>`), then exactly these sections:
 
 1. `## Run` — the run chosen and its pinned window.
 2. `## Gate` — the completeness result.

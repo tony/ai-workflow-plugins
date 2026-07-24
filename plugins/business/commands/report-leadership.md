@@ -72,8 +72,8 @@ Read the deferred references above, then write
 ## Output
 
 Open with a one-line hero (`✓ Leadership report: <committed figure
-with tag>` or `⚠ Refused: <what the gate found>`), then exactly
-these sections:
+with tag>`, `✓ Evidence report: <supported claim, unknowns named>`,
+or `⚠ Refused: <what the gate found>`), then exactly these sections:
 
 1. `## Run` — the run chosen and its pinned window.
 2. `## Gate` — the completeness result.

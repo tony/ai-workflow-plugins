@@ -69,7 +69,8 @@ Write `<run>/reports/pr-release.md`.
 
 ## Output
 
-Open with a one-line hero (`✓ PR release: <headline>` or
+Open with a one-line hero (`✓ PR release: <headline>`,
+`✓ Evidence report: <supported claim, unknowns named>`, or
 `⚠ Blocked: <reason>`), then exactly these sections:
 
 1. `## Run` — the run chosen.

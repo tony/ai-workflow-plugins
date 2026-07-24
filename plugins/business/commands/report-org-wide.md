@@ -76,8 +76,8 @@ it up before it appears here.
 ## Output
 
 Open with a one-line hero (`✓ Org-wide projection: <conservative
-figure with tag>` or `⚠ Refused: <reason>`), then exactly these
-sections:
+figure with tag>`, `✓ Evidence report: <supported claim, unknowns
+named>`, or `⚠ Refused: <reason>`), then exactly these sections:
 
 1. `## Run` — the run chosen and its pinned window.
 2. `## Gate` — the completeness result and the `a`/`r` values used,
