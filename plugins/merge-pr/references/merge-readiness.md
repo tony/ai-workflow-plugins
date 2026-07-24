@@ -46,9 +46,12 @@ run has moved trunk:
    branch's diff against its base before and after (`git range-diff`
    or `git diff` of the two three-dot ranges). Unexpected content
    drift halts the run.
-4. Force-push with `git push --force-with-lease` — never bare
+4. If conflicts were resolved, run the project's fast quality gates
+   — format, lint, typecheck, scoped tests, discovered from its
+   AGENTS.md/CLAUDE.md — and fix failures before pushing.
+5. Force-push with `git push --force-with-lease` — never bare
    `--force`.
-5. Wait for CI on the rebased head: `gh pr checks <n> --watch`.
+6. Wait for CI on the rebased head: `gh pr checks <n> --watch`.
 
 ## Merge commit message
 
