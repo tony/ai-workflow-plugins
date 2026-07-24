@@ -32,7 +32,10 @@ than guessing. Do no harm.
 ## Rebase procedure
 
 When a PR is `BEHIND` or `DIRTY`, or an earlier merge in a multi-PR
-run has moved trunk:
+run has moved trunk. Consent differs by command on purpose:
+`/merge-pr:this` confirms before rebasing — a rebase expands "merge
+this PR" — while `/merge-pr:multiple`'s between-merge rebases are
+its disclosed core loop, covered by the roster shown up front.
 
 1. Fetch, then rebase the PR branch onto its current base. For a
    stacked PR whose parent just merged, drop the parent's commits with
