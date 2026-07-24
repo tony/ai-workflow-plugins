@@ -49,6 +49,10 @@ A hard contract, not a preference:
   them: restate the claim in time or capacity units, or omit it. If
   asked to convert savings into money, decline and cite this
   contract.
+- Money-adjacent vocabulary counts as currency: "ROI", "dollar",
+  "cost savings", "monetize", "payback" in money terms. Do not use
+  them even in negations ("no ROI claim is made") — name the time or
+  capacity claim instead.
 
 ## Anti-inflation rules
 

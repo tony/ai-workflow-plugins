@@ -5,6 +5,10 @@ internal savings claim must land inside a defensible external range
 or explicitly explain its divergence. Defensible range: **−19% to
 +56%**. Realistic field cluster: **~10–26%**.
 
+Table compiled and sources last verified 2026-07-24. That date is
+each entry's retrieval date unless a later one is noted on the
+entry; re-verifying a study updates its date here.
+
 ## Studies
 
 - **METR RCT** (Jul 2025, arXiv 2507.09089) — 16 experienced OSS
@@ -38,8 +42,9 @@ or explicitly explain its divergence. Defensible range: **−19% to
 
 ## Usage rules
 
-- Cite a BENCHMARKED figure with its study label above and a
-  retrieval date.
+- Cite a BENCHMARKED figure with its study label above and its
+  retrieval date — the table's verification date unless the entry
+  carries its own.
 - Never import a vendor headline as an internal savings-rate input.
   Cite it alongside your own MEASURED number, flagged `(vendor)`.
 - Vendor magnitudes are directional context only; internal inputs

@@ -14,7 +14,8 @@ On WSL, prefer the Windows Documents folder: detect WSL by
 `/mnt/c/Users/<user>/Documents/<YYYY-MM-DD>/business/`.
 
 These roots are defaults, not decisions — always ask the user where
-to write before creating a run.
+to write before creating a run. Running non-interactively: use the
+default root and record that decision in the run README.
 
 ## Layout
 
@@ -86,14 +87,18 @@ explicitly, each with "what data would resolve this".
 
 ### reports/
 
-Written only by the report commands: `leadership.md`, `org-wide.md`,
-`case-study-internal.md`, `case-study-public.md`, `pr-release.md`.
+Created empty by `/business:research`; written only by the report
+commands: `leadership.md`, `org-wide.md`, `case-study-internal.md`,
+`case-study-public.md`, `pr-release.md`. A report command finding it
+absent creates it rather than failing.
 
 ## Locating an existing run
 
 Precedence: an explicit path argument, else the newest `*/business/`
 directory under the Documents roots above. Confirm the chosen run
-with the user before rendering anything from it.
+with the user before rendering anything from it. Running
+non-interactively: proceed with the newest run and record the choice
+in the output's Run section instead of asking.
 
 ## Completeness gate
 
@@ -106,7 +111,10 @@ in order:
 3. `assumptions.yaml` parses and every entry has every required
    field.
 4. Every figure in `measurements/` and `findings.md` carries one of
-   the four provenance tags.
+   the four provenance tags, and every MEASURED figure's citation
+   resolves: collect the cited manifest names and verify each names
+   an entry that exists in `sources.md` — a mechanical check, not a
+   judgment call.
 5. Every unknown in `findings.md` states what data would resolve it.
 
 On any failure: do not render. List exactly what is missing and

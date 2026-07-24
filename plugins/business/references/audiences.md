@@ -6,6 +6,16 @@ may never contain detail its tier's contract excludes, even though
 the run directory has it.** Sanitization is a property of the
 artifact, not of the data.
 
+## When the package holds no committable savings figure
+
+A complete package may still contain no defensible savings number —
+early instrumentation, unknowns blocking `S_inst`, no counterfactual
+yet. That is not a rendering failure at any tier: render an evidence
+report. The answer or headline states plainly what the data does and
+does not yet support; where a committed number would go, name the
+open unknowns and the data that would resolve them. Refusal is for
+gate failures, never for honest absence.
+
 ## Tier 0 — leadership
 
 Command: `/business:report-leadership`.

@@ -67,11 +67,14 @@ show all three segments.
   methods want roughly n ≥ 60 for stable coverage; small n gets wide
   intervals and honesty, not precision. Deterministic seed, recorded
   with the result.
-- Fewer than ~12–20 paired observations: present the raw pairs, the
-  median difference, and a wide interval, and label the result
+- Fewer than ~12–20 observations — paired comparisons and single
+  distributions alike: present the raw values, the median (or median
+  difference), and a wide interval, and label the result
   **DIRECTIONAL**. Never single-decimal percentages from 5 tasks.
 - Exclude the novelty ramp window; measure steady state. State the
-  excluded window in the run README.
+  excluded window in the run README. No identifiable introduction
+  event to anchor a ramp on → state "none excluded" with the
+  reasoning, rather than inventing a window.
 
 ## Counterfactual quality ladder
 
