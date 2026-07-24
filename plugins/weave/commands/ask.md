@@ -1,7 +1,7 @@
 ---
 description: Weave question — ask Claude, Antigravity, and GPT the same question in parallel, then synthesize the best answer
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<question> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
+argument-hint: "<question> [--cascade] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
 ---
 
 # Weave Ask
@@ -73,6 +73,7 @@ Scan `$ARGUMENTS` for explicit flags anywhere in the text. Flags use `--name=val
 | `--passes=N` | 1–5 | 1 | Number of synthesis passes |
 | `--timeout=N\|none` | seconds or `none` | command-specific | Timeout for external model commands |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | Execution mode preset |
+| `--cascade` | flag | off | Claude-only first pass; fan out to external models only when the confidence gate fires |
 | `--no-deslop` | flag | off | Skip the final deslop pass on the synthesised answer |
 | `--quiet-deslop` | flag | off | Replace the 8-line deslop summary with one line |
 | `--verbose-deslop` | flag | off | Add tier letter, signature id, confidence per finding |
@@ -327,6 +328,19 @@ Write the Context Packet built in Phase 1b to `$SESSION_DIR/context-packet.md`.
 
 ---
 
+## Phase 2b: Cascade Gate (only when `--cascade` was set)
+
+Read `${CLAUDE_PLUGIN_ROOT}/references/ensemble-techniques.md`
+(Technique 1) and apply it: run the Claude Answer lane from Phase 3
+alone, self-verify per Phase 4's Verify Claims step, and evaluate the
+five escalation triggers. On **early-exit**, skip the external lanes, blind judging,
+and rubric scoring; run the Critic and deslop steps, then present with
+`CASCADE_STATE` = `early-exit`. On **escalate** (or user escalation
+from the panel), continue to Phase 3 with the cheap-pass output reused
+as the Claude lane. Without `--cascade`, skip this phase.
+
+---
+
 ## Phase 3: Ask All Models in Parallel
 
 **Goal**: Send the same question to all available models simultaneously.
@@ -512,6 +526,18 @@ Compare responses to identify:
 - **Conflicts** — responses disagree → verify against the codebase, accept the one supported by evidence
 - **Unresolvable conflicts** — cannot determine which is correct from code alone → note both positions with available evidence
 
+While adjudicating, record the per-claim consensus map to
+`$SESSION_DIR/pass-NNNN/consensus.md`: classify each lane per claim as
+**agree**, **dissent** (incompatible position, including "not an
+issue"), or **silent**; over M lanes the levels are unanimous (M/M),
+majority (> M/2, someone dissents or is silent), split (no position
+> M/2), and single (one agree, rest silent). Dissent and silence are
+not the same — a single uncontested claim outranks a split one. On
+cascade-escalated runs, items restating a fired trigger count external
+lanes only. Split and majority-with-dissent items render in the
+Disagreements section — consensus is reported, never silently
+adjudicated away.
+
 **Step 4: Converge (Merge)**
 
 Build the final result using Merge convergence: Combine agreed points as foundation, apply adjudicated conflict resolutions, incorporate best unique contributions ordered by score, strip unverified claims.
@@ -559,6 +585,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 - `IN_PLAN_MODE` = false
 - `MODELS` = the models that participated
 - `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json` (or null for single-pass)
+- `CASCADE_STATE` = `early-exit`, `escalated`, or null when `--cascade` was not set
 
 After the reference returns, finalize the session per the existing
 session finalization block.
@@ -577,28 +604,19 @@ After presenting the answer, persist the synthesis:
 
 If `pass_count` is 1, skip this phase.
 
-For pass N ≥ 2, do NOT re-run the entire task. Instead, target only:
-
-1. **Unresolved conflicts** from the prior pass's adjudication (Step 3)
-2. **Critic findings** from the prior pass's critic (Step 5)
-3. **Low-confidence scores** — any dimension scoring < 5 on any response
-
-Construct refinement prompts that include ONLY these targeted items:
-
-> The following issues remain from the prior pass. Address ONLY these items:
->
-> **Unresolved conflicts**: [list from prior adjudication]
-> **Critic findings**: [list from prior critic.md]
-> **Low-confidence areas**: [dimensions/responses that scored < 5]
->
-> For each item: provide your resolution with evidence (file paths, line numbers, code references).
+For pass N ≥ 2, do NOT re-run the entire task. Passes are **residual
+re-attacks** per `${CLAUDE_PLUGIN_ROOT}/references/ensemble-techniques.md`
+(Technique 2): extract `$SESSION_DIR/pass-<N-1>/residuals.md` from the
+prior pass's unresolved conflicts, failed verification, unincorporated
+critic findings, and split-consensus items. An empty ledger means
+convergence — stop early and report it.
 
 After collecting targeted responses:
-- Re-score only affected dimensions (not the full rubric)
-- Re-adjudicate only the disputes targeted in this pass
+- Merge resolutions back into the prior synthesis at the quoted regions; untouched passages carry forward verbatim
+- Re-score only affected dimensions (not the full rubric); re-adjudicate only the ledger items
 - **Early-stop**: If no material delta between this pass and the prior pass (no scores changed by more than 1, no new conflicts identified), stop refinement early and report convergence
 
-Write the conflict-only prompt to `$SESSION_DIR/pass-{N}/prompt.md`. Follow the same retry protocol and artifact capture as the initial pass.
+Follow the same retry protocol and artifact capture as the initial pass.
 
 For each pass from 2 to `pass_count`:
 
@@ -608,13 +626,13 @@ For each pass from 2 to `pass_count`:
    mkdir -p -m 700 "$SESSION_DIR/pass-$(printf '%04d' $N)/outputs" "$SESSION_DIR/pass-$(printf '%04d' $N)/stderr"
    ```
 
-2. **Construct conflict-only prompts** targeting unresolved conflicts, critic findings, and low-confidence scores from the prior pass. For Claude, reference prior artifacts by path; for external models, inline them.
+2. **Construct the residual re-attack prompt** from the ledger — entries only, each with at most 10 lines of surrounding synthesis excerpt, never the full prior synthesis. For Claude, reference prior artifacts by path; for external models, inline them.
 
 3. **Write the refinement prompt** to `$SESSION_DIR/pass-{N}/prompt.md` and re-run all available models in parallel (same backends, same timeouts, same retry logic as Phase 3).
 
 4. **Capture outputs** to `$SESSION_DIR/pass-{N}/outputs/<model>.md`.
 
-5. **Re-synthesize** following Phase 4 (re-score only affected dimensions, re-adjudicate only targeted disputes). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
+5. **Re-synthesize** by merge-back (Technique 2). Write to `$SESSION_DIR/pass-{N}/synthesis.md`.
 
 6. **Early-stop** if no material delta from prior pass. **Update session**: set `completed_passes` to N in `session.json`, append `pass_complete` to `events.jsonl`.
 
