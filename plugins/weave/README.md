@@ -51,7 +51,7 @@ The orchestration commands follow consistent multi-phase workflows. The original
 2. **Detect models** — Check for `agy`, `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available; the Google lane prefers `agy` (Antigravity) and falls back to `gemini`, then the `agent` CLI with `--model` flags.
 3. **Run in parallel** — Execute the task across all available models simultaneously.
 4. **Synthesize** — Compare outputs, verify claims against the codebase, and combine the best elements.
-5. **Refine** (multi-pass) — Optionally re-run all models with the prior synthesis as context for deeper results.
+5. **Refine** (multi-pass) — Optionally re-attack the prior pass's unresolved residuals with all models for deeper results.
 
 ### Protocols
 
@@ -62,6 +62,7 @@ All commands share four quality protocols that decorrelate model outputs and imp
 - **Blind judging** — model outputs are randomly labeled (A/B/C) during scoring to prevent brand bias (ask/plan/prompt/execute/architecture/review)
 - **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence (ask/plan/prompt/execute/architecture/review)
 - **Judge-weave-distribute** — pick the best, incorporate strengths from runners-up, redistribute for another round (refine/brainstorm-and-refine)
+- **Consensus signal** — findings and disagreements carry per-lane agreement tags (unanimous/majority/split/single); split items are surfaced with both positions, never silently adjudicated away (ask/review; spec in `references/ensemble-techniques.md`)
 
 ### Repo Guard Protocol
 
@@ -186,9 +187,13 @@ even when the parent agent is in plan mode. Each sub-agent receives all
 needed context in its prompt since sub-agents don't share the parent's
 conversation state.
 
+## Cascade Mode
+
+`--cascade` (ask, review) inverts the cost model: a Claude-only first pass runs, self-verifies against the codebase, and fans out to the external models only when a confidence trigger fires — a contradicted or unverified load-bearing claim, an ambiguous request, a coverage gap, or a judgment call (for review, any Critical finding always escalates). On early exit the result is presented as Claude-lane-only with an "Escalate to full ensemble" option in the next-step panel. Trigger definitions live in `references/ensemble-techniques.md`.
+
 ## Multi-Pass Refinement
 
-Multi-pass re-runs all models with the prior synthesis prepended as context, allowing each model to challenge, deepen, or confirm the previous round's results. This produces higher-quality outputs at the cost of additional model invocations.
+Multi-pass runs additional rounds after the first synthesis. For ask and review, pass N ≥ 2 is a residual re-attack: models receive only the unresolved items from the prior pass — conflicts evidence could not settle, failed claim verification, leftover critic findings, split-consensus items — and their resolutions merge back into the prior synthesis, which otherwise carries forward verbatim. An empty residual ledger means convergence and stops early. The refine command scopes each redistribution round's critique to the pass's residual focus. This deepens results at the cost of additional model invocations.
 
 ### Flags
 
@@ -199,6 +204,7 @@ Control pass count, timeout, and execution mode with explicit flags:
 | `--passes=N` | 1–5 | 1 (refine: 2) | `/weave:plan add auth --passes=2` |
 | `--timeout=N\|none` | seconds or `none` | command-specific | `/weave:ask question --timeout=300` |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/weave:execute task --mode=deep` |
+| `--cascade` | flag (ask, review) | off | `/weave:ask question --cascade` |
 | `--variants=N` | 1–3 | 1 | `/weave:brainstorm idea --variants=2` |
 | `--judge=host\|round-robin` | Who judges each refinement pass | `host` | `/weave:refine draft --judge=round-robin` |
 | `--preamble=...` | text | built-in | `/weave:brainstorm idea --preamble='focus on perf'` |
