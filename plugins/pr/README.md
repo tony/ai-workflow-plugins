@@ -1,6 +1,6 @@
 # pr
 
-Generate and review gold-standard pull request descriptions with structured headings, tables, and test plans. Audit branch commits for AI slop, brittle counts, and verbose messages, then resolve via fixup commits and autosquash with quality-gate checks.
+Generate, refresh, recut, and review gold-standard pull request descriptions with structured headings, tables, and test plans. Audit branch commits for AI slop, brittle counts, and verbose messages, then resolve via fixup commits and autosquash with quality-gate checks.
 
 ## Installation
 
@@ -21,6 +21,8 @@ Install the plugin:
 | Command | Description |
 |---------|-------------|
 | `/pr` | Generate a gold-standard PR description from branch diff |
+| `/pr:refresh` | Update an existing PR description to the branch's current net change, preserving structure and customizations |
+| `/pr:recut` | Rewrite an existing PR description from scratch, carrying forward context that still matters |
 | `/pr:merge-commit` | Generate a gold-standard merge commit message from branch diff |
 | `/pr:review` | Review an existing PR description against gold-standard patterns |
 | `/pr:deslop` | Audit branch commits for AI slop / brittle counts / verbose messages and resolve via fixup commits with optional autosquash |
@@ -33,6 +35,22 @@ Install the plugin:
 2. **Read conventions** — check AGENTS.md/CLAUDE.md for PR description conventions and `.github/pull_request_template.md` for templates
 3. **Draft description** — apply gold-standard patterns: bold impact labels, structured headings, comparison tables, verification commands, test plan checklists
 4. **Present and create** — show the proposed title and body, then optionally create the PR via `gh pr create`
+
+### `/pr:refresh` — Refresh an existing PR description
+
+1. **Resolve the PR** — from the argument or the current branch; diff against the PR's actual base branch (stack-aware)
+2. **Back up** — save the current body under `.git/pr-backups/` before any edit
+3. **Map claims against the diff** — keep accurate content byte-for-byte, minimally rewrite stale claims, add missing changes to existing sections, ask before touching hand-written content it can't verify
+4. **Present and apply** — show an old → new comparison, then apply via `gh pr edit` on approval
+
+Content-only: structure, links, formatting, and customizations are preserved; restructuring is `/pr:recut`'s job.
+
+### `/pr:recut` — Rewrite an existing PR description from scratch
+
+1. **Resolve the PR and back up** — same stack-aware base detection and `.git/pr-backups/` backup as `/pr:refresh`
+2. **Mine the old description** — inventory issue links, setup steps, screenshots, reviewer commitments, and other context not derivable from the diff; ask about anything unclear
+3. **Resolve the template** — a template named in your message wins; otherwise the repo's PR template; otherwise gold-standard structure; ambiguity between candidates gets a question
+4. **Draft, present, apply** — fresh gold-standard description of the current net change with carried-forward context woven in, applied via `gh pr edit` on approval, with dropped items listed for veto
 
 ### `/pr:merge-commit` — Generate merge commit message
 
@@ -65,6 +83,16 @@ Generate a PR description with an optional hint:
 ```
 /pr
 /pr fixes the race condition in new_session
+```
+
+Refresh or recut an existing PR (defaults to the current branch's PR):
+
+```
+/pr:refresh
+/pr:refresh #42
+/pr:refresh the retry logic was dropped
+/pr:recut
+/pr:recut #42 use .github/PULL_REQUEST_TEMPLATE/feature.md
 ```
 
 Generate a merge commit message with an optional hint:
@@ -113,12 +141,17 @@ The generated PR descriptions follow patterns extracted from high-quality open-s
 - **Before/After** code blocks for behavioral changes
 - **Negative assertions** proving unwanted patterns are fully removed
 
+## PR Templates
+
+`/pr` and `/pr:recut` resolve which template to draft against: a template named in your message wins, then the repository's PR template (all standard GitHub locations, including `.github/PULL_REQUEST_TEMPLATE/`), then the gold-standard structure. When several candidate templates are in play, they ask instead of guessing. `/pr:review` accepts a template named in your message as its evaluation baseline. `/pr:refresh` never applies templates — it preserves the description's existing structure.
+
 ## Safety
 
 - Never force-pushes or runs destructive git commands
 - Never pushes to main/master
 - Always presents the description before creating the PR
 - Review command never modifies the PR — only reports findings
+- Refresh and recut back up the existing description under `.git/pr-backups/` before editing, and only edit after approval
 
 ## Prerequisites
 

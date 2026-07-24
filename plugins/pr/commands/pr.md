@@ -41,8 +41,8 @@ Full diff:
 ### 2. Read Project Conventions
 
 - Read AGENTS.md and/or CLAUDE.md for any PR description conventions
-- Check for a PR template at `.github/pull_request_template.md`
-- If a template exists, use its structure as the starting point and fill it in with the gold-standard patterns below
+- Resolve the PR template per `${CLAUDE_PLUGIN_ROOT}/references/template-resolution.md`: a template mentioned in the user's message wins; otherwise the repository's PR template; otherwise the gold-standard patterns below. When multiple candidate templates are in play, ask — never guess between them
+- If a template applies, its structure is the starting point; fill it in with the gold-standard patterns below
 
 ### 3. Draft PR Description
 
