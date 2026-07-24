@@ -21,6 +21,10 @@ Read these first; they bind every step:
 - `${CLAUDE_PLUGIN_ROOT}/references/measurement.md` — what the data
   must feed: the saving formulas, statistics discipline, the
   counterfactual ladder, and the quality guardrails.
+- `${CLAUDE_PLUGIN_ROOT}/references/instruments.md` — per-instrument
+  probes, collection discipline (timezone and cohort conventions,
+  the GraphQL filteredCount trap, absence snapshots), and the
+  collection targets in query-ready form.
 
 User arguments: $ARGUMENTS
 
@@ -53,20 +57,22 @@ Documents folder when detected). Wait for confirmation.
 
 ### 2. Instrument discovery — never assumption
 
-Probe what is actually available; never assume an instrument exists.
-Candidates (illustrative, not a fixed list): `git` history; `gh`
-(verify auth and rate limits before relying on it); ticket-tracker
-MCPs or CLIs such as Jira or Linear; CI telemetry; session logs;
-time-tracking exports. Record every instrument as available or
+Probe what is actually available using the per-instrument probes in
+`instruments.md`; never assume an instrument exists. Candidates
+(illustrative, not a fixed list): `git` history; `gh` (verify auth
+and rate limits before relying on it); ticket-tracker MCPs or CLIs
+such as Jira or Linear; CI telemetry; session logs; time-tracking
+exports. Record every instrument as available or
 unavailable in the run README. Data an unavailable instrument would
 have provided is recorded as `unknown` — never fabricated, never
 silently skipped.
 
 ### 3. Collect
 
-For each available instrument, run pinned-window queries and
-snapshot raw output into `raw/` before deriving anything. Targets —
-collect what the instruments support and record the rest as unknown:
+For each available instrument, run pinned-window queries per the
+collection discipline in `instruments.md` and snapshot raw output
+into `raw/` before deriving anything. Targets — collect what the
+instruments support and record the rest as unknown:
 
 - Task and PR cycle times, review latency. Prefer GraphQL over the
   Search API for reliability; paginate; compute distributions

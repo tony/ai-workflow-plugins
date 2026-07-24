@@ -102,6 +102,9 @@ All commands read from `references/`:
 - `evidence.md` — the external study table (METR, Cui et al.,
   Google, Peng et al., Bain, DORA, plus vendor telemetry flagged as
   such) and the triangulation procedure.
+- `instruments.md` — per-instrument probes and pinned-window
+  collection discipline: timezone and cohort conventions, GraphQL
+  pagination and the filteredCount trap, absence snapshots.
 - `interim-format.md` — the run-directory layout, run location
   rules, and the completeness gate report commands enforce.
 - `audiences.md` — the four-tier disclosure ladder and the tier-3
