@@ -29,6 +29,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [lean](plugins/lean/) | Development | Write tight, slop-free prose and code, and tighten existing files in place with no commits — a model-invocable writing discipline plus a working-tree cleanup command |
 | [double-check](plugins/double-check/) | Productivity | Make verification requests return the re-derived answer instead of a diff against the agent's prior turn — an ambient skill for 'double check' / 'are you sure' moments plus an /align command to repair a chat where the diff already happened |
 | [release](plugins/release/) | Development | Cut and bump releases with safe defaults — no push, no tag, no tag push without an explicit flag — and roll new releases out to every downstream consumer repo with CI verification |
+| [merge-pr](plugins/merge-pr/) | Development | Merge PRs via gh with merge commits matching the repo's own git history — readiness checks and CI watch before every merge, plus multi-PR runs with stack detection, rebase, and conflict resolution between merges |
 
 ## Installation
 
