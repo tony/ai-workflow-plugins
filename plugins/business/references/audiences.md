@@ -47,8 +47,8 @@ Commands: `/business:case-study-public`, `/business:pr-release`.
 
 Hard sanitization contract:
 
-- No organization, repository, or person names; no ticket IDs; no
-  internal URLs; no internal or local file paths.
+- No organization, repository, team, or person names; no ticket
+  IDs; no internal URLs; no internal or local file paths.
 - Aggregates and ranges only. Round to honest precision — a
   number's precision must not exceed what its interval supports.
 - Every headline claim triangulated per `evidence.md`.
@@ -64,9 +64,9 @@ Hard sanitization contract:
 over the finished draft. `/business:pr-release` inherits the result
 by sourcing figures only from the public case study.
 
-1. Scan the draft for organization, repository, and person names,
-   ticket IDs, internal URLs, and internal or local paths — remove
-   every hit.
+1. Scan the draft for organization, repository, team, and person
+   names, ticket IDs, internal URLs, and internal or local paths —
+   remove every hit.
 2. Confirm every figure is an aggregate or a range, rounded to
    honest precision.
 3. Confirm every headline claim passed triangulation or carries its
