@@ -166,12 +166,12 @@ If `AskUserQuestion` is unavailable (headless mode via `claude -p`), use `pass_c
 Use `AskUserQuestion` to prompt the user for any unresolved settings:
 
 **Question 1 — Passes** (skipped when `--passes` was provided):
-- question: "How many synthesis passes? Multi-pass re-runs all models with prior results for deeper refinement."
+- question: "How many synthesis passes? Multi-pass re-attacks unresolved residuals from the prior pass."
 - header: "Passes"
 - When `pass_count` exists (from mode preset or legacy trigger), move the matching option first with "(Recommended)" suffix. Other options follow in ascending order.
 - When `pass_count` is null, use default ordering:
   - "1 — single pass (Recommended)" — Run models once and synthesize. Sufficient for most tasks.
-  - "2 — multipass" — One refinement round. Models see prior synthesis and can challenge or deepen it.
+  - "2 — multipass" — One refinement round. Models re-attack only the prior pass's unresolved residuals.
   - "3 — triple pass" — Two refinement rounds. Maximum depth, highest token usage.
 
 **Question 2 — Timeout** (skipped when `--timeout` was provided):

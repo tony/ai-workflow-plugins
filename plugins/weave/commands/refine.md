@@ -768,8 +768,9 @@ Fill the residual-focus block from `$SESSION_DIR/pass-NNNN/residuals.md`,
 extracted per `${CLAUDE_PLUGIN_ROOT}/references/ensemble-techniques.md`
 (Technique 2) from: critique points the woven version left unaddressed,
 runner-up strengths the weave could not reconcile, and any judge
-override or split judgment. If the ledger is empty, that satisfies
-early-stop Condition 2 (Step 5).
+override or split judgment. If the ledger is empty, omit the
+residual-focus block — models then address only defects the weave
+itself introduced; early-stop remains governed by Step 5's conditions.
 
 Write this prompt to `$SESSION_DIR/pass-NEXT/prompt.md`.
 
