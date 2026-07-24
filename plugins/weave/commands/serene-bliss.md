@@ -387,8 +387,9 @@ verdicts are merged via peer-only averaging.
 ### Step 1: Build the shared judge prompt
 
 The panel judges share a single prompt. Build it identically to the
-External Judge Protocol from `plugins/weave/commands/refine.md` (lines
-522-616) — scoring rubric (4 dimensions × 0-10), expected output format
+**External Judge Protocol** section of
+`plugins/weave/commands/refine.md` — scoring rubric (4 dimensions ×
+0-10), expected output format
 (scores table, winner, rationale, runner-up analysis), and ALL
 selected originals included inline (external models cannot read
 session files).
