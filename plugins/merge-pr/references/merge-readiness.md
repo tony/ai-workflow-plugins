@@ -37,8 +37,9 @@ run has moved trunk. Consent differs by command on purpose:
 this PR" — while `/merge-pr:multiple`'s between-merge rebases are
 its disclosed core loop, covered by the roster shown up front.
 
-1. Fetch, then rebase the PR branch onto its current base. For a
-   stacked PR whose parent just merged, drop the parent's commits with
+1. Check out the PR branch (`gh pr checkout <n>`), fetch, then
+   rebase it onto its current base. For a stacked PR whose parent
+   just merged, drop the parent's commits with
    `git rebase --onto <base> <old-parent-head> <branch>`.
 2. Resolve conflicts. Mechanical resolutions (context drift, adjacent
    hunks, a list both sides appended to) are resolved directly. A
