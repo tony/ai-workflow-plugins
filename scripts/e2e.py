@@ -64,6 +64,7 @@ PLUGINS = [
     "action",
     "lean",
     "double-check",
+    "pr",
 ]
 
 app = typer.Typer(help="E2E plugin lifecycle tests for ai-workflow-plugins.")

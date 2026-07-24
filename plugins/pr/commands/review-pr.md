@@ -34,6 +34,7 @@ Target PR: $ARGUMENTS
   ```
 - Count files changed and estimate the magnitude (small fix, medium feature, large overhaul)
 - This context is needed to judge whether the description is **proportional** to the change
+- If the user's message names a PR template, read it and use its sections as the structural baseline for the evaluation below. Use it silently — this command reports findings and never raises template questions
 
 ### 3. Evaluate Against Quality Patterns
 

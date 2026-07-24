@@ -1,7 +1,7 @@
 {
   "name": "changelog",
-  "description": "Generate categorized changelog entries from branch commits and PR context",
-  "version": "0.0.1",
+  "description": "Generate categorized changelog entries from branch commits and PR context; refresh or recut a branch's own entries as it evolves",
+  "version": "0.1.0",
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"

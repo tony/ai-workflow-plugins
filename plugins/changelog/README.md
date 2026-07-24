@@ -1,6 +1,6 @@
 # changelog
 
-Generate categorized changelog entries from branch commits and PR context.
+Generate categorized changelog entries from branch commits and PR context, and keep a branch's own entries in sync as the branch evolves.
 
 ## Installation
 
@@ -16,11 +16,13 @@ Install the plugin:
 /plugin install changelog@ai-workflow-plugins
 ```
 
-## Command
+## Commands
 
 | Command | Description |
 |---------|-------------|
 | `/changelog` | Analyze commits, categorize changes, and insert entries into the changelog |
+| `/changelog:refresh` | Update the branch's own entries to its current net change (stacks a new commit with `--commit`) |
+| `/changelog:recut` | Rebase out the branch's earlier changelog commits and regenerate its entries fresh (commits with `--commit`) |
 
 ## 5-Phase Workflow
 
@@ -29,6 +31,18 @@ Install the plugin:
 3. **Generate entries** — Write markdown matching the existing changelog style
 4. **Present for review** — Show proposed entries and insertion point, wait for user approval
 5. **Insert** — Apply approved entries to the changelog file
+
+## Refresh and Recut
+
+Both follow-up commands are hard-scoped to changelog content the branch itself introduced — entries from earlier releases or from other branches' unreleased work are read-only, and anything requiring an edit outside that footprint gets a question, not a guess. Both are stack-aware: the base is the branch's PR base when a PR exists, trunk otherwise. Both reuse `/changelog`'s categorization, voice, and release-safety rules. Like `/changelog`, neither commits by default — the edit is left in the working tree with a suggested commit message unless you pass `--commit`.
+
+### `/changelog:refresh` — correct the entries in place
+
+Recomputes what the branch's entries should say from its current net change, diffs that against what the entries currently say, and applies the correction (with `--commit`, as a new commit stacked on top). History is never rewritten.
+
+### `/changelog:recut` — rebuild the branch's changelog history
+
+Drops the branch's pure-changelog commits via a scripted non-interactive rebase (after creating a backup branch and confirming if the branch is pushed), verifies the branch's code diff is untouched, then regenerates entries fresh — committing once at the tip with `--commit`. Commits that mix changelog and code changes are never rewritten without an explicit choice. The command never pushes — publishing the rewrite with `git push --force-with-lease` is left to you.
 
 ## A Branch Is Not a Release
 
