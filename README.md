@@ -28,6 +28,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [action](plugins/action/) | Development | Take tickets to branches in isolated git worktrees — resolve Linear/GitHub issues strictly read-only, name branches by the team's own conventions, land gated commits, and fan out multiple tickets in parallel |
 | [lean](plugins/lean/) | Development | Write tight, slop-free prose and code, and tighten existing files in place with no commits — a model-invocable writing discipline plus a working-tree cleanup command |
 | [double-check](plugins/double-check/) | Productivity | Make verification requests return the re-derived answer instead of a diff against the agent's prior turn — an ambient skill for 'double check' / 'are you sure' moments plus an /align command to repair a chat where the diff already happened |
+| [release](plugins/release/) | Development | Cut and bump releases with safe defaults — no push, no tag, no tag push without an explicit flag — and roll new releases out to every downstream consumer repo with CI verification |
 
 ## Installation
 
