@@ -59,6 +59,7 @@ A list of entries:
   unit: ratio
   source_type: ESTIMATED
   confidence: medium
+  rationale: Seat admin export shows 60% weekly active in June
   source_ref: sources.md#gh-user-activity
   retrieved: 2026-07-24
   owner: eng-productivity lead
