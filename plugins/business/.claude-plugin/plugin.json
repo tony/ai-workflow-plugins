@@ -1,0 +1,9 @@
+{
+  "name": "business",
+  "description": "Measure and report the business value of AI skills and agentic workflows — provenance-tagged data collection and audience-tiered reports in engineer-hours and cycle time, never currency",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}

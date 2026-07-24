@@ -67,6 +67,7 @@ PLUGINS = [
     "pr",
     "release",
     "merge-pr",
+    "business",
 ]
 
 app = typer.Typer(help="E2E plugin lifecycle tests for ai-workflow-plugins.")
