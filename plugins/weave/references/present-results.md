@@ -20,6 +20,7 @@ The caller sets these variables before invoking this reference:
 | IN_PLAN_MODE | boolean | True for plan and fix-review; suppresses next-step panel |
 | MODELS | JSON array of strings | For Attribution |
 | LABEL_MAP_PATH | absolute path or null | For Attribution; null when no label map exists |
+| CASCADE_STATE | `early-exit`, `escalated`, or null | Set by cascade-capable callers (ask, review); null otherwise |
 
 ---
 
@@ -51,6 +52,9 @@ content. Emit 1–4 lines.
 | execute | `Best of N implementations` |
 | fix-review | `N fixes applied, M skipped` |
 
+When CASCADE_STATE is `early-exit`, append the suffix
+`— cascade early-exit (Claude lane only)` to the hero's first line.
+
 ### Step 3: Render body sections
 
 Look up RESULT_KIND in this table. Render sections **in this exact
@@ -71,6 +75,12 @@ optional.
 | architecture | Chosen Architecture · Component Map · Trade-off Analysis · Risks · Attribution |
 | execute | Winning Implementation · Diff Summary · Trade-offs · Attribution |
 | fix-review | Applied Fixes · Tests Added · Skipped Findings · Final Verification · Attribution |
+
+For `review` and `ask`, findings and Disagreements carry the consensus
+tags and ordering the caller recorded in its consensus map
+(`consensus 2/3`, `consensus 1/3 (uncontested)`; within a severity
+band: unanimous-verified, majority-verified, single-verified, then
+unverified). Omit consensus tags when only one lane participated.
 
 ### Output contract
 
@@ -106,7 +116,10 @@ When IN_PLAN_MODE is true, skip Phase B entirely.
 
 ### Step 1: Present options
 
-Call `AskUserQuestion` with options from this table:
+Call `AskUserQuestion` with options from this table. When CASCADE_STATE
+is `early-exit`, prepend **Escalate to full ensemble** as the first
+option — on selection, return control to the caller's escalation path
+(`references/ensemble-techniques.md`, Technique 1) instead of Phase C.
 
 | RESULT_KIND | Options (in display order) |
 |---|---|
