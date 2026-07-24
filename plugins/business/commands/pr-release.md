@@ -35,12 +35,14 @@ Recent runs:
 Use the `$ARGUMENTS` path if given, else the newest run per
 `interim-format.md`. Confirm the choice with the user.
 
-### 2. Locate the firewall
+### 2. Locate and verify the firewall
 
 Check for `<run>/reports/case-study-public.md`. If it is missing,
 ask via `AskUserQuestion` whether to run
 `/business:case-study-public` now or stop — never draft the release
-straight from the interim package.
+straight from the interim package. If present, run the firewall
+sweep from `audiences.md`; a sweep failure routes back to
+`/business:case-study-public`, never into hand-patching here.
 
 ### 3. Compose one page
 

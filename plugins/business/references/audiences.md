@@ -77,3 +77,20 @@ by sourcing figures only from the public case study.
 
 Report the checklist results in the command output — pass per item,
 with what was removed or reworded.
+
+## Firewall sweep
+
+`/business:pr-release` treats the public case study as its
+sanitization firewall — and verifies it rather than trusting it.
+Before deriving the announcement, sweep the located case study:
+
+- No organization, repository, team, person, or ticket identifiers;
+  no internal URLs or paths.
+- Aggregates and ranges only; figures carry provenance tags and
+  denominators.
+- A limitations section exists.
+- No currency symbols or money-adjacent terms.
+
+Any failure means the case study is regenerated via
+`/business:case-study-public`, never patched around in the release.
+Report the sweep result in the command output.
