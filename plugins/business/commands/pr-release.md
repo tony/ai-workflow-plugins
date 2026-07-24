@@ -14,7 +14,7 @@ time, and capacity; never money.
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` first — it
 defines run location. Defer these until the firewall (the public case
-study) is located; a refused compose never loads them:
+study) is located:
 
 - `${CLAUDE_PLUGIN_ROOT}/references/provenance.md` — tag rendering,
   denominators, the no-currency contract.
