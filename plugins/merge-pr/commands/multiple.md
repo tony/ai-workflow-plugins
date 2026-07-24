@@ -1,7 +1,7 @@
 ---
 description: Merge a set of PRs one at a time — detect stack vs independent set, rebase and resolve conflicts between merges, watch CI, merge each via gh
 argument-hint: "[PR numbers/URLs, e.g. '#31 #32'] [--squash | --rebase | any other gh pr merge flag]"
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
+allowed-tools: ["Bash", "Read", "Grep", "Edit", "AskUserQuestion"]
 ---
 
 # Merge Multiple PRs
