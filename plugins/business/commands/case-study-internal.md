@@ -12,10 +12,10 @@ take from it. Tier 2: internal team and repo names allowed;
 individuals anonymized to roles. Value is engineer-hours, cycle
 time, and capacity; never money.
 
-Read these first; they bind every step:
+Read `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` first — it
+defines run location and the completeness gate. Defer these rendering
+references until the gate passes; a refused render never loads them:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` — locating
-  the run and the completeness gate.
 - `${CLAUDE_PLUGIN_ROOT}/references/provenance.md` — tag rendering,
   anti-inflation rules, the no-currency contract.
 - `${CLAUDE_PLUGIN_ROOT}/references/audiences.md` — the tier-2
@@ -42,7 +42,8 @@ from an incomplete package; list what is missing and stop.
 
 ### 3. Render the case study
 
-Write `<run>/reports/case-study-internal.md` as a narrative in this
+Read the deferred references above, then write
+`<run>/reports/case-study-internal.md` as a narrative in this
 fixed order:
 
 1. **Situation** — the team, the recurring task, why it cost enough

@@ -11,10 +11,10 @@ close with a summary the whole company can read. Tier 1: team-level
 aggregates only, no individual names anywhere. Value is
 engineer-hours and capacity; never money.
 
-Read these first; they bind every step:
+Read `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` first — it
+defines run location and the completeness gate. Defer these rendering
+references until the gate passes; a refused render never loads them:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` — locating
-  the run and the completeness gate.
 - `${CLAUDE_PLUGIN_ROOT}/references/provenance.md` — tag rendering,
   anti-inflation rules, the no-currency contract.
 - `${CLAUDE_PLUGIN_ROOT}/references/measurement.md` — the
@@ -44,7 +44,8 @@ from an incomplete package; list what is missing and stop.
 
 ### 3. Secure the multipliers
 
-Read adoption `a` and realization `r` from `assumptions.yaml`. If
+Read the deferred references above. Then read adoption `a` and
+realization `r` from `assumptions.yaml`. If
 either is absent, ask the user via `AskUserQuestion` — explain what
 each means per `measurement.md` — and append the answer to the
 register as an ESTIMATED entry with rationale and owner. Both are

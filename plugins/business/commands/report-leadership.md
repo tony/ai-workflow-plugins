@@ -11,10 +11,10 @@ withholds nothing: names, raw links, registers inline. It still
 never contains money — value is engineer-hours, cycle time, and
 capacity.
 
-Read these first; they bind every step:
+Read `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` first — it
+defines run location and the completeness gate. Defer these rendering
+references until the gate passes; a refused render never loads them:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` — locating
-  the run and the completeness gate.
 - `${CLAUDE_PLUGIN_ROOT}/references/provenance.md` — tag rendering,
   anti-inflation rules, the no-currency contract.
 - `${CLAUDE_PLUGIN_ROOT}/references/measurement.md` — the value
@@ -47,7 +47,8 @@ list exactly what is missing and stop.
 
 ### 3. Render the report
 
-Write `<run>/reports/leadership.md` with this fixed structure:
+Read the deferred references above, then write
+`<run>/reports/leadership.md` with this fixed structure:
 
 1. **SCQA opening** — Situation, Complication, Question, Answer,
    with the Answer stated first.

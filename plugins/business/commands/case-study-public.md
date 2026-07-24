@@ -11,10 +11,10 @@ Tier 3 is the hard sanitization tier: no internal identifiers of any
 kind, aggregates and ranges only, every headline claim triangulated.
 Value is engineer-hours, cycle time, and capacity; never money.
 
-Read these first; they bind every step:
+Read `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` first — it
+defines run location and the completeness gate. Defer these rendering
+references until the gate passes; a refused render never loads them:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` — locating
-  the run and the completeness gate.
 - `${CLAUDE_PLUGIN_ROOT}/references/provenance.md` — tag rendering,
   anti-inflation rules, the no-currency contract.
 - `${CLAUDE_PLUGIN_ROOT}/references/evidence.md` — the external
@@ -43,7 +43,8 @@ from an incomplete package; list what is missing and stop.
 
 ### 3. Draft under the tier-3 contract
 
-Draft the case study in this order — sanitized from the first word,
+Read the deferred references above, then draft the case study in
+this order — sanitized from the first word,
 not sanitized afterwards:
 
 1. **Context** — the kind of team and the kind of task, described

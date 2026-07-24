@@ -12,10 +12,10 @@ command introduces no figure that is not already in it and re-derives
 nothing from the interim package. Value is engineer-hours, cycle
 time, and capacity; never money.
 
-Read these first; they bind every step:
+Read `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` first — it
+defines run location. Defer these until the firewall (the public case
+study) is located; a refused compose never loads them:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/interim-format.md` — locating
-  the run.
 - `${CLAUDE_PLUGIN_ROOT}/references/provenance.md` — tag rendering,
   denominators, the no-currency contract.
 - `${CLAUDE_PLUGIN_ROOT}/references/audiences.md` — the tier-3
@@ -44,7 +44,7 @@ straight from the interim package.
 
 ### 3. Compose one page
 
-From the public case study only:
+Read the deferred references above. From the public case study only:
 
 1. **Headline result** — the case study's headline, with its tag
    and range.
