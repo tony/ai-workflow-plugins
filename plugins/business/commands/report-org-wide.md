@@ -1,7 +1,7 @@
 ---
 description: Render the tier-1 org-wide projection — explicit adoption and realization inputs, scenario spread, sensitivity ranking, plain-language company close
 argument-hint: "[run directory]"
-allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "AskUserQuestion"]
+allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion"]
 ---
 
 # Org-Wide Report (tier 1)
@@ -28,7 +28,7 @@ User arguments: $ARGUMENTS
 ## Context
 
 Recent runs:
-`!ls -dt ~/Documents/*/business/ /mnt/c/Users/*/Documents/*/business/ 2>/dev/null | head -5 || echo "(no runs found)"`
+`!sh -c 'ls -dt "$HOME"/Documents/*/business/ /mnt/c/Users/*/Documents/*/business/ 2>/dev/null' | head -5 | grep . || echo "(no runs found)"`
 
 ## Procedure
 

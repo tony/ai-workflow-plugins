@@ -1,7 +1,7 @@
 ---
 description: Render the tier-0 leadership report from a business run — SCQA with the answer first, action-titled exhibits, explicit value build, the conservative number committed
 argument-hint: "[run directory]"
-allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "AskUserQuestion"]
+allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion"]
 ---
 
 # Leadership Report (tier 0)
@@ -29,7 +29,7 @@ User arguments: $ARGUMENTS
 ## Context
 
 Recent runs:
-`!ls -dt ~/Documents/*/business/ /mnt/c/Users/*/Documents/*/business/ 2>/dev/null | head -5 || echo "(no runs found)"`
+`!sh -c 'ls -dt "$HOME"/Documents/*/business/ /mnt/c/Users/*/Documents/*/business/ 2>/dev/null' | head -5 | grep . || echo "(no runs found)"`
 
 ## Procedure
 

@@ -1,7 +1,7 @@
 ---
 description: Collect business-value data for an AI skill or workflow into a provenance-tagged run package — instrument discovery, pinned-window collection, immutable raw snapshots
 argument-hint: "[skill or workflow to measure] [date range, e.g. 2026-04-01..2026-06-30]"
-allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "AskUserQuestion", "EnterPlanMode"]
+allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion", "EnterPlanMode"]
 ---
 
 # Business Research
@@ -30,13 +30,10 @@ Today:
 `!date +%F`
 
 Kernel (WSL detection):
-`!grep -io microsoft /proc/version 2>/dev/null || echo "(not WSL)"`
+`!grep -qi microsoft /proc/version 2>/dev/null && echo "WSL" || echo "(not WSL)"`
 
-Windows user dirs:
-`!ls /mnt/c/Users 2>/dev/null || echo "(no /mnt/c)"`
-
-git:
-`!git --version 2>/dev/null || echo "(git unavailable)"`
+Instruments on PATH:
+`!for c in git gh jq; do command -v $c >/dev/null && echo "$c: available" || echo "$c: unavailable"; done`
 
 gh:
 `!gh auth status 2>&1 | head -3`

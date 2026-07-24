@@ -1,7 +1,7 @@
 ---
 description: Write the tier-2 internal case study — situation, what was built, tagged outcomes with denominators, lessons, replication guide for other teams
 argument-hint: "[run directory]"
-allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "AskUserQuestion"]
+allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion"]
 ---
 
 # Internal Case Study (tier 2)
@@ -26,7 +26,7 @@ User arguments: $ARGUMENTS
 ## Context
 
 Recent runs:
-`!ls -dt ~/Documents/*/business/ /mnt/c/Users/*/Documents/*/business/ 2>/dev/null | head -5 || echo "(no runs found)"`
+`!sh -c 'ls -dt "$HOME"/Documents/*/business/ /mnt/c/Users/*/Documents/*/business/ 2>/dev/null' | head -5 | grep . || echo "(no runs found)"`
 
 ## Procedure
 
