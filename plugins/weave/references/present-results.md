@@ -78,9 +78,9 @@ optional.
 
 For `review` and `ask`, findings and Disagreements carry the consensus
 tags and ordering the caller recorded in its consensus map
-(`consensus 2/3`, `consensus 1/3 (uncontested)`; within a severity
-band: unanimous-verified, majority-verified, single-verified, then
-unverified). Omit consensus tags when only one lane participated.
+(`consensus 2/3`, `consensus 1/3 (uncontested)`; for `review`, within
+a severity band: unanimous-verified, majority-verified,
+single-verified, then unverified). Omit consensus tags when only one lane participated.
 
 ### Output contract
 

@@ -88,9 +88,11 @@ specific claim/reading/gap as evidence when fired. Append to
 
 ### Early-exit path
 
-Skip the external lanes, blind judging, and rubric scoring (nothing to
-compare). Keep the command's Critic step — it is the only remaining
-error correction — and the deslop pass. Present via
+Early-exit ends the run: any remaining configured passes are not run,
+making this pass the final pass. Skip the external lanes, blind
+judging, and rubric scoring (nothing to compare). Keep the command's
+Critic step — it is the only remaining error correction — and the
+deslop pass. Present via
 `references/present-results.md` with `CASCADE_STATE` = `early-exit`:
 the hero gains the suffix `— cascade early-exit (Claude lane only)` and
 the next-step panel gains **Escalate to full ensemble** as the first
@@ -152,8 +154,8 @@ shown to the user). One entry per residual:
   convention rule) would settle it
 
 An empty ledger means the pass converged: skip remaining passes,
-report convergence (this is the operational definition behind each
-command's early-stop).
+report convergence (this is the operational definition behind ask's
+and review's early-stop; refine stops per its own Step 5 conditions).
 
 ### Scoped re-attack prompt
 
@@ -207,9 +209,9 @@ contradicted outranks a split one.
 
 ### Artifacts
 
-Write the per-item consensus map into `$SESSION_DIR/pass-NNNN/`
-`consensus.md` using blind labels; model names are revealed there after
-scoring, alongside the label map.
+Write the per-item consensus map into
+`$SESSION_DIR/pass-NNNN/consensus.md` using blind labels; model names
+are revealed there after scoring, alongside the label map.
 
 ### Surfacing in output
 

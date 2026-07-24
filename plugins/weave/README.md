@@ -45,7 +45,7 @@ Skills provide auto-discovery — they trigger when the user's intent matches th
 
 ## How It Works
 
-The orchestration commands follow consistent multi-phase workflows. The original six (ask, plan, prompt, execute, architecture, review) use **targeted conflict resolution** for multi-pass — subsequent passes only address unresolved conflicts. The new three (brainstorm, refine, brainstorm-and-refine) use **expansive weaving** — each pass is a full judge-pick-best-incorporate-strengths-address-weaknesses cycle. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
+The orchestration commands follow consistent multi-phase workflows. Of the original six, plan, prompt, execute, and architecture use **targeted conflict resolution** for multi-pass (passes only address unresolved conflicts), while ask and review use **residual re-attack** (passes address only the prior pass's unresolved residuals). The new three (brainstorm, refine, brainstorm-and-refine) use **expansive weaving** — each pass is a full judge-pick-best-incorporate-strengths-address-weaknesses cycle. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
 
 1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
 2. **Detect models** — Check for `agy`, `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available; the Google lane prefers `agy` (Antigravity) and falls back to `gemini`, then the `agent` CLI with `--model` flags.
