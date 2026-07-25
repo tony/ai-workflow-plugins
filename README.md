@@ -145,6 +145,42 @@ uv run ./scripts/marketplace.py sync --write
 uv run ./scripts/marketplace.py check-outdated
 ```
 
+### Regenerate the portable skill export
+
+`.agents/skills/` is a generated, committed mirror of every plugin skill and
+command in a form that agents outside Claude Code (Codex, Cursor, pi,
+Antigravity, Grok) can read: one `SKILL.md` per component, spec-only
+frontmatter, no `${CLAUDE_PLUGIN_ROOT}`, and no host-specific inline-bash
+expansion. Files a component references are copied into its own directory, so
+each exported skill is self-contained and can be moved on its own.
+
+```bash
+uv run ./scripts/marketplace.py portable
+```
+
+Verify the committed tree matches the plugins it was generated from:
+
+```bash
+uv run ./scripts/marketplace.py portable --check
+```
+
+Edit `plugins/`, never `.agents/skills/`. `.agents/portable-manifest.json`
+records each exported skill's sources, its bundled files, and how many times
+each source file is copied across the export.
+
+Hosts that scan `.agents/skills/` read the tree straight from a checkout, with
+no install step. The `skills` CLI reads the same tree:
+
+```bash
+npx skills add tony/ai-workflow-plugins
+```
+
+That installs the export and nothing else. The CLI would otherwise also walk
+each plugin's `skills/` directory and offer both renderings of the same skill —
+the exported one and the Claude Code original, which has not been through the
+transform. `metadata.pluginRoot` in the marketplace manifest is what keeps it to
+the export alone; a manifest edit that drops it brings the duplicates back.
+
 ### Code quality for scripts
 
 Lint:

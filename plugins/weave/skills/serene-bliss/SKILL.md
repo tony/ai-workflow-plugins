@@ -62,7 +62,7 @@ preamble mapping each variant slot to one of the three lenses.
 
 The command locks `--variants` and `--preamble`; do not override
 either. For the canonical compound preamble text and the delegation
-contract, see `plugins/weave/commands/serene-bliss.md`.
+contract, see `${CLAUDE_PLUGIN_ROOT}/commands/serene-bliss.md`.
 
 ## Context Packet Expectations
 
