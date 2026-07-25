@@ -1510,7 +1510,13 @@ class SkillBuilder:
             src, plugin = self._pending.pop(0)
             rel = self._vendored[src]
             mode = src.stat().st_mode & 0o777
-            raw = src.read_text(encoding="utf-8")
+            try:
+                raw = src.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                # An assets/ image or font carries no paths to rewrite; copy it
+                # through untouched rather than failing the whole export.
+                self._files[rel] = (src.read_bytes(), mode)
+                continue
             base = plugin
             if src.suffix == _MARKDOWN_SUFFIX:
                 text = self._transform_markdown(raw, plugin, base)
