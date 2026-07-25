@@ -168,6 +168,14 @@ Edit `plugins/`, never `.agents/skills/`. `.agents/portable-manifest.json`
 records each exported skill's sources, its bundled files, and how many times
 each source file is copied across the export.
 
+Hosts that scan `.agents/skills/` read the tree straight from a checkout, with
+no install step. The `skills` CLI also discovers it with no manifest changes,
+because `.agents/skills` is one of the project paths it scans by default:
+
+```bash
+npx skills add tony/ai-workflow-plugins
+```
+
 ### Code quality for scripts
 
 Lint:
