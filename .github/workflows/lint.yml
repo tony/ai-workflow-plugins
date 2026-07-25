@@ -39,6 +39,9 @@ jobs:
       - name: Portable export check
         run: uv run scripts/marketplace.py portable --check
 
+      - name: Skill routing check
+        run: uv run scripts/skill_evals.py check --min-rank1 80
+
   e2e:
     runs-on: ubuntu-latest
     needs: lint
