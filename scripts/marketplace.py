@@ -164,13 +164,22 @@ class PluginEntry(pydantic.BaseModel):
 class MarketplaceMetadata(pydantic.BaseModel):
     """Marketplace metadata block (required by ``claude plugin validate``).
 
+    ``pluginRoot`` is the base path Claude Code applies to relative plugin
+    sources. It must be declared here so ``sync --write`` round-trips it
+    instead of dropping it: third-party skill installers key off its exact
+    spelling to decide whether to walk ``plugins/*/skills``.
+
     Examples
     --------
     >>> MarketplaceMetadata(description="Test marketplace")
-    MarketplaceMetadata(description='Test marketplace')
+    MarketplaceMetadata(description='Test marketplace', pluginRoot=None)
+
+    >>> MarketplaceMetadata(description="Test", pluginRoot=".").pluginRoot
+    '.'
     """
 
     description: str
+    pluginRoot: str | None = None  # noqa: N815
 
 
 class MarketplaceManifest(pydantic.BaseModel):

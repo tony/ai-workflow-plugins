@@ -1,7 +1,8 @@
 {
   "name": "ai-workflow-plugins",
   "metadata": {
-    "description": "Language-agnostic workflow plugins for Claude Code — cross-model AI collaboration, rebase automation, changelog generation, and TDD workflows"
+    "description": "Language-agnostic workflow plugins for Claude Code — cross-model AI collaboration, rebase automation, changelog generation, and TDD workflows",
+    "pluginRoot": "."
   },
   "owner": {
     "name": "Tony Narlock",
