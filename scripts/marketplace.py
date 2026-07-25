@@ -904,6 +904,8 @@ RESOURCE_DIRS = ("references", "templates", "docs", "assets")
 
 _MARKDOWN_SUFFIX = ".md"
 _VENDOR_ROOT = "references"
+_COMPONENT_DEPTH = 2
+"""Segments in a plugin-relative component path, as in ``skills/<name>``."""
 _DESCRIPTION_WRAP = 76
 
 _ASK_TOKEN = "ask-user-choice"  # noqa: S105
@@ -1230,6 +1232,13 @@ def _describe_source_path(plugin_name: str, rel: str) -> str:
     "the pr plugin's quality-gates reference"
     >>> _describe_source_path("commit", "hooks/")
     "the commit plugin's hooks/ directory"
+
+    A path deeper than ``<kind>/<name>`` describes its leaf, so a stale
+    coordinate cannot be laundered into a confident claim about a component
+    that does not exist:
+
+    >>> _describe_source_path("pr", "skills/deslop/references/quality-gates.md")
+    "the pr plugin's quality-gates reference"
     """
     parts = [p for p in rel.split("/") if p]
     if not parts:
@@ -1244,10 +1253,10 @@ def _describe_source_path(plugin_name: str, rel: str) -> str:
         "skills": "skill",
         "hooks": "hook",
     }
+    if len(parts) == _COMPONENT_DEPTH and parts[0] == "skills":
+        return f"the {plugin_name} plugin's {parts[1]} skill"
     stem = parts[-1].split(".")[0]
-    kind = kinds.get(parts[0], "file")
-    if parts[0] == "skills" and len(parts) > 1:
-        stem = parts[1]
+    kind = kinds.get(parts[-2] if len(parts) > 1 else parts[0], "file")
     return f"the {plugin_name} plugin's {stem} {kind}"
 
 

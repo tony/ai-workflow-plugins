@@ -1,7 +1,7 @@
 # Slop registry — versioned, project-overridable.
 #
 # This is a v1 byte-for-byte duplicate of:
-#   the pr plugin's deslop skill
+#   the pr plugin's signatures reference
 #
 # The duplication exists because the plugin root is per-plugin
 # and there is no stable cross-plugin file path. Until v1.1 extracts

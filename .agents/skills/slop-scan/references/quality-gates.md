@@ -1,7 +1,7 @@
 # Quality-Gate Discovery
 
 > **Lockstep note**: the algorithm in this file is identical to
-> the pr plugin's deslop skill; only the
+> the pr plugin's quality-gates reference; only the
 > ownership/usage notes (which steps in which skill consume the
 > result) differ between the two copies. Both the `pr-deslop` skill and
 > this skill run the same discovery algorithm and fallback rules.

@@ -428,7 +428,7 @@
         "references/signatures.yml": "plugins/slop/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/slop/references/slop-taxonomy.md"
       },
-      "bytes": 63559
+      "bytes": 63589
     },
     {
       "name": "spike-bakeoff",
@@ -502,7 +502,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
       },
-      "bytes": 99689
+      "bytes": 99697
     },
     {
       "name": "weave-brainstorm",
@@ -533,7 +533,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
       },
-      "bytes": 112468
+      "bytes": 112476
     },
     {
       "name": "weave-execute",
@@ -571,7 +571,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
       },
-      "bytes": 105798
+      "bytes": 105806
     },
     {
       "name": "weave-prompt",
@@ -600,7 +600,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
       },
-      "bytes": 111127
+      "bytes": 111135
     },
     {
       "name": "weave-review",
@@ -615,7 +615,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
       },
-      "bytes": 104810
+      "bytes": 104818
     },
     {
       "name": "weave-serene-bliss",
@@ -632,7 +632,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
       },
-      "bytes": 97519
+      "bytes": 97527
     }
   ],
   "duplication": {

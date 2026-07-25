@@ -1,7 +1,7 @@
 # Slop Taxonomy
 
 > **Lockstep note**: this catalog is a v1 byte-for-byte duplicate of
-> the pr plugin's deslop skill. Both
+> the pr plugin's slop-taxonomy reference. Both
 > the `pr-deslop` skill and this skill read the matching signature registry,
 > and both must describe the tiers identically. When you change one
 > file, change the other in the same PR. v1.1 will extract this
