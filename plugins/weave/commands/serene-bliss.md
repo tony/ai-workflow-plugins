@@ -90,7 +90,7 @@ reserved flag was seen):
 ## Phase 1: Gather Context
 
 Follow Phase 1 (Gather Context) of
-`plugins/weave/commands/brainstorm-and-refine.md` verbatim — read
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` verbatim — read
 CLAUDE.md/AGENTS.md for project
 conventions, detect the trunk branch, capture the prompt from
 `$ARGUMENTS`. No serene-bliss-specific changes.
@@ -98,7 +98,7 @@ conventions, detect the trunk branch, capture the prompt from
 ## Phase 1b: Build Context Packet
 
 Follow Phase 1b (Build Context Packet) of
-`plugins/weave/commands/brainstorm-and-refine.md` verbatim — assemble
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` verbatim — assemble
 the structured context bundle that
 all models will receive.
 
@@ -112,7 +112,7 @@ this is load-bearing.
 ## Phase 2: Configure and Detect Models
 
 Follow Phase 2 (Configuration and Model Detection) of
-`plugins/weave/commands/brainstorm-and-refine.md` — flag parsing,
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` — flag parsing,
 mode/timeout/passes resolution, model
 detection (Claude, Antigravity, GPT), session directory setup — with these
 **serene-bliss overrides** applied after the standard parsing:
@@ -146,7 +146,7 @@ After model detection completes, count the available models:
   > "Warning: only Claude detected — panel is unavailable. Falling
   > back to host judging for all passes."
   All judging will use the Host Judge Protocol from
-  `plugins/weave/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+  `${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
   Host Judge Protocol).
 
 Record the resolved `judge_mode` and panel member set in
@@ -368,7 +368,7 @@ gpt-5.4-mini via agent.
 ## Phase 4: Present Originals and Transition Gate
 
 Follow Phase 4 (Present Brainstorm Results and Transition Gate) of
-`plugins/weave/commands/brainstorm-and-refine.md` verbatim. Present all
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` verbatim. Present all
 successful brainstorm originals
 to the user, ask which ones enter refinement via `AskUserQuestion`,
 update `session.json` to `phase: "refine"`, and proceed.
@@ -388,7 +388,7 @@ verdicts are merged via peer-only averaging.
 
 The panel judges share a single prompt. Build it identically to the
 **External Judge Protocol** section of
-`plugins/weave/commands/refine.md` — scoring rubric (4 dimensions ×
+`${CLAUDE_PLUGIN_ROOT}/commands/refine.md` — scoring rubric (4 dimensions ×
 0-10), expected output format
 (scores table, winner, rationale, runner-up analysis), and ALL
 selected originals included inline (external models cannot read
@@ -466,7 +466,7 @@ table, winner, rationale, runner-up analysis) with this header:
 If only 2 models are available (degraded panel), launch 2 judges and
 proceed. If only Claude is available (panel infeasible), skip Phase 5
 Steps 1-4 entirely and use the **Host Judge Protocol** from
-`plugins/weave/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
 Host Judge Protocol).
 
 ### Step 3: Parse judge responses
@@ -483,7 +483,7 @@ For each judge that completed dispatch:
 
 **Full-panel failure fallback**: if 0 judges succeed (all parse or
 dispatch failed), fall back to the **Host Judge Protocol** from
-`plugins/weave/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
 Host Judge Protocol). Run
 that protocol now and produce a single `judge.md` file. Mark the
 resulting `panel.md` (Step 4) as
@@ -572,7 +572,7 @@ Write the merged assessment to
 ### Step 5: Weave
 
 Follow Phase 5 Steps 2-3 (Analyze Runners-Up and Weave) of
-`plugins/weave/commands/brainstorm-and-refine.md` verbatim, with one
+`${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` verbatim, with one
 substitution: read `panel.md` (this command's
 merged assessment) instead of `judge.md`. The host (Claude) constructs
 the woven version incorporating the winner plus runner-up strengths
@@ -603,7 +603,7 @@ For each subsequent pass `N`:
 - Output paths use `pass-NNNN` (zero-padded) consistently.
 
 **Early-stop detection** mirrors Phase 6 Step 5 (Early-Stop
-Detection) of `plugins/weave/commands/brainstorm-and-refine.md`: if
+Detection) of `${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md`: if
 the woven version of pass `N` is substantially identical to the woven
 version of pass `N-1`, stop early and skip to Phase 7.
 
