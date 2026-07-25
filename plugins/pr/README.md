@@ -125,7 +125,7 @@ The default mode is **audit-only** — patches are written under
 `.git/deslop/<ts>-<pid>/` for review; nothing is applied. Use
 `--apply-patches` to create fixup commits without rebasing, or
 `--apply-rebase` to also run autosquash. See
-`plugins/pr/skills/deslop/SKILL.md` for the full flag reference and
+`plugins/pr/commands/deslop.md` for the full flag reference and
 edge cases.
 
 ## Gold-Standard Patterns

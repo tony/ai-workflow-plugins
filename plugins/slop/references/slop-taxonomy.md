@@ -1,7 +1,7 @@
 # Slop Taxonomy
 
 > **Lockstep note**: this catalog is a v1 byte-for-byte duplicate of
-> `plugins/pr/skills/deslop/references/slop-taxonomy.md`. Both
+> `plugins/pr/references/slop-taxonomy.md`. Both
 > `/pr:deslop` and `/slop:scan` read the matching signature registry,
 > and both must describe the tiers identically. When you change one
 > file, change the other in the same PR. v1.1 will extract this
