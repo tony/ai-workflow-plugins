@@ -1,0 +1,13 @@
+{
+  "skill_name": "tailwind-spacing-audit",
+  "trigger": {
+    "positive": [
+      { "prompt": "the gaps between these navbar items look uneven", "top_k": 3 },
+      { "prompt": "normalize the inconsistent spacing in this Tailwind component", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "my pytest suite takes too long" },
+      { "prompt": "double-check the analysis you just gave me" }
+    ]
+  }
+}

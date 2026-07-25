@@ -1,0 +1,14 @@
+{
+  "skill_name": "pytest-optimizer",
+  "trigger": {
+    "positive": [
+      { "prompt": "my pytest suite takes too long, can you speed it up", "top_k": 3 },
+      { "prompt": "profile the slow fixtures in this test suite", "top_k": 3 },
+      { "prompt": "which fixtures are unused or mis-scoped", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "double-check the analysis you just gave me", "owner": "double-check" },
+      { "prompt": "brainstorm three approaches to this design", "owner": "brainstorm" }
+    ]
+  }
+}
