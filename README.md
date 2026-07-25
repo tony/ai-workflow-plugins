@@ -169,12 +169,17 @@ records each exported skill's sources, its bundled files, and how many times
 each source file is copied across the export.
 
 Hosts that scan `.agents/skills/` read the tree straight from a checkout, with
-no install step. The `skills` CLI also discovers it with no manifest changes,
-because `.agents/skills` is one of the project paths it scans by default:
+no install step. The `skills` CLI reads the same tree:
 
 ```bash
 npx skills add tony/ai-workflow-plugins
 ```
+
+That installs the export and nothing else. The CLI would otherwise also walk
+each plugin's `skills/` directory and offer both renderings of the same skill —
+the exported one and the Claude Code original, which has not been through the
+transform. `metadata.pluginRoot` in the marketplace manifest is what keeps it to
+the export alone; a manifest edit that drops it brings the duplicates back.
 
 ### Code quality for scripts
 
