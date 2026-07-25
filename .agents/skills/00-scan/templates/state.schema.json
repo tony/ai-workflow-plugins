@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tony/ai-workflow-plugins/pytest-optimizer/state.schema.json",
+  "title": "pytest-optimizer durable memory",
+  "description": "Schemas for the JSON files written under the resolved memory directory (.pytest-optimizer/ or the XDG/LOCALAPPDATA fallback).",
+  "$defs": {
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "memory_dir", "completed"],
+      "properties": {
+        "phase": { "enum": ["scan", "benchmark", "plan", "execute"] },
+        "run_id": { "type": "string" },
+        "memory_dir": { "type": "string" },
+        "collection_hash": { "type": "string" },
+        "env_token": { "type": "string" },
+        "completed": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scan": { "type": "boolean" },
+            "benchmark": { "type": "boolean" },
+            "plan": { "type": "boolean" },
+            "execute": { "type": "boolean" }
+          }
+        },
+        "last_applied_index": { "type": "integer", "minimum": -1 }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pytest_version", "noise"],
+      "properties": {
+        "captured_at": { "type": "string" },
+        "python": { "type": "string" },
+        "pytest_version": { "type": "string" },
+        "plugins": { "type": "object", "additionalProperties": { "type": "string" } },
+        "capabilities": { "type": "object", "additionalProperties": { "type": "boolean" } },
+        "runs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { "wall_seconds": { "type": "number" } }
+          }
+        },
+        "noise": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["median", "mad"],
+          "properties": {
+            "median": { "type": "number" },
+            "mad": { "type": "number" },
+            "floor": { "type": "number" },
+            "k": { "type": "number" }
+          }
+        },
+        "timings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nodeid", "phase", "seconds"],
+            "properties": {
+              "nodeid": { "type": "string" },
+              "phase": { "enum": ["setup", "call", "teardown"] },
+              "seconds": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "heuristic", "addresses", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "heuristic": { "type": "string", "pattern": "^H[0-9]{2}$" },
+        "addresses": { "type": "array", "items": { "type": "integer", "minimum": 1, "maximum": 11 } },
+        "evidence": { "type": "string" },
+        "est_risk": { "enum": ["low", "medium", "high"] },
+        "est_effort": { "enum": ["trivial", "small", "medium", "large"] },
+        "status": { "enum": ["open", "validated", "rejected", "planned", "applied", "skipped"] }
+      }
+    },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "median_delta", "clears_noise", "verdict"],
+      "properties": {
+        "id": { "type": "string" },
+        "runs": { "type": "integer", "minimum": 1 },
+        "median_delta": { "type": "number" },
+        "clears_noise": { "type": "boolean" },
+        "gates": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "order_indep": { "type": "boolean" },
+            "collection_det": { "type": "boolean" },
+            "green": { "type": "boolean" }
+          }
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "observed_risk": { "enum": ["low", "medium", "high"] },
+        "verdict": { "enum": ["validated", "rejected"] },
+        "reason": { "type": "string" }
+      }
+    },
+    "plan_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "id", "score", "files", "commit", "verify"],
+      "properties": {
+        "order": { "type": "integer", "minimum": 1 },
+        "id": { "type": "string" },
+        "score": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["safety", "impact", "effort", "confidence", "reversibility", "total"],
+          "properties": {
+            "safety": { "type": "number", "minimum": 0, "maximum": 1 },
+            "impact": { "type": "number", "minimum": 0, "maximum": 1 },
+            "effort": { "type": "number", "minimum": 0, "maximum": 1 },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "reversibility": { "type": "number", "minimum": 0, "maximum": 1 },
+            "total": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "files": { "type": "array", "items": { "type": "string" } },
+        "commit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["subject", "body"],
+          "properties": {
+            "subject": { "type": "string", "maxLength": 50 },
+            "body": { "type": "string" }
+          }
+        },
+        "verify": { "type": "string" },
+        "depends_on": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "execution_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "id", "applied"],
+      "properties": {
+        "order": { "type": "integer", "minimum": 1 },
+        "id": { "type": "string" },
+        "applied": { "type": "boolean" },
+        "verify": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "passed": { "type": "boolean" },
+            "output_ref": { "type": "string" }
+          }
+        },
+        "commit_sha": { "type": ["string", "null"] },
+        "skip_reason": { "type": ["string", "null"] },
+        "ts": { "type": "string" }
+      }
+    }
+  }
+}
