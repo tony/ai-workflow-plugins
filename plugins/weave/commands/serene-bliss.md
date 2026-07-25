@@ -647,7 +647,7 @@ events.jsonl, latest symlink.
 ## Relationship to the skill
 
 The `weave:serene-bliss` skill at
-`plugins/weave/skills/serene-bliss/SKILL.md` auto-discovers on serene-DX
+`${CLAUDE_PLUGIN_ROOT}/skills/serene-bliss/SKILL.md` auto-discovers on serene-DX
 vocabulary ("serene bliss", "DX bliss", "DX serenity", "DX sublimity",
 "reader happiness", etc.) and routes to this command. The skill owns
 the trigger surface; this command owns the execution contract, the

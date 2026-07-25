@@ -253,7 +253,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/pr/references/slop-taxonomy.md"
       },
-      "bytes": 72783
+      "bytes": 72814
     },
     {
       "name": "pr-merge-commit",

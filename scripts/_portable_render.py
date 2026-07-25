@@ -47,10 +47,20 @@ _ASK_TOKEN = "ask-user-choice"  # noqa: S105
 
 _BASH_PROSE = "run this command and read the output:"
 
-_TOKEN_RE = re.compile(
+REPO_PATH_PATTERN = r"(?<![A-Za-z0-9._/-])plugins/[a-z][a-z0-9-]*/[A-Za-z0-9._/-]*"
+"""A repo-relative path into a plugin, as written in prose or a code span.
+
+Shared with the citation lint in ``marketplace.py`` so the rewriter and the
+check cannot disagree about what counts as one. The lookbehind keeps this
+project's own name inside a URL from reading as a citation.
+"""
+
+TOKEN_RE = re.compile(
     r"""
       (?P<root>\$\{CLAUDE_PLUGIN_ROOT\}(?P<root_path>/[A-Za-z0-9._/-]+)?)
-    | (?P<repo>(?<![A-Za-z0-9._/-])plugins/[a-z][a-z0-9-]*/[A-Za-z0-9._/-]*)(?::\d+(?:-\d+)?)?
+    | (?P<repo>"""
+    + REPO_PATH_PATTERN
+    + r""")(?::\d+(?:-\d+)?)?
     | (?P<res>(?<![A-Za-z0-9._/-])(?:references|templates|docs|assets)/[A-Za-z0-9._/-]+)
     | (?P<slash>(?<![A-Za-z0-9/])/[a-z][a-z0-9-]*:[a-z0-9][a-z0-9-]*)
     """,
@@ -628,7 +638,7 @@ class SkillBuilder:
         """Rewrite every host-specific path or slash token in ``text``."""
         out: list[str] = []
         pos = 0
-        for match in _TOKEN_RE.finditer(text):
+        for match in TOKEN_RE.finditer(text):
             start, end = match.start(), match.end()
             quoted = start > 0 and text[start - 1] == "`" and text[end : end + 1] == "`"
             replacement, drop_quotes = self._replace(match, plugin, base)
@@ -713,8 +723,10 @@ class SkillBuilder:
 
 
 __all__ = [
+    "REPO_PATH_PATTERN",
     "RESOURCE_DIRS",
     "SPEC_FRONTMATTER_KEYS",
+    "TOKEN_RE",
     "BuiltSkill",
     "OutputSkill",
     "PortableIndex",

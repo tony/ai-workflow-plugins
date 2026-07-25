@@ -1,7 +1,7 @@
 # Quality-Gate Discovery
 
 > **Lockstep note**: the algorithm in this file is identical to
-> `plugins/pr/skills/deslop/references/quality-gates.md`; only the
+> `plugins/pr/references/quality-gates.md`; only the
 > ownership/usage notes (which steps in which skill consume the
 > result) differ between the two copies. Both `/pr:deslop` and
 > `/slop:scan` run the same discovery algorithm and fallback rules.

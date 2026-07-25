@@ -1,7 +1,7 @@
 # Slop registry — versioned, project-overridable.
 #
 # This is a v1 byte-for-byte duplicate of:
-#   plugins/pr/skills/deslop/references/signatures.yml
+#   plugins/pr/references/signatures.yml
 #
 # The duplication exists because ${CLAUDE_PLUGIN_ROOT} is per-plugin
 # and there is no stable cross-plugin file path. Until v1.1 extracts

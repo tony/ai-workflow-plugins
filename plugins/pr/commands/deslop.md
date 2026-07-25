@@ -92,16 +92,17 @@ single SHA) and override `<trunk>..HEAD`.
 
 | Skill | Surface | Posture |
 |---|---|---|
-| `/pr:review-pr` | The PR description on GitHub | Read-only — only reports findings (`plugins/pr/commands/review-pr.md:78`). |
+| `/pr:review-pr` | The PR description on GitHub | Read-only — only reports findings, per its *Rules* section in `${CLAUDE_PLUGIN_ROOT}/commands/review-pr.md`. |
 | `/pr:deslop` | The branch's commits (diffs + messages) | Patch series → optional aggregated fixups → optional autosquash. Never edits the PR description. |
 
 Bidirectional: neither skill modifies the other's surface. `deslop`
 may *suggest* running `/pr:review-pr` afterward when it spots
 PR-description problems; it never invokes it.
 
-`/pr:review-pr` already includes a "No brittle details" rubric at
-`plugins/pr/commands/review-pr.md:55`. `/pr:deslop` reuses that rubric
-as Tier A/B core and extends it with the broader signature registry.
+`/pr:review-pr` already includes a "No brittle details" rubric in its
+quality-patterns table (`${CLAUDE_PLUGIN_ROOT}/commands/review-pr.md`).
+`/pr:deslop` reuses that rubric as Tier A/B core and extends it with
+the broader signature registry.
 
 ## Orchestration Plan
 
@@ -726,8 +727,8 @@ passed, recommend `git push --force-with-lease` over `git push
 ## Future: `PostToolUse` preventative hook (not shipped here)
 
 The right preventative layer is a `PostToolUse` hook on `Bash`
-matching `^\s*git\s+commit\b`, in the `commit` plugin
-(`plugins/commit/hooks/`). It would inspect the just-created commit
+matching `^\s*git\s+commit\b`, in the `commit` plugin — which ships
+no hooks today. It would inspect the just-created commit
 message and **warn** (not block) on Tier A signals. The user can
 then run `/pr:deslop --message-only`.
 
@@ -762,11 +763,10 @@ For detailed catalogs and discovery procedures, consult:
 
 ## Cited repo artifacts
 
-- `plugins/pr/commands/review-pr.md:55` — "No brittle details"
-  rubric; this skill extends it for commit-level rules.
-- `plugins/pr/commands/review-pr.md:78` — "Never modify the PR — only
-  report findings" posture; mirrored as
-  `/pr:deslop`'s never-edit-PR-description rule.
+- `${CLAUDE_PLUGIN_ROOT}/commands/review-pr.md` — the "No brittle
+  details" rubric, which this skill extends for commit-level rules,
+  and the "Never modify the PR — only report findings" posture,
+  mirrored as `/pr:deslop`'s never-edit-PR-description rule.
 - `plugins/rebase/commands/rebase.md:46-67` — Phase 4 conflict loop
   with quality gates; the model this skill borrows.
 - `plugins/rebase/commands/rebase.md:9-12` — trunk detection pattern.

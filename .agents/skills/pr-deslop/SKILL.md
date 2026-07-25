@@ -94,16 +94,17 @@ single SHA) and override `<trunk>..HEAD`.
 
 | Skill | Surface | Posture |
 |---|---|---|
-| the `pr-review-pr` skill | The PR description on GitHub | Read-only — only reports findings (the `pr-review-pr` skill). |
+| the `pr-review-pr` skill | The PR description on GitHub | Read-only — only reports findings, per its *Rules* section in the `pr-review-pr` skill. |
 | this skill | The branch's commits (diffs + messages) | Patch series → optional aggregated fixups → optional autosquash. Never edits the PR description. |
 
 Bidirectional: neither skill modifies the other's surface. `deslop`
 may *suggest* running the `pr-review-pr` skill afterward when it spots
 PR-description problems; it never invokes it.
 
-the `pr-review-pr` skill already includes a "No brittle details" rubric at
-the `pr-review-pr` skill. this skill reuses that rubric
-as Tier A/B core and extends it with the broader signature registry.
+the `pr-review-pr` skill already includes a "No brittle details" rubric in its
+quality-patterns table (the `pr-review-pr` skill).
+this skill reuses that rubric as Tier A/B core and extends it with
+the broader signature registry.
 
 ## Orchestration Plan
 
@@ -728,8 +729,8 @@ passed, recommend `git push --force-with-lease` over `git push
 ## Future: `PostToolUse` preventative hook (not shipped here)
 
 The right preventative layer is a `PostToolUse` hook on `Bash`
-matching `^\s*git\s+commit\b`, in the `commit` plugin
-(the commit plugin's hooks/ directory). It would inspect the just-created commit
+matching `^\s*git\s+commit\b`, in the `commit` plugin — which ships
+no hooks today. It would inspect the just-created commit
 message and **warn** (not block) on Tier A signals. The user can
 then run `this skill --message-only`.
 
@@ -764,11 +765,10 @@ For detailed catalogs and discovery procedures, consult:
 
 ## Cited repo artifacts
 
-- the `pr-review-pr` skill — "No brittle details"
-  rubric; this skill extends it for commit-level rules.
-- the `pr-review-pr` skill — "Never modify the PR — only
-  report findings" posture; mirrored as
-  this skill's never-edit-PR-description rule.
+- the `pr-review-pr` skill — the "No brittle
+  details" rubric, which this skill extends for commit-level rules,
+  and the "Never modify the PR — only report findings" posture,
+  mirrored as this skill's never-edit-PR-description rule.
 - the `rebase` skill — Phase 4 conflict loop
   with quality gates; the model this skill borrows.
 - the `rebase` skill — trunk detection pattern.

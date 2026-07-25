@@ -47,6 +47,7 @@ import yaml
 from _portable_render import (  # pyright: ignore[reportImplicitRelativeImport]
     RESOURCE_DIRS,
     SPEC_FRONTMATTER_KEYS,
+    TOKEN_RE,
     BuiltSkill,
     OutputSkill,
     PortableIndex,
@@ -82,6 +83,7 @@ _PLUGIN_RELATED_WORDS = frozenset(
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_PATH = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 PLUGINS_DIR = REPO_ROOT / "plugins"
+
 
 app = typer.Typer(
     help="Marketplace management CLI for ai-workflow-plugins.",
@@ -384,6 +386,23 @@ def parse_frontmatter(path: Path) -> dict[str, t.Any] | None:
     return None
 
 
+def _validate_commands_dir(plugin_name: str, commands_dir: Path) -> list[str]:
+    """Validate commands/*.md frontmatter in a plugin directory."""
+    errors: list[str] = []
+    md_files = sorted(commands_dir.glob("*.md"))
+    if not md_files:
+        errors.append(f"[{plugin_name}] No .md files in commands/")
+    for md_file in md_files:
+        fm = parse_frontmatter(md_file)
+        if fm is None:
+            errors.append(f"[{plugin_name}] commands/{md_file.name}: Missing YAML frontmatter")
+        elif "description" not in fm:
+            errors.append(
+                f"[{plugin_name}] commands/{md_file.name}: Frontmatter missing 'description'"
+            )
+    return errors
+
+
 def _validate_agents_dir(plugin_name: str, agents_dir: Path) -> list[str]:
     """Validate agents/*.md frontmatter in a plugin directory."""
     errors: list[str] = []
@@ -545,6 +564,149 @@ def _validate_lsp_json(plugin_name: str, path: Path) -> list[str]:
     return errors
 
 
+def _is_runtime_instruction(rel: Path) -> bool:
+    """Whether a plugin-relative file is loaded into a host's context at runtime.
+
+    Instruction text is read with the *user's* project as the working directory,
+    so a repo-relative path in it addresses nothing. A plugin's ``README.md`` and
+    its dated design specs are read on GitHub instead, where a repo-relative path
+    is the correct address and rewriting it would break the link.
+
+    Parameters
+    ----------
+    rel : Path
+        Path relative to the plugin directory.
+
+    Returns
+    -------
+    bool
+        True when the file ships as instructions rather than as repo prose.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> _is_runtime_instruction(Path("commands/deslop.md"))
+    True
+    >>> _is_runtime_instruction(Path("README.md"))
+    False
+
+    A spec under ``docs/specs/`` describes the repo's own layout, so its
+    ``plugins/...`` coordinates are the subject matter:
+
+    >>> _is_runtime_instruction(Path("docs/specs/2026-05-17-plan-handoff.md"))
+    False
+
+    A doc a command loads at runtime is not exempt just for living in ``docs/``:
+
+    >>> _is_runtime_instruction(Path("docs/repo-guard-protocol.md"))
+    True
+    """
+    if rel.parts == ("README.md",):
+        return False
+    return rel.parts[:2] != ("docs", "specs")
+
+
+# SPIKE: the split above is by name, not by reachability. The exact question is
+# whether any command or skill can reach the file, which the portable export
+# already answers when it walks a bundle. Wiring that walk in would let a spec
+# that a command actually loads be checked, and would stop a new prose directory
+# from silently opting itself out.
+
+
+def _citation_error(owner: str, token: str, *, exists: bool, runtime: bool) -> str | None:
+    """Report why a repo-relative plugin citation is wrong, or None if it is fine.
+
+    Parameters
+    ----------
+    owner : str
+        Name of the plugin whose file contains the citation.
+    token : str
+        The cited path, without any trailing ``:line`` suffix.
+    exists : bool
+        Whether the cited path resolves in this repo.
+    runtime : bool
+        Whether the citing file ships as instructions (see
+        :func:`_is_runtime_instruction`).
+
+    Returns
+    -------
+    str or None
+        Error text, or None when the citation is legitimate.
+
+    Examples
+    --------
+    A file citing its own plugin by repo path breaks on install, because the host
+    resolves the path against the user's project:
+
+    >>> _citation_error("pr", "plugins/pr/commands/review-pr.md", exists=True, runtime=True)
+    "cites its own plugin by repo path; use '${CLAUDE_PLUGIN_ROOT}/commands/review-pr.md'"
+
+    A citation into a *different* plugin has no ``${CLAUDE_PLUGIN_ROOT}`` spelling
+    — that variable only ever names the citing plugin — so it is left alone:
+
+    >>> _citation_error("weave", "plugins/pr/commands/deslop.md", exists=True, runtime=True) is None
+    True
+
+    Repo prose may address its own plugin, since it is read in the repo:
+
+    >>> _citation_error("weave", "plugins/weave/README.md", exists=True, runtime=False) is None
+    True
+
+    A path that resolves nowhere is an error in any file, in any direction:
+
+    >>> _citation_error("slop", "plugins/pr/references/gone.md", exists=False, runtime=True)
+    'cites a path that does not exist'
+    """
+    if not exists:
+        return "cites a path that does not exist"
+    _, _, remainder = token.partition("/")
+    cited, _, rel = remainder.partition("/")
+    if runtime and cited == owner:
+        return f"cites its own plugin by repo path; use '${{CLAUDE_PLUGIN_ROOT}}/{rel}'"
+    return None
+
+
+def _validate_path_citations(plugin_name: str, plugin_dir: Path) -> list[str]:
+    """Check every ``plugins/...`` path a plugin's files cite.
+
+    Two failures, both invisible until someone installs the plugin: a file
+    pointing into its own plugin by repo path, and a path that resolves nowhere.
+
+    Parameters
+    ----------
+    plugin_name : str
+        Plugin name for error messages.
+    plugin_dir : Path
+        Path to the plugin directory.
+
+    Returns
+    -------
+    list[str]
+        Error messages (empty if valid).
+    """
+    errors: list[str] = []
+    for path in sorted(plugin_dir.rglob("*")):
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        rel = path.relative_to(plugin_dir)
+        runtime = _is_runtime_instruction(rel)
+        for lineno, line in enumerate(text.splitlines(), 1):
+            for match in TOKEN_RE.finditer(line):
+                token = match.group("repo")
+                if token is None:
+                    continue
+                trimmed = token.rstrip(".,;:")
+                exists = (REPO_ROOT / token).exists() or (REPO_ROOT / trimmed).exists()
+                problem = _citation_error(plugin_name, trimmed, exists=exists, runtime=runtime)
+                if problem is not None:
+                    errors.append(f"[{plugin_name}] {rel}:{lineno}: '{token}' {problem}")
+    return errors
+
+
 def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     """Validate a single plugin directory structure.
 
@@ -595,17 +757,7 @@ def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     # Validate commands/*.md frontmatter
     commands_dir = plugin_dir / "commands"
     if commands_dir.exists():
-        md_files = sorted(commands_dir.glob("*.md"))
-        if not md_files:
-            errors.append(f"[{name}] No .md files in commands/")
-        for md_file in md_files:
-            fm = parse_frontmatter(md_file)
-            if fm is None:
-                errors.append(f"[{name}] commands/{md_file.name}: Missing YAML frontmatter")
-            elif "description" not in fm:
-                errors.append(
-                    f"[{name}] commands/{md_file.name}: Frontmatter missing 'description'"
-                )
+        errors.extend(_validate_commands_dir(name, commands_dir))
 
     # Validate agents/*.md and skills/*/SKILL.md frontmatter
     agents_dir = plugin_dir / "agents"
@@ -632,6 +784,8 @@ def validate_plugin_dir(plugin_dir: Path) -> list[str]:
     lsp_json_path = plugin_dir / ".lsp.json"
     if lsp_json_path.exists():
         errors.extend(_validate_lsp_json(name, lsp_json_path))
+
+    errors.extend(_validate_path_citations(name, plugin_dir))
 
     return errors
 
@@ -755,11 +909,11 @@ def lint() -> None:
     console.print()
     if warnings:
         for warning in warnings:
-            console.print(f"[yellow]Warning:[/yellow] {warning}")
+            console.print(f"[yellow]Warning:[/yellow] {rich.markup.escape(warning)}")
 
     if errors:
         for error in errors:
-            console.print(f"[red]Error:[/red] {error}")
+            console.print(f"[red]Error:[/red] {rich.markup.escape(error)}")
         console.print(f"\n[red bold]{len(errors)} error(s) found.[/red bold]")
         raise SystemExit(1)
 
