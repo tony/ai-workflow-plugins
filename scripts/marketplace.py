@@ -1337,6 +1337,42 @@ def _merge_units(group: list[SourceComponent]) -> list[tuple[SourceComponent, So
     return units
 
 
+def _qualify(plugin: str, raw_name: str) -> str:
+    """Namespace an output name with the plugin that owns it.
+
+    Portable skills install into a directory shared with every other pack a
+    user has, so a bare name such as ``this`` or ``scan`` is unsafe there.
+    Names that already lead with the plugin keep their form rather than
+    doubling it.
+
+    Parameters
+    ----------
+    plugin : str
+        Owning plugin name.
+    raw_name : str
+        Component name before namespacing.
+
+    Returns
+    -------
+    str
+        The namespaced output name.
+
+    Examples
+    --------
+    >>> _qualify("merge-pr", "this")
+    'merge-pr-this'
+    >>> _qualify("pytest-optimizer", "00-scan")
+    'pytest-optimizer-00-scan'
+    >>> _qualify("commit", "commit")
+    'commit'
+    >>> _qualify("changelog", "changelog-recut")
+    'changelog-recut'
+    """
+    if raw_name == plugin or raw_name.startswith(f"{plugin}-"):
+        return raw_name
+    return f"{plugin}-{raw_name}"
+
+
 def _assign_names(sources: list[SourceComponent]) -> tuple[list[OutputSkill], PortableIndex]:
     """Resolve output names and build the peer lookup index.
 
@@ -1358,9 +1394,8 @@ def _assign_names(sources: list[SourceComponent]) -> tuple[list[OutputSkill], Po
     index = PortableIndex(by_path={}, by_invocation={})
     for raw_name in sorted(groups):
         units = _merge_units(groups[raw_name])
-        collides = len(units) > 1
         for body, overview in units:
-            name = f"{body.plugin.name}-{raw_name}" if collides else raw_name
+            name = _qualify(body.plugin.name, raw_name)
             skills.append(OutputSkill(name, body, None if overview is body else overview))
             for member in {body, overview}:
                 index.by_path[member.path] = name

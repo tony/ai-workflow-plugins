@@ -1,8 +1,8 @@
 # Lean rubric
 
-The shared reference for the `lean-writing` skill and the `tighten` skill.
+The shared reference for the `lean-writing` skill and the `lean-tighten` skill.
 Curated judgment, not an exhaustive regex registry — for heavy,
-signature-driven detection with commits, use the `scan` skill.
+signature-driven detection with commits, use the `slop-scan` skill.
 
 ## Slop signatures to flag
 

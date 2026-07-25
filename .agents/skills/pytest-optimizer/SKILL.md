@@ -44,10 +44,10 @@ the loop can continue until no candidate clears the rubric.
 
 | Phase | Command | Reads | Writes |
 |-------|---------|-------|--------|
-| 1 | the `00-scan` skill | `AGENTS.md`/`CLAUDE.md`, prior `state.json` | `baseline.json`, `capabilities.json`, `hypotheses.json` |
-| 2 | the `01-benchmark` skill | `baseline.json`, `hypotheses.json` | `benchmarks.json` |
-| 3 | the `02-plan` skill | `benchmarks.json`, `baseline.json` | `plan.json` |
-| 4 | the `03-execute` skill | `plan.json`, `baseline.json` | `execution-log.json` + commits |
+| 1 | the `pytest-optimizer-00-scan` skill | `AGENTS.md`/`CLAUDE.md`, prior `state.json` | `baseline.json`, `capabilities.json`, `hypotheses.json` |
+| 2 | the `pytest-optimizer-01-benchmark` skill | `baseline.json`, `hypotheses.json` | `benchmarks.json` |
+| 3 | the `pytest-optimizer-02-plan` skill | `benchmarks.json`, `baseline.json` | `plan.json` |
+| 4 | the `pytest-optimizer-03-execute` skill | `plan.json`, `baseline.json` | `execution-log.json` + commits |
 
 ## Step 1: Detect preferred tools and the project test command
 

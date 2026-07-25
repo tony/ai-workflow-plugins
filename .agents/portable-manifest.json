@@ -2,166 +2,28 @@
   "generator": "scripts/marketplace.py portable",
   "skills": [
     {
-      "name": "00-scan",
+      "name": "action-worktree",
       "sources": [
-        "plugins/pytest-optimizer/commands/00-scan.md"
+        "plugins/action/commands/worktree.md"
       ],
       "bundled": {
-        "references/durations-parsing.md": "plugins/pytest-optimizer/references/durations-parsing.md",
-        "references/fixture-analysis.md": "plugins/pytest-optimizer/references/fixture-analysis.md",
-        "references/heuristic-catalog.md": "plugins/pytest-optimizer/references/heuristic-catalog.md",
-        "references/memory-schema.md": "plugins/pytest-optimizer/references/memory-schema.md",
-        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
-        "references/parametrize-convention.md": "plugins/pytest-optimizer/references/parametrize-convention.md",
-        "references/version-matrix.md": "plugins/pytest-optimizer/references/version-matrix.md",
-        "templates/pytest_optimizer_plugin.py": "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py",
-        "templates/state.schema.json": "plugins/pytest-optimizer/templates/state.schema.json"
+        "references/ticket-detection.md": "plugins/action/references/ticket-detection.md",
+        "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 58905
+      "bytes": 27415
     },
     {
-      "name": "01-benchmark",
+      "name": "action-worktrees",
       "sources": [
-        "plugins/pytest-optimizer/commands/01-benchmark.md"
+        "plugins/action/commands/worktrees.md"
       ],
       "bundled": {
-        "references/heuristic-catalog.md": "plugins/pytest-optimizer/references/heuristic-catalog.md",
-        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
-        "references/safety-gates.md": "plugins/pytest-optimizer/references/safety-gates.md"
+        "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 26211
+      "bytes": 15844
     },
     {
-      "name": "02-plan",
-      "sources": [
-        "plugins/pytest-optimizer/commands/02-plan.md"
-      ],
-      "bundled": {
-        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
-        "references/scoring-rubric.md": "plugins/pytest-optimizer/references/scoring-rubric.md",
-        "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
-      },
-      "bytes": 11669
-    },
-    {
-      "name": "03-execute",
-      "sources": [
-        "plugins/pytest-optimizer/commands/03-execute.md"
-      ],
-      "bundled": {
-        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
-        "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
-      },
-      "bytes": 7700
-    },
-    {
-      "name": "address",
-      "sources": [
-        "plugins/review/commands/address.md"
-      ],
-      "bundled": {
-        "references/verification-gates.md": "plugins/review/references/verification-gates.md"
-      },
-      "bytes": 16063
-    },
-    {
-      "name": "agy",
-      "sources": [
-        "plugins/model-cli/skills/agy/SKILL.md"
-      ],
-      "bundled": {},
-      "bytes": 6321
-    },
-    {
-      "name": "align",
-      "sources": [
-        "plugins/double-check/commands/align.md"
-      ],
-      "bundled": {
-        "references/verification-contract.md": "plugins/double-check/references/verification-contract.md"
-      },
-      "bytes": 7567
-    },
-    {
-      "name": "architecture",
-      "sources": [
-        "plugins/weave/commands/architecture.md"
-      ],
-      "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
-      },
-      "bytes": 68478
-    },
-    {
-      "name": "ask",
-      "sources": [
-        "plugins/weave/commands/ask.md"
-      ],
-      "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
-      },
-      "bytes": 99576
-    },
-    {
-      "name": "bakeoff",
-      "sources": [
-        "plugins/spike/commands/bakeoff.md"
-      ],
-      "bundled": {
-        "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
-      },
-      "bytes": 17143
-    },
-    {
-      "name": "brainstorm",
-      "sources": [
-        "plugins/weave/commands/brainstorm.md",
-        "plugins/weave/skills/brainstorm/SKILL.md"
-      ],
-      "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/overview.md": "plugins/weave/skills/brainstorm/SKILL.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
-      },
-      "bytes": 57806
-    },
-    {
-      "name": "brainstorm-and-refine",
-      "sources": [
-        "plugins/weave/commands/brainstorm-and-refine.md",
-        "plugins/weave/skills/brainstorm-and-refine/SKILL.md"
-      ],
-      "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/overview.md": "plugins/weave/skills/brainstorm-and-refine/SKILL.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
-      },
-      "bytes": 112349
-    },
-    {
-      "name": "bump",
-      "sources": [
-        "plugins/release/commands/bump.md"
-      ],
-      "bundled": {
-        "references/release-conventions.md": "plugins/release/references/release-conventions.md"
-      },
-      "bytes": 11674
-    },
-    {
-      "name": "case-study-internal",
+      "name": "business-case-study-internal",
       "sources": [
         "plugins/business/commands/case-study-internal.md"
       ],
@@ -170,10 +32,10 @@
         "references/interim-format.md": "plugins/business/references/interim-format.md",
         "references/provenance.md": "plugins/business/references/provenance.md"
       },
-      "bytes": 14385
+      "bytes": 14493
     },
     {
-      "name": "case-study-public",
+      "name": "business-case-study-public",
       "sources": [
         "plugins/business/commands/case-study-public.md"
       ],
@@ -183,7 +45,59 @@
         "references/interim-format.md": "plugins/business/references/interim-format.md",
         "references/provenance.md": "plugins/business/references/provenance.md"
       },
-      "bytes": 18050
+      "bytes": 18140
+    },
+    {
+      "name": "business-pr-release",
+      "sources": [
+        "plugins/business/commands/pr-release.md"
+      ],
+      "bundled": {
+        "references/audiences.md": "plugins/business/references/audiences.md",
+        "references/interim-format.md": "plugins/business/references/interim-format.md",
+        "references/provenance.md": "plugins/business/references/provenance.md"
+      },
+      "bytes": 14775
+    },
+    {
+      "name": "business-report-leadership",
+      "sources": [
+        "plugins/business/commands/report-leadership.md"
+      ],
+      "bundled": {
+        "references/audiences.md": "plugins/business/references/audiences.md",
+        "references/evidence.md": "plugins/business/references/evidence.md",
+        "references/interim-format.md": "plugins/business/references/interim-format.md",
+        "references/measurement.md": "plugins/business/references/measurement.md",
+        "references/provenance.md": "plugins/business/references/provenance.md"
+      },
+      "bytes": 22050
+    },
+    {
+      "name": "business-report-org-wide",
+      "sources": [
+        "plugins/business/commands/report-org-wide.md"
+      ],
+      "bundled": {
+        "references/audiences.md": "plugins/business/references/audiences.md",
+        "references/interim-format.md": "plugins/business/references/interim-format.md",
+        "references/measurement.md": "plugins/business/references/measurement.md",
+        "references/provenance.md": "plugins/business/references/provenance.md"
+      },
+      "bytes": 18971
+    },
+    {
+      "name": "business-research",
+      "sources": [
+        "plugins/business/commands/research.md"
+      ],
+      "bundled": {
+        "references/instruments.md": "plugins/business/references/instruments.md",
+        "references/interim-format.md": "plugins/business/references/interim-format.md",
+        "references/measurement.md": "plugins/business/references/measurement.md",
+        "references/provenance.md": "plugins/business/references/provenance.md"
+      },
+      "bytes": 21151
     },
     {
       "name": "changelog",
@@ -210,52 +124,12 @@
       "bytes": 6258
     },
     {
-      "name": "codex",
-      "sources": [
-        "plugins/model-cli/skills/codex/SKILL.md"
-      ],
-      "bundled": {},
-      "bytes": 5092
-    },
-    {
       "name": "commit",
       "sources": [
         "plugins/commit/commands/commit.md"
       ],
       "bundled": {},
       "bytes": 7754
-    },
-    {
-      "name": "cursor",
-      "sources": [
-        "plugins/model-cli/skills/cursor/SKILL.md"
-      ],
-      "bundled": {},
-      "bytes": 3500
-    },
-    {
-      "name": "cut",
-      "sources": [
-        "plugins/release/commands/cut.md"
-      ],
-      "bundled": {
-        "references/release-conventions.md": "plugins/release/references/release-conventions.md"
-      },
-      "bytes": 13274
-    },
-    {
-      "name": "deslop",
-      "sources": [
-        "plugins/pr/commands/deslop.md"
-      ],
-      "bundled": {
-        "references/apply-template.sh": "plugins/pr/references/apply-template.sh",
-        "references/conflict-loop.md": "plugins/pr/references/conflict-loop.md",
-        "references/quality-gates.md": "plugins/pr/references/quality-gates.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-taxonomy.md": "plugins/pr/references/slop-taxonomy.md"
-      },
-      "bytes": 72744
     },
     {
       "name": "double-check",
@@ -265,54 +139,27 @@
       "bundled": {
         "references/verification-contract.md": "plugins/double-check/references/verification-contract.md"
       },
-      "bytes": 8274
+      "bytes": 8300
     },
     {
-      "name": "execute",
+      "name": "double-check-align",
       "sources": [
-        "plugins/weave/commands/execute.md"
+        "plugins/double-check/commands/align.md"
       ],
       "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
+        "references/verification-contract.md": "plugins/double-check/references/verification-contract.md"
       },
-      "bytes": 65838
+      "bytes": 7580
     },
     {
-      "name": "fix",
+      "name": "lean-tighten",
       "sources": [
-        "plugins/tdd/commands/fix.md"
-      ],
-      "bundled": {},
-      "bytes": 8626
-    },
-    {
-      "name": "fix-review",
-      "sources": [
-        "plugins/weave/commands/fix-review.md"
+        "plugins/lean/commands/tighten.md"
       ],
       "bundled": {
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
+        "references/lean-rubric.md": "plugins/lean/references/lean-rubric.md"
       },
-      "bytes": 29245
-    },
-    {
-      "name": "gemini",
-      "sources": [
-        "plugins/model-cli/skills/gemini/SKILL.md"
-      ],
-      "bundled": {},
-      "bytes": 1408
-    },
-    {
-      "name": "gpt",
-      "sources": [
-        "plugins/model-cli/skills/gpt/SKILL.md"
-      ],
-      "bundled": {},
-      "bytes": 1002
+      "bytes": 6819
     },
     {
       "name": "lean-writing",
@@ -322,40 +169,67 @@
       "bundled": {
         "references/lean-rubric.md": "plugins/lean/references/lean-rubric.md"
       },
-      "bytes": 5022
+      "bytes": 5045
     },
     {
-      "name": "merge-commit",
-      "sources": [
-        "plugins/pr/commands/merge-commit.md"
-      ],
-      "bundled": {},
-      "bytes": 6585
-    },
-    {
-      "name": "multiple",
+      "name": "merge-pr-multiple",
       "sources": [
         "plugins/merge-pr/commands/multiple.md"
       ],
       "bundled": {
         "references/merge-readiness.md": "plugins/merge-pr/references/merge-readiness.md"
       },
-      "bytes": 10312
+      "bytes": 10339
     },
     {
-      "name": "plan",
+      "name": "merge-pr-this",
       "sources": [
-        "plugins/weave/commands/plan.md"
+        "plugins/merge-pr/commands/this.md"
       ],
       "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/merge-readiness.md": "plugins/merge-pr/references/merge-readiness.md"
       },
-      "bytes": 105691
+      "bytes": 9803
+    },
+    {
+      "name": "model-cli-agy",
+      "sources": [
+        "plugins/model-cli/skills/agy/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 6331
+    },
+    {
+      "name": "model-cli-codex",
+      "sources": [
+        "plugins/model-cli/skills/codex/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 5102
+    },
+    {
+      "name": "model-cli-cursor",
+      "sources": [
+        "plugins/model-cli/skills/cursor/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 3510
+    },
+    {
+      "name": "model-cli-gemini",
+      "sources": [
+        "plugins/model-cli/skills/gemini/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 1448
+    },
+    {
+      "name": "model-cli-gpt",
+      "sources": [
+        "plugins/model-cli/skills/gpt/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 1052
     },
     {
       "name": "pr",
@@ -366,6 +240,28 @@
         "references/template-resolution.md": "plugins/pr/references/template-resolution.md"
       },
       "bytes": 10226
+    },
+    {
+      "name": "pr-deslop",
+      "sources": [
+        "plugins/pr/commands/deslop.md"
+      ],
+      "bundled": {
+        "references/apply-template.sh": "plugins/pr/references/apply-template.sh",
+        "references/conflict-loop.md": "plugins/pr/references/conflict-loop.md",
+        "references/quality-gates.md": "plugins/pr/references/quality-gates.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-taxonomy.md": "plugins/pr/references/slop-taxonomy.md"
+      },
+      "bytes": 72783
+    },
+    {
+      "name": "pr-merge-commit",
+      "sources": [
+        "plugins/pr/commands/merge-commit.md"
+      ],
+      "bundled": {},
+      "bytes": 6588
     },
     {
       "name": "pr-recut",
@@ -386,38 +282,12 @@
       "bytes": 6051
     },
     {
-      "name": "pr-release",
+      "name": "pr-review-pr",
       "sources": [
-        "plugins/business/commands/pr-release.md"
+        "plugins/pr/commands/review-pr.md"
       ],
-      "bundled": {
-        "references/audiences.md": "plugins/business/references/audiences.md",
-        "references/interim-format.md": "plugins/business/references/interim-format.md",
-        "references/provenance.md": "plugins/business/references/provenance.md"
-      },
-      "bytes": 14667
-    },
-    {
-      "name": "probe",
-      "sources": [
-        "plugins/spike/commands/probe.md"
-      ],
-      "bundled": {
-        "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
-      },
-      "bytes": 16481
-    },
-    {
-      "name": "prompt",
-      "sources": [
-        "plugins/weave/commands/prompt.md"
-      ],
-      "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
-      },
-      "bytes": 63874
+      "bundled": {},
+      "bytes": 4837
     },
     {
       "name": "pytest-optimizer",
@@ -438,7 +308,60 @@
         "templates/pytest_optimizer_plugin.py": "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py",
         "templates/state.schema.json": "plugins/pytest-optimizer/templates/state.schema.json"
       },
-      "bytes": 76471
+      "bytes": 76539
+    },
+    {
+      "name": "pytest-optimizer-00-scan",
+      "sources": [
+        "plugins/pytest-optimizer/commands/00-scan.md"
+      ],
+      "bundled": {
+        "references/durations-parsing.md": "plugins/pytest-optimizer/references/durations-parsing.md",
+        "references/fixture-analysis.md": "plugins/pytest-optimizer/references/fixture-analysis.md",
+        "references/heuristic-catalog.md": "plugins/pytest-optimizer/references/heuristic-catalog.md",
+        "references/memory-schema.md": "plugins/pytest-optimizer/references/memory-schema.md",
+        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
+        "references/parametrize-convention.md": "plugins/pytest-optimizer/references/parametrize-convention.md",
+        "references/version-matrix.md": "plugins/pytest-optimizer/references/version-matrix.md",
+        "templates/pytest_optimizer_plugin.py": "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py",
+        "templates/state.schema.json": "plugins/pytest-optimizer/templates/state.schema.json"
+      },
+      "bytes": 58922
+    },
+    {
+      "name": "pytest-optimizer-01-benchmark",
+      "sources": [
+        "plugins/pytest-optimizer/commands/01-benchmark.md"
+      ],
+      "bundled": {
+        "references/heuristic-catalog.md": "plugins/pytest-optimizer/references/heuristic-catalog.md",
+        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
+        "references/safety-gates.md": "plugins/pytest-optimizer/references/safety-gates.md"
+      },
+      "bytes": 26245
+    },
+    {
+      "name": "pytest-optimizer-02-plan",
+      "sources": [
+        "plugins/pytest-optimizer/commands/02-plan.md"
+      ],
+      "bundled": {
+        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
+        "references/scoring-rubric.md": "plugins/pytest-optimizer/references/scoring-rubric.md",
+        "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
+      },
+      "bytes": 11703
+    },
+    {
+      "name": "pytest-optimizer-03-execute",
+      "sources": [
+        "plugins/pytest-optimizer/commands/03-execute.md"
+      ],
+      "bundled": {
+        "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
+        "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
+      },
+      "bytes": 7751
     },
     {
       "name": "rebase",
@@ -449,87 +372,53 @@
       "bytes": 4301
     },
     {
-      "name": "refine",
+      "name": "release-bump",
       "sources": [
-        "plugins/weave/commands/refine.md",
-        "plugins/weave/skills/refine/SKILL.md"
+        "plugins/release/commands/bump.md"
       ],
       "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/overview.md": "plugins/weave/skills/refine/SKILL.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/release-conventions.md": "plugins/release/references/release-conventions.md"
       },
-      "bytes": 111038
+      "bytes": 11732
     },
     {
-      "name": "report-leadership",
+      "name": "release-cut",
       "sources": [
-        "plugins/business/commands/report-leadership.md"
+        "plugins/release/commands/cut.md"
       ],
       "bundled": {
-        "references/audiences.md": "plugins/business/references/audiences.md",
-        "references/evidence.md": "plugins/business/references/evidence.md",
-        "references/interim-format.md": "plugins/business/references/interim-format.md",
-        "references/measurement.md": "plugins/business/references/measurement.md",
-        "references/provenance.md": "plugins/business/references/provenance.md"
+        "references/release-conventions.md": "plugins/release/references/release-conventions.md"
       },
-      "bytes": 21942
+      "bytes": 13298
     },
     {
-      "name": "report-org-wide",
+      "name": "release-update-downstream-packages",
       "sources": [
-        "plugins/business/commands/report-org-wide.md"
-      ],
-      "bundled": {
-        "references/audiences.md": "plugins/business/references/audiences.md",
-        "references/interim-format.md": "plugins/business/references/interim-format.md",
-        "references/measurement.md": "plugins/business/references/measurement.md",
-        "references/provenance.md": "plugins/business/references/provenance.md"
-      },
-      "bytes": 18863
-    },
-    {
-      "name": "research",
-      "sources": [
-        "plugins/business/commands/research.md"
-      ],
-      "bundled": {
-        "references/instruments.md": "plugins/business/references/instruments.md",
-        "references/interim-format.md": "plugins/business/references/interim-format.md",
-        "references/measurement.md": "plugins/business/references/measurement.md",
-        "references/provenance.md": "plugins/business/references/provenance.md"
-      },
-      "bytes": 21142
-    },
-    {
-      "name": "review",
-      "sources": [
-        "plugins/weave/commands/review.md"
-      ],
-      "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
-      },
-      "bytes": 104697
-    },
-    {
-      "name": "review-pr",
-      "sources": [
-        "plugins/pr/commands/review-pr.md"
+        "plugins/release/commands/update-downstream-packages.md"
       ],
       "bundled": {},
-      "bytes": 4834
+      "bytes": 8017
     },
     {
-      "name": "scan",
+      "name": "research-study-deps",
+      "sources": [
+        "plugins/research/skills/deps/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 8442
+    },
+    {
+      "name": "review-address",
+      "sources": [
+        "plugins/review/commands/address.md"
+      ],
+      "bundled": {
+        "references/verification-gates.md": "plugins/review/references/verification-gates.md"
+      },
+      "bytes": 16104
+    },
+    {
+      "name": "slop-scan",
       "sources": [
         "plugins/slop/commands/scan.md"
       ],
@@ -539,32 +428,27 @@
         "references/signatures.yml": "plugins/slop/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/slop/references/slop-taxonomy.md"
       },
-      "bytes": 63470
+      "bytes": 63559
     },
     {
-      "name": "serene-bliss",
+      "name": "spike-bakeoff",
       "sources": [
-        "plugins/weave/commands/serene-bliss.md",
-        "plugins/weave/skills/serene-bliss/SKILL.md"
+        "plugins/spike/commands/bakeoff.md"
       ],
       "bundled": {
-        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
-        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
-        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/overview.md": "plugins/weave/skills/serene-bliss/SKILL.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md",
-        "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 97304
+      "bytes": 17226
     },
     {
-      "name": "study-deps",
+      "name": "spike-probe",
       "sources": [
-        "plugins/research/skills/deps/SKILL.md"
+        "plugins/spike/commands/probe.md"
       ],
-      "bundled": {},
-      "bytes": 8433
+      "bundled": {
+        "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
+      },
+      "bytes": 16529
     },
     {
       "name": "tailwind-spacing-audit",
@@ -578,61 +462,177 @@
       "bytes": 28530
     },
     {
-      "name": "this",
+      "name": "tdd-fix",
       "sources": [
-        "plugins/merge-pr/commands/this.md"
-      ],
-      "bundled": {
-        "references/merge-readiness.md": "plugins/merge-pr/references/merge-readiness.md"
-      },
-      "bytes": 9776
-    },
-    {
-      "name": "tighten",
-      "sources": [
-        "plugins/lean/commands/tighten.md"
-      ],
-      "bundled": {
-        "references/lean-rubric.md": "plugins/lean/references/lean-rubric.md"
-      },
-      "bytes": 6776
-    },
-    {
-      "name": "update-downstream-packages",
-      "sources": [
-        "plugins/release/commands/update-downstream-packages.md"
+        "plugins/tdd/commands/fix.md"
       ],
       "bundled": {},
-      "bytes": 8009
+      "bytes": 8630
     },
     {
-      "name": "worktree",
-      "sources": [
-        "plugins/action/commands/worktree.md"
-      ],
-      "bundled": {
-        "references/ticket-detection.md": "plugins/action/references/ticket-detection.md",
-        "references/verification-gates.md": "plugins/action/references/verification-gates.md"
-      },
-      "bytes": 27346
-    },
-    {
-      "name": "worktrees",
-      "sources": [
-        "plugins/action/commands/worktrees.md"
-      ],
-      "bundled": {
-        "references/verification-gates.md": "plugins/action/references/verification-gates.md"
-      },
-      "bytes": 15712
-    },
-    {
-      "name": "xfail",
+      "name": "tdd-xfail",
       "sources": [
         "plugins/tdd/skills/xfail/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 12913
+      "bytes": 12917
+    },
+    {
+      "name": "weave-architecture",
+      "sources": [
+        "plugins/weave/commands/architecture.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md"
+      },
+      "bytes": 68550
+    },
+    {
+      "name": "weave-ask",
+      "sources": [
+        "plugins/weave/commands/ask.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+      },
+      "bytes": 99689
+    },
+    {
+      "name": "weave-brainstorm",
+      "sources": [
+        "plugins/weave/commands/brainstorm.md",
+        "plugins/weave/skills/brainstorm/SKILL.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/overview.md": "plugins/weave/skills/brainstorm/SKILL.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md"
+      },
+      "bytes": 57878
+    },
+    {
+      "name": "weave-brainstorm-and-refine",
+      "sources": [
+        "plugins/weave/commands/brainstorm-and-refine.md",
+        "plugins/weave/skills/brainstorm-and-refine/SKILL.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/overview.md": "plugins/weave/skills/brainstorm-and-refine/SKILL.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+      },
+      "bytes": 112468
+    },
+    {
+      "name": "weave-execute",
+      "sources": [
+        "plugins/weave/commands/execute.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md"
+      },
+      "bytes": 65910
+    },
+    {
+      "name": "weave-fix-review",
+      "sources": [
+        "plugins/weave/commands/fix-review.md"
+      ],
+      "bundled": {
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md"
+      },
+      "bytes": 29311
+    },
+    {
+      "name": "weave-plan",
+      "sources": [
+        "plugins/weave/commands/plan.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+      },
+      "bytes": 105798
+    },
+    {
+      "name": "weave-prompt",
+      "sources": [
+        "plugins/weave/commands/prompt.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md"
+      },
+      "bytes": 63934
+    },
+    {
+      "name": "weave-refine",
+      "sources": [
+        "plugins/weave/commands/refine.md",
+        "plugins/weave/skills/refine/SKILL.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/overview.md": "plugins/weave/skills/refine/SKILL.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+      },
+      "bytes": 111127
+    },
+    {
+      "name": "weave-review",
+      "sources": [
+        "plugins/weave/commands/review.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+      },
+      "bytes": 104810
+    },
+    {
+      "name": "weave-serene-bliss",
+      "sources": [
+        "plugins/weave/commands/serene-bliss.md",
+        "plugins/weave/skills/serene-bliss/SKILL.md"
+      ],
+      "bundled": {
+        "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
+        "references/deslop-pass.md": "plugins/weave/references/deslop-pass.md",
+        "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
+        "references/overview.md": "plugins/weave/skills/serene-bliss/SKILL.md",
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/signatures.yml": "plugins/pr/references/signatures.yml",
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+      },
+      "bytes": 97519
     }
   ],
   "duplication": {
@@ -686,13 +686,13 @@
   },
   "external_paths": {
     "docs/architecture.md": [
-      "scan"
+      "slop-scan"
     ],
     "docs/architecture.md.": [
-      "scan"
+      "slop-scan"
     ],
     "docs/install.md": [
-      "scan"
+      "slop-scan"
     ],
     "docs/pull_request_template.md": [
       "pr",

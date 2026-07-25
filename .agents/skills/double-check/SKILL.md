@@ -9,8 +9,8 @@ description: >-
   source artifacts and returns it standalone in the original request's
   structure — never a revision log of the prior turn. Also invoke before
   re-running any analysis whose output the user has already seen once. To
-  repair a chat where a diff-shaped answer already happened, use the `align`
-  skill.
+  repair a chat where a diff-shaped answer already happened, use the
+  `double-check-align` skill.
 metadata:
   source: "plugins/double-check/skills/double-check/SKILL.md"
 ---

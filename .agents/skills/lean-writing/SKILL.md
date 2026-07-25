@@ -6,8 +6,8 @@ description: >-
   tight and slop-free: lead with the result, state current truth over the
   journey, reuse before creating, and preserve references when editing.
   Guidance only; it never edits files. To clean slop out of existing files
-  in place, use the `tighten` skill; for repo-wide or branch-scoped commit
-  cleanup, use the `scan` skill or the `deslop` skill.
+  in place, use the `lean-tighten` skill; for repo-wide or branch-scoped
+  commit cleanup, use the `slop-scan` skill or the `pr-deslop` skill.
 allowed-tools: ["Read", "Grep", "Glob"]
 metadata:
   source: "plugins/lean/skills/lean-writing/SKILL.md"

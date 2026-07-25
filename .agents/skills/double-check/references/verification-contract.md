@@ -1,7 +1,7 @@
 # The verification contract
 
 The shared rule behind the `double-check` skill and
-the `align` skill. Both load this file; host projects can copy
+the `double-check-align` skill. Both load this file; host projects can copy
 the fragment at the bottom into their own AGENTS.md.
 
 ## The failure
