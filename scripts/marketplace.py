@@ -991,9 +991,39 @@ def _serialize_manifest(manifest: MarketplaceManifest) -> str:
     return json.dumps(raw_out, indent=2, ensure_ascii=False) + "\n"
 
 
+def _load_plugin_json(plugin_dir: Path) -> PluginJson:
+    """Read and validate one plugin's manifest.
+
+    Parameters
+    ----------
+    plugin_dir : Path
+        A directory under ``plugins/`` holding ``.claude-plugin/plugin.json``.
+
+    Returns
+    -------
+    PluginJson
+        The parsed manifest.
+
+    Examples
+    --------
+    >>> plugin_dir = discover_plugins()[0]
+    >>> _load_plugin_json(plugin_dir).name == plugin_dir.name
+    True
+    """
+    raw = t.cast(
+        "dict[str, t.Any]",
+        json.loads((plugin_dir / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")),
+    )
+    return PluginJson.model_validate(raw)
+
+
 @app.command()
 def sync(*, write: bool = False, check: bool = False) -> None:
     """Compare discovered plugins with marketplace manifest.
+
+    Drift is a plugin present on one side only, or an entry whose description
+    no longer matches its ``plugin.json``. Descriptions are the listing users
+    read, and nothing else in CI compares them.
 
     Parameters
     ----------
@@ -1024,8 +1054,14 @@ def sync(*, write: bool = False, check: bool = False) -> None:
 
     additions = sorted(discovered_names - manifest_names)
     removals = sorted(manifest_names - discovered_names)
+    stale = sorted(
+        entry.name
+        for entry in manifest.plugins
+        if entry.name in discovered_names
+        and entry.description != _load_plugin_json(PLUGINS_DIR / entry.name).description
+    )
 
-    if not additions and not removals:
+    if not additions and not removals and not stale:
         console.print("[green]Marketplace manifest is in sync with plugins/.[/green]")
         return
 
@@ -1037,6 +1073,8 @@ def sync(*, write: bool = False, check: bool = False) -> None:
         table.add_row("[green]+ Add[/green]", name)
     for name in removals:
         table.add_row("[red]- Remove[/red]", name)
+    for name in stale:
+        table.add_row("[yellow]~ Description[/yellow]", name)
 
     console.print(table)
 
@@ -1054,13 +1092,7 @@ def sync(*, write: bool = False, check: bool = False) -> None:
 
     # Add new plugins
     for name in additions:
-        plugin_dir = PLUGINS_DIR / name
-        plugin_json_path = plugin_dir / ".claude-plugin" / "plugin.json"
-        raw = t.cast(
-            "dict[str, t.Any]",
-            json.loads(plugin_json_path.read_text(encoding="utf-8")),
-        )
-        plugin_meta = PluginJson.model_validate(raw)
+        plugin_meta = _load_plugin_json(PLUGINS_DIR / name)
         new_entry = PluginEntry(
             name=plugin_meta.name,
             description=plugin_meta.description,
@@ -1078,6 +1110,11 @@ def sync(*, write: bool = False, check: bool = False) -> None:
 
     # Remove missing plugins
     manifest.plugins = [e for e in manifest.plugins if e.name not in removals]
+
+    # Refresh drifted descriptions
+    for entry in manifest.plugins:
+        if entry.name in stale:
+            entry.description = _load_plugin_json(PLUGINS_DIR / entry.name).description
 
     # Write updated manifest
     _ = MARKETPLACE_PATH.write_text(_serialize_manifest(manifest), encoding="utf-8")
