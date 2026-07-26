@@ -23,14 +23,22 @@ Lint the marketplace:
 ...     capture_output=True,
 ...     text=True,
 ...     cwd=REPO_ROOT,
+...     env={**os.environ, "CI": ""},
 ... )
 >>> "errors" in result.stdout.lower() or result.returncode == 0
 True
+
+``CI`` is cleared so this exercises one path regardless of where it runs.
+Under ``CI`` a missing ``claude`` binary is an error, and ``lint`` reports
+counts as ``N error(s) found.`` rather than ``0 errors found.`` -- neither
+substring the assertion looks for, so the doctest would fail for a reason
+that has nothing to do with the manifest.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -826,8 +834,16 @@ def _run_claude_validate(path: Path) -> tuple[list[str], list[str]]:
 
 
 def _lint_claude_validate() -> tuple[list[str], list[str]]:
-    """Run ``claude plugin validate`` on the repo and each plugin, printing status."""
+    """Run ``claude plugin validate`` on the repo and each plugin, printing status.
+
+    A missing CLI is a skip locally and an error under CI. Skipping silently in
+    CI turns the only schema-level check into a no-op while the job still
+    reports zero errors, which is how a manifest that fails validation reached
+    the default branch unnoticed.
+    """
     if shutil.which("claude") is None:
+        if os.environ.get("CI"):
+            return ["claude validate: CLI not found (required under CI)"], []
         console.print("\n[dim]Skipping claude plugin validate (CLI not found)[/dim]")
         return [], []
 
