@@ -1,0 +1,9 @@
+{
+  "name": "ruff",
+  "description": "Move one repo or a whole fleet onto a new ruff release — work out which rules the release can actually fire against each repo's own select list, gate on the resolver being able to see the version at all, then land one reviewed commit per rule with the upstream rule doc cited",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}
