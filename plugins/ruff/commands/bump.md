@@ -1,6 +1,6 @@
 ---
 description: Move one repo or a whole fleet onto a new ruff release — predict which rules can fire against each repo's own select list, gate on the resolver seeing the version, then land one reviewed commit per rule
-argument-hint: "[version] [--root <dir>] [--repo <path|slug>...] [--owner <name>...] [--branch <name>] [--audit-only] [--no-pr] [--no-changelog]"
+argument-hint: "[version] [--root <dir>] [--repo <path|slug>...] [--owner <name>...] [--branch <name>] [--adopt-defaults] [--audit-only] [--no-pr] [--no-changelog]"
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 ---
 
@@ -8,10 +8,11 @@ allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "W
 
 Raise the ruff version floor across the repositories in scope and absorb everything the new release surfaces — one commit per rule, each justified against the rule's own documentation, behind the project's own quality gates.
 
-Two references carry the parts that are easy to get wrong. Read both before acting on anything.
+Three references carry the parts that are easy to get wrong. Read all three before acting on anything.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/release-triage.md` — how to work out what a release actually does to a specific repo, and how much care each class of fix needs.
 - `${CLAUDE_PLUGIN_ROOT}/references/pin-sites-and-gating.md` — every file a version can be pinned in, and what to do when the resolver refuses to see the release.
+- `${CLAUDE_PLUGIN_ROOT}/references/default-rule-set.md` — measuring and adopting a newly curated default rule set, and curating what it surfaces.
 
 User arguments: $ARGUMENTS
 
@@ -51,7 +52,7 @@ Within scope, drop repositories that have no ruff configuration at all, and repo
 
 Follow the triage reference. Read the release's own changelog at its tag, sort every change into the five buckets, then — separately for each repository — intersect those buckets with that repository's effective rule selection to predict exactly which diagnostics it can produce. Repositories that share a configuration share a prediction; do the research once and reuse it.
 
-The intersection is the point of this phase. A release that expands the default rule set is inert for a repository with an explicit `select`, and reporting it as a risk there is noise. A formatter change that widens which *file types* are covered applies everywhere regardless of rule selection, and is usually the largest single source of diff.
+The intersection is the point of this phase. A release that expands the default rule set produces no new diagnostics for a repository with an explicit `select` — but that is a finding, not a non-event, and phase 8 is where it gets raised rather than filed under noise. A formatter change that widens which *file types* are covered applies everywhere regardless of rule selection, and is usually the largest single source of diff.
 
 Dispatch a subagent per repository where the host supports it, since the repositories are independent.
 
@@ -71,7 +72,15 @@ Only when the resolver genuinely cannot see the target version. Follow the gatin
 
 Edit every pin site the reference enumerates, in one commit. Prefer a floor over an exact pin, except in pre-commit configuration where the tag is exact by design. Refresh the lockfile with the project's own resolver, and confirm the lock actually moved to the target version rather than assuming the constraint was enough. Cite the release notes in the commit body.
 
-### 8. One rule, one commit
+### 8. Surface the default-rule-set decision
+
+If the release changed the default rule set and a repository sets an explicit `select`, that repository gets no new diagnostics — and is now silently opted out of the vendor's recommended baseline, invisibly and permanently. Do not report this as inert.
+
+Follow the default-rule-set reference: measure each repository's real delta by extending its configured selection with the default codes on the command line, then present the per-repo finding counts alongside the recommended config shape. With `--adopt-defaults`, carry the change through — the config edit lands as its own commit, before any fix or ignore, and reports the enabled-rule count before and after. Without the flag, report the measurement and stop, so the decision stays the user's.
+
+Whole-linter prefixes are not a substitute for the default codes: a curated default set takes a subset of each linter, so selecting whole prefixes enables far more than the vendor recommends. Measure it rather than assuming, and say what the measurement showed.
+
+### 9. One rule, one commit
 
 Enumerate the distinct rule codes the linter now reports. For each, in its own commit: apply that rule's safe fixes alone, hand-fix what the autofix leaves, re-run the project's quality checks, and commit with a body that explains why the rule exists, what changed, and — for behavior-changing rules — what the behavior delta is. Close each body with the rule's documentation URL.
 
@@ -79,13 +88,13 @@ A rule that produces a large mechanical diff across many files is still one comm
 
 Do not add code comments explaining a lint fix. The commit message carries the rationale, and a comment naming a linter rule ages into noise the moment the rule is renamed or removed. Configuration files are the exception: a temporary resolver exemption must be annotated where it lives.
 
-### 9. Verify before claiming anything
+### 10. Verify before claiming anything
 
 Run the project's own quality checks — lint, format check, type check, tests — as defined in its `AGENTS.md`/`CLAUDE.md` or its CI workflow. Never substitute assumed commands for the ones the project actually runs.
 
 If tests fail, establish whether they fail on the default branch too before attributing the failure to the bump. Pre-existing failures are reported, not fixed and not concealed. Never report green without having read the output that says so.
 
-### 10. Push, open, watch, record
+### 11. Push, open, watch, record
 
 Push the branch and open a pull request unless `--no-pr`. The body states which rules moved and links each to its documentation, and — when phase 6 applied — carries an explicit pre-merge instruction to drop the exemption and re-resolve, with the time the block lapses.
 
@@ -108,9 +117,10 @@ Open with a one-line hero (`✓ N repos on ruff X.Y.Z` or `⚠ Audit only: N rep
 
 1. `## Release` — what the target version changes, sorted into the triage buckets, with the formatter's scope change called out separately if there is one.
 2. `## Scope` — repositories in scope with their current and target versions, and what was excluded as fork, unowned, already-current, or already-branched.
-3. `## Per repo` — for each: the rules that fired against its selection, the commits made, and the pull request.
-4. `## Verification` — the quality checks run per repository and their real results, with any pre-existing failure named as pre-existing.
-5. `## Pre-merge` — every repository carrying a temporary resolver exemption, and when its block lapses.
-6. `## Drift` — pin sites found disagreeing with each other before the bump, repositories with no lint configuration, and repositories relying on the default rule set.
+3. `## Default rule set` — per repository: whether it is opted out of the vendor's default set, the measured finding delta if it adopted them, and the recommended config shape. Omit this section only when the release did not change the default set.
+4. `## Per repo` — for each: the rules that fired against its selection, the commits made, and the pull request.
+5. `## Verification` — the quality checks run per repository and their real results, with any pre-existing failure named as pre-existing.
+6. `## Pre-merge` — every repository carrying a temporary resolver exemption, and when its block lapses.
+7. `## Drift` — pin sites found disagreeing with each other before the bump, repositories with no lint configuration, and repositories relying on the default rule set.
 
 End with an `AskUserQuestion` panel offering next steps — for example: drop the resolver exemptions now that the block has lapsed, merge the green pull requests, adopt a newly stabilized rule that is currently unselected, or stop here. Skip the panel only in plan mode.

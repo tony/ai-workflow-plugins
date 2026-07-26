@@ -456,10 +456,11 @@
         "plugins/ruff/commands/bump.md"
       ],
       "bundled": {
+        "references/default-rule-set.md": "plugins/ruff/references/default-rule-set.md",
         "references/pin-sites-and-gating.md": "plugins/ruff/references/pin-sites-and-gating.md",
         "references/release-triage.md": "plugins/ruff/references/release-triage.md"
       },
-      "bytes": 22358
+      "bytes": 30887
     },
     {
       "name": "situate",
@@ -805,6 +806,7 @@
     "plugins/pr/references/slop-taxonomy.md": 1,
     "plugins/pytest-optimizer/templates/conftest_cache_snippet.py": 1,
     "plugins/review/references/verification-gates.md": 1,
+    "plugins/ruff/references/default-rule-set.md": 1,
     "plugins/ruff/references/pin-sites-and-gating.md": 1,
     "plugins/ruff/references/release-triage.md": 1,
     "plugins/slop/references/commit-template.md": 1,
