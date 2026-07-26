@@ -31,6 +31,7 @@ True
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -826,8 +827,16 @@ def _run_claude_validate(path: Path) -> tuple[list[str], list[str]]:
 
 
 def _lint_claude_validate() -> tuple[list[str], list[str]]:
-    """Run ``claude plugin validate`` on the repo and each plugin, printing status."""
+    """Run ``claude plugin validate`` on the repo and each plugin, printing status.
+
+    A missing CLI is a skip locally and an error under CI. Skipping silently in
+    CI turns the only schema-level check into a no-op while the job still
+    reports zero errors, which is how a manifest that fails validation reached
+    the default branch unnoticed.
+    """
     if shutil.which("claude") is None:
+        if os.environ.get("CI"):
+            return ["claude validate: CLI not found (required under CI)"], []
         console.print("\n[dim]Skipping claude plugin validate (CLI not found)[/dim]")
         return [], []
 
