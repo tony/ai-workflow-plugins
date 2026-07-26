@@ -318,9 +318,15 @@ Each component type has specific frontmatter requirements:
 - `disallowedTools` (optional) — comma-separated tools to deny
 - `model` (optional) — `sonnet`, `opus`, `haiku`, `fable`, a full model
   ID, or `inherit`; defaults to `inherit`
+- `effort` (optional) — `low`, `medium`, `high`, `xhigh`, or `max`;
+  inherits the session level when unset
 - `maxTurns` (optional) — max agentic turns before agent stops
 - `skills` (optional) — skill names to preload into agent context
 - `memory` (optional) — persistent memory scope: `user`, `project`, `local`
+- `background` (optional) — `true` always runs the agent as a background
+  task; Claude chooses when unset
+- `isolation` (optional) — `worktree`, the only valid value, runs the
+  agent in a temporary git worktree off the default branch
 - `color` (optional) — visual indicator: `red`, `blue`, `green`,
   `yellow`, `purple`, `orange`, `pink`, or `cyan`
 
