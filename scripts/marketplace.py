@@ -977,9 +977,17 @@ def _serialize_manifest(manifest: MarketplaceManifest) -> str:
     >>> manifest.metadata.pluginRoot = "."
     >>> '"pluginRoot": "."' in _serialize_manifest(manifest)
     True
+
+    No root-level ``$schema`` is written. ``claude plugin validate`` rejected
+    unknown root keys in Claude Code v2.1.76 and broke CI for four days; the
+    key was dropped from the manifest then, and emitting it here would put it
+    back on the next write. Current versions tolerate it again, but the
+    validator's strictness is upstream and not ours to depend on.
+
+    >>> "$schema" in _serialize_manifest(manifest)
+    False
     """
     raw_out: dict[str, t.Any] = manifest.model_dump(mode="json", exclude_none=True)
-    raw_out["$schema"] = "https://anthropic.com/claude-code/marketplace.schema.json"
     return json.dumps(raw_out, indent=2, ensure_ascii=False) + "\n"
 
 
