@@ -459,7 +459,7 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 14974
+      "bytes": 16356
     },
     {
       "name": "situate-situational-awareness",
@@ -470,7 +470,7 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 14244
+      "bytes": 15626
     },
     {
       "name": "slop-scan",

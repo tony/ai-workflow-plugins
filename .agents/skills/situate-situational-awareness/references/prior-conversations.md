@@ -38,6 +38,24 @@ unrelated projects.
 uvx agentgrep search --only-here --branch "$(git branch --show-current)" --limit 20 <terms>
 ```
 
+`--only-here` matches on each record's working directory. In a git
+worktree that is not the directory the project's earlier sessions ran
+in, so the filter excludes the very history it was meant to select and
+the layer comes back empty — a dry result indistinguishable from a real
+one. Resolve the primary checkout before scoping:
+
+```console
+dirname "$(git rev-parse --path-format=absolute --git-common-dir)"
+```
+
+That returns the current directory in an ordinary clone and the primary
+checkout from a worktree. When it differs from the current directory,
+scope to it explicitly:
+
+```console
+uvx agentgrep search --repo <primary-checkout> --limit 20 <terms>
+```
+
 Search prompts before conversations. The default `--scope prompts`
 returns what the user asked for, which is the record of intent;
 `--scope conversations` adds every assistant reply and buries it.
