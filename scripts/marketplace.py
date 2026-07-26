@@ -23,9 +23,16 @@ Lint the marketplace:
 ...     capture_output=True,
 ...     text=True,
 ...     cwd=REPO_ROOT,
+...     env={**os.environ, "CI": ""},
 ... )
 >>> "errors" in result.stdout.lower() or result.returncode == 0
 True
+
+``CI`` is cleared so this exercises one path regardless of where it runs.
+Under ``CI`` a missing ``claude`` binary is an error, and ``lint`` reports
+counts as ``N error(s) found.`` rather than ``0 errors found.`` -- neither
+substring the assertion looks for, so the doctest would fail for a reason
+that has nothing to do with the manifest.
 """
 
 from __future__ import annotations
