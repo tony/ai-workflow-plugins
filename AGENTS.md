@@ -325,14 +325,22 @@ Each component type has specific frontmatter requirements:
 - `color` (optional) — visual indicator: `yellow`, `green`, `red`, `cyan`, `pink`
 
 **Skills** (`skills/*/SKILL.md`):
-- `name` (required) — skill display name
-- `description` (required) — describes when and how to invoke the skill
-- `version` (optional) — skill version
-- `tools` (optional) — comma-separated tool access list
-- `disallowedTools` (optional) — comma-separated tools to deny
-- `context` (optional) — agent context mode
+- `name` (required here) — skill display name; upstream it defaults to
+  the directory name, but this repo's gates expect it written out
+- `description` (required here) — when and how to invoke the skill
+- `allowed-tools` (optional) — tools usable without a permission prompt;
+  space- or comma-separated string, or a YAML list
+- `disallowed-tools` (optional) — tools removed while the skill is active
+- `context` (optional) — set to `fork` to run in a subagent
 - `disable-model-invocation` (optional) — if true, runs without model invocation
 - Content can reference `$ARGUMENTS` to access arguments passed to the skill
+
+Skills hyphenate both tool fields while the Agents schema above uses
+camelCase `tools`/`disallowedTools` — a real difference between the two
+components, not a typo in one of them. And `allowed-tools` grants
+pre-approval rather than sandboxing: every tool stays callable either
+way, so listing tools only skips the permission prompt for those. Only
+`disallowed-tools` removes a tool from the pool.
 
 **Hooks** (`hooks/hooks.json`):
 ```json
