@@ -1,0 +1,13 @@
+{
+  "skill_name": "brainstorm",
+  "trigger": {
+    "positive": [
+      { "prompt": "brainstorm some ideas for this feature", "top_k": 3 },
+      { "prompt": "give me multiple approaches to this design", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "refine this draft", "owner": "refine" },
+      { "prompt": "brainstorm and then refine the best idea", "owner": "brainstorm-and-refine" }
+    ]
+  }
+}
