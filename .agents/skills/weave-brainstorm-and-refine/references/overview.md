@@ -1,6 +1,8 @@
 # Weave Brainstorm & Refine
 
-The full pipeline: generate independent originals from each model, then iteratively refine them through judge-weave-incorporate cycles.
+Generate independent originals from adversarial participants, then refine them
+through judge-weave-incorporate cycles. Host-native sub-agents are the
+default; separate model CLIs are available by explicit choice.
 
 ## When to Use
 
@@ -10,17 +12,18 @@ The full pipeline: generate independent originals from each model, then iterativ
 
 ## Key Features
 
-- Phase 1 (Brainstorm): Independent originals from each model, optional `--variants=N`
+- `--workers=subagents|model-clis`: Use host-native sub-agents by default or explicitly select separate model CLIs
+- Phase 1 (Brainstorm): Independent originals from each participant, optional `--variants=N`
 - Transition gate: You choose which originals enter refinement
 - Phase 2 (Refine): Iterative judge-weave-distribute cycle over `--passes=N`
 - Full rationale chain from brainstorm through every refinement pass
-- `--judge=host|round-robin`: Host judges every pass, or rotate judging across models
+- `--judge=host|round-robin`: Host judges every pass, or rotate judging across participants
 
 ## The Pipeline
 
-1. **Brainstorm**: Each model generates independent original responses
+1. **Brainstorm**: Each participant generates independent original responses
 2. **Review**: All originals presented — you pick which ones to refine
-3. **Refine**: Judge picks the best, weaves in strengths from runners-up, redistributes to all models
+3. **Refine**: Judge picks the best, weaves in strengths from runners-up, redistributes to all participants
 4. **Repeat**: Each pass improves the woven result until convergence or passes exhausted
 
 ## How to Invoke

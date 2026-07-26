@@ -45,6 +45,9 @@ _DESCRIPTION_WRAP = 76
 _ASK_TOKEN = "ask-user-choice"  # noqa: S105
 """Host-neutral stand-in for the Claude-only ``AskUserQuestion`` tool."""
 
+_HEADLESS_DEFAULT_MARKER = "<!-- portable: ask-user-choice=headless-default -->"
+"""Source marker allowing a command's documented choice default in headless mode."""
+
 _BASH_PROSE = "run this command and read the output:"
 
 REPO_PATH_PATTERN = r"(?<![A-Za-z0-9._/-])plugins/[a-z][a-z0-9-]*/[A-Za-z0-9._/-]*"
@@ -467,10 +470,15 @@ class SkillBuilder:
         body = _read_body(body_src.path)
         sources = [str(body_src.path.relative_to(REPO_ROOT))]
         body = self._transform_markdown(body, body_src.plugin, body_src.base)
+        has_headless_default = _HEADLESS_DEFAULT_MARKER in body
+        body = body.replace(_HEADLESS_DEFAULT_MARKER, "")
         if self._skill.overview is not None:
             body = self._attach_overview(body)
             sources.append(str(self._skill.overview.path.relative_to(REPO_ROOT)))
-        text = self._render(fm, body + self._portability_notes(body))
+        text = self._render(
+            fm,
+            body + self._portability_notes(body, has_headless_default=has_headless_default),
+        )
         self._files["SKILL.md"] = (text.encode("utf-8"), 0o644)
         self._drain()
         return BuiltSkill(
@@ -556,14 +564,23 @@ class SkillBuilder:
             self._notes.add("ask")
         return _ASK_RE.sub(_ASK_TOKEN, text)
 
-    def _portability_notes(self, body: str) -> str:
+    def _portability_notes(self, body: str, *, has_headless_default: bool) -> str:
         """Build the trailing notes block for whatever degraded forms were used."""
-        ask_note = (
-            f"- `{_ASK_TOKEN}` — present the listed options and wait for the user to"
-            " pick one. Hosts with a structured multiple-choice tool (Claude Code's"
-            " `AskUserQuestion`) should use it; otherwise print a numbered list and wait"
-            " for a numbered reply. Never proceed on an assumed answer."
-        )
+        if has_headless_default:
+            ask_note = (
+                f"- `{_ASK_TOKEN}` — follow the source's choice contract. Hosts with a"
+                " structured multiple-choice tool (Claude Code's `AskUserQuestion`) should"
+                " use it. Honor a documented headless default when the source defines one;"
+                " otherwise print a numbered list and wait for a numbered reply. Never"
+                " invent a choice."
+            )
+        else:
+            ask_note = (
+                f"- `{_ASK_TOKEN}` — present the listed options and wait for the user to"
+                " pick one. Hosts with a structured multiple-choice tool (Claude Code's"
+                " `AskUserQuestion`) should use it; otherwise print a numbered list and wait"
+                " for a numbered reply. Never proceed on an assumed answer."
+            )
         args_note = (
             "- `$ARGUMENTS` — the text the user passed when invoking this skill. If"
             " your host does not substitute it, read it as the user's request in the"

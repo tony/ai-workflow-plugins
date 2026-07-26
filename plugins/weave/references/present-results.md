@@ -14,11 +14,14 @@ The caller sets these variables before invoking this reference:
 | Variable | Type | Purpose |
 |---|---|---|
 | RESULT_KIND | one of: review, plan, ask, brainstorm, brainstorm-and-refine, refine, prompt, architecture, execute, fix-review, serene-bliss | Selects template and handoff options |
-| ARTIFACT_PATH | absolute path | Desloped final artifact (single file) or directory of per-model outputs |
+| ARTIFACT_PATH | absolute path | Desloped final artifact (single file) or directory of per-participant outputs |
 | SESSION_DIR | absolute path | Session directory for auxiliary writes |
 | PASS_COUNT | integer | Toggles Evolution/Confidence sections |
 | IN_PLAN_MODE | boolean | True for plan and fix-review; suppresses next-step panel |
-| MODELS | JSON array of strings | For Attribution |
+| WORKER_BACKEND | `subagents`, `model-clis`, or null | Selects participant attribution; null for fix-review |
+| PARTICIPANTS | JSON array of strings | Successful role IDs (`subagents`) or lane artifact IDs (`model-clis`) |
+| EXECUTORS | JSON object or null | Participant ID to actual executor mapping; null for fix-review |
+| MODELS | JSON array of strings or null | Resolved providers or models for `model-clis`; null otherwise |
 | LABEL_MAP_PATH | absolute path or null | For Attribution; null when no label map exists |
 | CASCADE_STATE | `early-exit`, `escalated`, or null | Set by cascade-capable callers (ask, review); null otherwise |
 
@@ -29,7 +32,7 @@ The caller sets these variables before invoking this reference:
 ### Step 1: Read the artifact
 
 - When RESULT_KIND is `brainstorm` or `prompt`: ARTIFACT_PATH is a
-  **directory**. List its contents to find per-model output files.
+  **directory**. List its contents to find per-participant output files.
 - All other RESULT_KINDs: ARTIFACT_PATH is a **single markdown file**.
   Read it.
 
@@ -43,17 +46,18 @@ content. Emit 1–4 lines.
 | review | `⚠ N blockers before merge` + per-blocker one-liner; `✓ No blockers` when zero |
 | plan | `Plan: N steps, M files touched` |
 | ask | One-sentence answer |
-| brainstorm | `N ideas from M models` |
+| brainstorm | `N ideas from M participants` |
 | brainstorm-and-refine | `Refined through N passes` (suffix `(early-stop @ K)` if converged early) |
 | refine | `Refined through N passes` (suffix `(early-stop @ K)` if converged early) |
 | serene-bliss | `Refined through N passes` (suffix `(early-stop @ K)` if converged early) |
-| prompt | `Winner: <model>` |
+| prompt | `Winner: <participant>` |
 | architecture | `Architecture: <chosen approach>` |
 | execute | `Best of N implementations` |
 | fix-review | `N fixes applied, M skipped` |
 
-When CASCADE_STATE is `early-exit`, append the suffix
-`— cascade early-exit (Claude lane only)` to the hero's first line.
+When CASCADE_STATE is `early-exit`, append `— cascade early-exit
+(Maintainer lane only)` in subagent mode or `— cascade early-exit
+(Claude lane only)` in model-CLI mode to the hero's first line.
 
 ### Step 3: Render body sections
 
@@ -67,7 +71,7 @@ optional.
 | review | Scores · Verified Issues (Critical / Important / Suggestions) · False Positives Rejected · Reviewer Disagreements · Critic Findings · Confidence Evolution (only when PASS_COUNT > 1) · Summary · Attribution |
 | plan | Architecture Decision · Implementation Steps · Test Strategy · Risks and Mitigations · Scores · Verification Summary · Adjudication · Critic Findings · Plan Evolution (only when PASS_COUNT > 1) · Attribution. Rendered into the harness plan file, not chat. |
 | ask | Verified Answer · Evidence (file:line bullets) · Disagreements (only if any) · Refinement Notes (only when PASS_COUNT > 1) · Attribution |
-| brainstorm | Per-model responses (variants flattened) · Attribution |
+| brainstorm | Per-participant responses (variants flattened) · Attribution |
 | brainstorm-and-refine | Final Result · Evolution Summary · Rationale Chain · Attribution |
 | refine | Final Result · Evolution Summary · Rationale Chain · Attribution |
 | serene-bliss | Final Result · Evolution Summary · Rationale Chain · Attribution |
@@ -104,8 +108,15 @@ single-verified, then unverified). Omit consensus tags when only one lane partic
 Shared across all RESULT_KINDs. Render as the final body section:
 
 - If LABEL_MAP_PATH is set and file exists: read the label map and show
-  the blind-label → model-name mapping.
-- List models from MODELS.
+  the blind-label → participant mapping.
+- When WORKER_BACKEND is `subagents`, list the successful role IDs from
+  PARTICIPANTS (`maintainer`, `skeptic`, `builder`) and state that they are
+  host-native sub-agents. Show their executors from EXECUTORS. Do not claim
+  model diversity.
+- When WORKER_BACKEND is `model-clis`, list the successful lane artifact IDs
+  from PARTICIPANTS (`claude`, `agy`, `gpt` as available), their actual
+  executors from EXECUTORS, and resolved provider/model details from MODELS.
+  The `gpt` lane normally runs through `codex`; do not call `gpt` a CLI.
 - End with: `**Session artifacts**: $SESSION_DIR`
 
 ---
@@ -130,7 +141,7 @@ option — on selection, return control to the caller's escalation path
 | serene-bliss | **Plan the refined result** · **Refine again** (suggest `/weave:refine`) · **Done** |
 | refine | **Plan the refined result** · **Refine again** (suggest `/weave:refine`) · **Done** |
 | architecture | **Plan the chosen architecture** · **Brainstorm alternatives** (suggest `/weave:brainstorm`) · **Done** |
-| execute | **Apply the winning implementation** · **Compare with another model** (suggest `/weave:prompt`) · **Done** |
+| execute | **Apply the winning implementation** · **Compare with another participant** (suggest `/weave:prompt`) · **Done** |
 | prompt | **Use the winner — plan it** · **Re-run with different variants** · **Done** |
 
 ### Step 2: Route user choice
@@ -153,10 +164,10 @@ Triggered only when the user picks a plan-entry option in Phase B.
 
 ### Step 1: Synthesize plan brief
 
-Launch one Task sub-agent (`subagent_type: "general-purpose"`,
-`mode: "default"`). Input: ARTIFACT_PATH content + the extractor
-instruction from this table. Output written to
-`$SESSION_DIR/handoff/plan-brief.md`.
+Launch one host-native sub-agent. In Claude Code, use a Task sub-agent
+with `subagent_type: "general-purpose"` and `mode: "default"`. Input:
+ARTIFACT_PATH content plus the extractor instruction from this table.
+Write its output to `$SESSION_DIR/handoff/plan-brief.md`.
 
 | RESULT_KIND | Extractor instruction |
 |---|---|
@@ -175,14 +186,13 @@ Call `EnterPlanMode`. If unavailable, go to headless fallback.
 
 In plan mode: read `$SESSION_DIR/handoff/plan-brief.md`, read the
 codebase files referenced in the brief, write the plan file at the path
-supplied by Claude Code's plan-mode system message. Format as an
+supplied by the host's plan-mode system message. Format as an
 Implementation Plan (same shape as `/weave:plan` Phase 4 output). Call
 `ExitPlanMode`.
 
 ### Headless fallback
 
-If `EnterPlanMode` is unavailable (e.g. `claude -p`), emit one line
-and stop:
+If `EnterPlanMode` is unavailable, emit one line and stop:
 
 ```
 Plan mode unavailable — plan brief written to $SESSION_DIR/handoff/plan-brief.md.
@@ -199,5 +209,5 @@ Run /weave:plan with this context to enter plan mode.
 | LABEL_MAP_PATH set but file missing | Omit label mapping from Attribution; note "label map unavailable". |
 | AskUserQuestion unavailable | Skip Phase B; emit "Session complete" line. |
 | EnterPlanMode unavailable | Headless fallback (Phase C). |
-| Task unavailable (Phase C Step 1) | Emit plan-brief stub with ARTIFACT_PATH pointer; proceed to headless fallback. |
+| Host-native sub-agents unavailable (Phase C Step 1) | Emit plan-brief stub with ARTIFACT_PATH pointer; proceed to headless fallback. |
 | Plan-brief generation fails | Emit error; do not enter plan mode. |

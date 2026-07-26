@@ -1,19 +1,38 @@
 ---
 name: weave-prompt
 description: >-
-  Weave prompt — run a prompt across Claude, Antigravity, and GPT in
-  isolated git worktrees, then pick the best approach
+  Weave prompt — compare independent adversarial implementations, then pick
+  the best approach
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
 metadata:
-  argument-hint: "<implementation prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep]"
+  argument-hint: "<implementation prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--workers=subagents|model-clis]"
   source: "plugins/weave/commands/prompt.md"
 ---
 
 # Weave Prompt
 
-Run a prompt across multiple AI models (Claude, Antigravity, GPT), each working in its own **isolated git worktree**. After all models complete, compare their implementations and **pick the single best approach** to bring back to the main working tree. This command is for prompts where the user wants to see competing implementations and choose.
+Run a prompt across independent adversarial workers, using host-native sub-agents by default or separate model CLIs when selected. Each worker uses an **isolated git worktree**. After all workers complete, compare their implementations and **pick the single best approach** to bring back to the main working tree.
 
 The prompt comes from `$ARGUMENTS`. If no arguments are provided, ask the user what they want implemented.
+
+## Worker selection
+
+
+
+Before any other unresolved configuration choice or operational step, read
+`references/worker-backends.md`. Resolve
+`worker_backend` from `--workers=subagents|model-clis` using that reference;
+if the flag is absent, ask its worker question first.
+If interactive choice is unavailable, honor its documented headless default.
+
+The selected backend governs the whole session: dispatch, retry, judging,
+refinement, artifacts, session metadata, and presentation. The shared reference
+adapts provider-named examples across every later phase to that backend.
+
+When `worker_backend == subagents`, use only the reference's native sub-agent
+path. Skip every model-CLI detection, timeout question, timeout resolution,
+retry, fallback, and dispatch instruction below. Every such instruction below
+is conditional on `worker_backend == model-clis`.
 
 ---
 
@@ -316,7 +335,9 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "status": "in_progress",
   "branch": "<current branch>",
   "ref": "<short SHA>",
-  "models": ["claude", "..."],
+  "worker_backend": "<subagents or model-clis>",
+  "participants": ["<participant artifact ID>", "..."],
+  "executors": {"<participant artifact ID>": "<executor>"},
   "completed_passes": 0,
   "prompt_summary": "<first 120 chars of user prompt>",
   "created_at": "<ISO 8601 UTC>",
@@ -324,19 +345,24 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
 }
 ```
 
+When `worker_backend == model-clis`, add a `"models"` array containing the
+resolved model for each participant. Omit `"models"` when
+`worker_backend == subagents`.
+
 #### Step 7: Append `events.jsonl`
 
 Append one event line to `$SESSION_DIR/events.jsonl`:
 
 ```json
-{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"prompt","models":["claude","..."]}
+{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"prompt","worker_backend":"<subagents or model-clis>","participants":["<participant artifact ID>","..."]}
 ```
 
 #### Step 8: Write `metadata.md`
 
 Write to `$SESSION_DIR/metadata.md` containing:
 - Command name, start time, configured pass count
-- Models detected, timeout setting
+- Worker backend, participant artifact IDs, and executor mapping
+- Resolved models only for `model-clis`, timeout setting when applicable
 - Git branch (`git branch --show-current`), commit ref (`git rev-parse --short HEAD`)
 
 Store `$SESSION_DIR` for use in all subsequent phases.
@@ -344,6 +370,40 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 #### Step 9: Write Context Packet
 
 Write the Context Packet built in Phase 1b to `$SESSION_DIR/context-packet.md`.
+
+---
+
+## Native mutating lifecycle
+
+When `worker_backend == subagents`, this lifecycle replaces the
+provider-specific worktree creation, dispatch, artifact capture, main-tree
+reset, and provider cleanup instructions below. Keep the backend-independent
+comparison rubric, blind judging, winner selection, and quality gates.
+
+1. Create one dedicated branch and isolated worktree under
+   `$SESSION_DIR/worktrees/<participant>` for each native participant. Base
+   each tree on the captured clean baseline after the user's changes are
+   stashed. No worker runs in the main checkout.
+2. Dispatch the prompt WorkItem from `references/worker-backends.md` to a fresh
+   role-matched sub-agent rooted in that participant's worktree. Persist its
+   returned explanation as
+   `$SESSION_DIR/pass-NNNN/outputs/<participant>.md`.
+3. Capture each participant's binary diff, changed-file snapshots, quality
+   results, and failure diagnostics under the existing
+   `diffs/<participant>.patch`, `files/<participant>/`, and quality artifact
+   paths. Build blind labels from participant IDs.
+4. Keep each participant worktree through refinement. Redispatch a fresh
+   role-matched sub-agent into the same worktree for later passes, then capture
+   the new artifacts before judging.
+5. Adopt the chosen participant's complete patch and snapshots into the clean
+   main checkout. The host verifies the adopted tree and runs the final quality
+   gates; no worker writes there.
+6. After adoption artifacts are secured, cleanup only the exact
+   session-scoped participant worktrees and branches, then restore the user's
+   stash through the existing restoration step.
+
+The Claude, Antigravity, and GPT paths below are used only when
+`worker_backend == model-clis`.
 
 ---
 
@@ -651,7 +711,10 @@ Read `references/present-results.md` and apply it with:
 - `SESSION_DIR` = `$SESSION_DIR`
 - `PASS_COUNT` = the resolved pass count
 - `IN_PLAN_MODE` = false
-- `MODELS` = the models that participated
+- `WORKER_BACKEND` = `worker_backend`
+- `PARTICIPANTS` = the successful participant artifact IDs
+- `EXECUTORS` = the resolved participant artifact ID to executor mapping
+- `MODELS` = resolved models when `worker_backend == model-clis`; otherwise null
 - `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
 After the reference returns, finalize the session per the existing
@@ -791,6 +854,6 @@ git branch -D weave/gpt/<timestamp> 2>/dev/null || true
 
 ## Portability notes
 
-- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `ask-user-choice` — follow the source's choice contract. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it. Honor a documented headless default when the source defines one; otherwise print a numbered list and wait for a numbered reply. Never invent a choice.
 - `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
 - Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.

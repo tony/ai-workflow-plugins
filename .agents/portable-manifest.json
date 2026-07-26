@@ -540,9 +540,10 @@
       "bundled": {
         "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 68550
+      "bytes": 85698
     },
     {
       "name": "weave-ask",
@@ -555,9 +556,10 @@
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 99697
+      "bytes": 115113
     },
     {
       "name": "weave-brainstorm",
@@ -569,9 +571,10 @@
         "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
         "references/overview.md": "plugins/weave/skills/brainstorm/SKILL.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 57878
+      "bytes": 73519
     },
     {
       "name": "weave-brainstorm-and-refine",
@@ -586,9 +589,10 @@
         "references/overview.md": "plugins/weave/skills/brainstorm-and-refine/SKILL.md",
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 112476
+      "bytes": 128097
     },
     {
       "name": "weave-execute",
@@ -598,9 +602,10 @@
       "bundled": {
         "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 65910
+      "bytes": 83104
     },
     {
       "name": "weave-fix-review",
@@ -611,7 +616,7 @@
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
         "references/present-results.md": "plugins/weave/references/present-results.md"
       },
-      "bytes": 29311
+      "bytes": 30758
     },
     {
       "name": "weave-plan",
@@ -624,9 +629,10 @@
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 105806
+      "bytes": 120696
     },
     {
       "name": "weave-prompt",
@@ -636,9 +642,10 @@
       "bundled": {
         "docs/repo-guard-protocol.md": "plugins/weave/docs/repo-guard-protocol.md",
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
-        "references/present-results.md": "plugins/weave/references/present-results.md"
+        "references/present-results.md": "plugins/weave/references/present-results.md",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 63934
+      "bytes": 80987
     },
     {
       "name": "weave-refine",
@@ -653,9 +660,10 @@
         "references/overview.md": "plugins/weave/skills/refine/SKILL.md",
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 111135
+      "bytes": 126869
     },
     {
       "name": "weave-review",
@@ -668,9 +676,10 @@
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 104818
+      "bytes": 120239
     },
     {
       "name": "weave-serene-bliss",
@@ -685,15 +694,17 @@
         "references/overview.md": "plugins/weave/skills/serene-bliss/SKILL.md",
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
-        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml"
+        "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
+        "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 97527
+      "bytes": 112932
     }
   ],
   "duplication": {
     "plugins/weave/references/ensemble-techniques.md": 11,
     "plugins/weave/references/present-results.md": 11,
     "plugins/weave/docs/repo-guard-protocol.md": 10,
+    "plugins/weave/references/worker-backends.md": 10,
     "plugins/pr/references/signatures.yml": 7,
     "plugins/slop/references/signatures.yml": 7,
     "plugins/business/references/interim-format.md": 6,

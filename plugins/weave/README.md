@@ -1,6 +1,8 @@
 # weave
 
-Weave prompts across Claude, Antigravity, and GPT in parallel — plan, execute, review, and synthesize the best of all models.
+Weave prompts across independent adversarial participants in parallel — plan,
+execute, review, and synthesize their strongest work. Host-native sub-agents
+are the default; separate model CLIs are available by explicit choice.
 
 ## Installation
 
@@ -20,17 +22,17 @@ Install the plugin:
 
 | Command | Description |
 |---------|-------------|
-| `/weave:ask` | Ask all models a question, synthesize the best answer |
-| `/weave:plan` | Get implementation plans from all models, synthesize the best plan |
+| `/weave:ask` | Ask adversarial participants a question, synthesize the best answer |
+| `/weave:plan` | Get independent implementation plans, synthesize the best plan |
 | `/weave:prompt` | Run a prompt in isolated worktrees, pick the best implementation |
 | `/weave:execute` | Run a task in isolated worktrees, synthesize the best parts of each |
 | `/weave:architecture` | Generate project scaffolding, conventions, skills, and architectural docs, then synthesize the best architecture |
-| `/weave:review` | Run code review with all models, produce consensus-weighted report |
+| `/weave:review` | Run independent code reviews, produce a consensus-weighted report |
 | `/weave:fix-review` | Fix review findings as atomic commits with test coverage |
-| `/weave:brainstorm` | Generate independent original ideas from each model, with optional multiple variants |
-| `/weave:refine` | Iteratively improve an artifact through multi-model critique and weaving |
+| `/weave:brainstorm` | Generate independent original ideas from each participant, with optional multiple variants |
+| `/weave:refine` | Iteratively improve an artifact through adversarial critique and weaving |
 | `/weave:brainstorm-and-refine` | Full pipeline: brainstorm originals, then iteratively judge, weave, and refine |
-| `/weave:serene-bliss` | Three-lens DX brainstorm-and-refine (Bliss, Serenity, Sublimity) with multi-model panel judging |
+| `/weave:serene-bliss` | Three-lens DX brainstorm-and-refine (Bliss, Serenity, Sublimity) with panel judging |
 
 ## Skills
 
@@ -47,19 +49,24 @@ Skills provide auto-discovery — they trigger when the user's intent matches th
 
 The orchestration commands follow consistent multi-phase workflows. Of the original six, plan, prompt, execute, and architecture use **targeted conflict resolution** for multi-pass (passes only address unresolved conflicts), while ask and review use **residual re-attack** (passes address only the prior pass's unresolved residuals). The new three (brainstorm, refine, brainstorm-and-refine) use **expansive weaving** — each pass is a full judge-pick-best-incorporate-strengths-address-weaknesses cycle. The `fix-review` command is a separate remediation workflow for applying review findings as atomic commits.
 
-1. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings.
-2. **Detect models** — Check for `agy`, `gemini`, `codex`, and `agent` CLIs. Use native CLIs when available; the Google lane prefers `agy` (Antigravity) and falls back to `gemini`, then the `agent` CLI with `--model` flags.
-3. **Run in parallel** — Execute the task across all available models simultaneously.
+1. **Choose workers** — Use `--workers=subagents|model-clis` or answer the first configuration prompt. Host-native sub-agents are recommended and selected automatically in headless mode.
+2. **Configure** — Parse `--passes`, `--timeout`, `--mode` flags and prompt for any remaining settings. CLI timeouts apply only to `model-clis`.
+3. **Run in parallel** — Dispatch the Maintainer, Skeptic, and Builder as independent participants.
 4. **Synthesize** — Compare outputs, verify claims against the codebase, and combine the best elements.
-5. **Refine** (multi-pass) — Optionally re-attack the prior pass's unresolved residuals with all models for deeper results.
+5. **Refine** (multi-pass) — Optionally re-attack the prior pass's unresolved residuals with all participants for deeper results.
+
+When `model-clis` is selected, Weave detects `agy`, `gemini`, `codex`,
+and `agent` only after that explicit choice. Retry and fallback stay
+within the selected worker backend; Weave never switches between
+sub-agents and model CLIs without asking.
 
 ### Protocols
 
-All commands share four quality protocols that decorrelate model outputs and improve synthesis:
+All commands share quality protocols that decorrelate participant outputs and improve synthesis:
 
-- **Context packets** — a structured bundle (conventions, repo state, key snippets) included verbatim in every model prompt so all models work from the same information
-- **Role differentiation** — each model receives a distinct evaluation lens (Maintainer, Skeptic, Builder) to reduce shared blind spots
-- **Blind judging** — model outputs are randomly labeled (A/B/C) during scoring to prevent brand bias (ask/plan/prompt/execute/architecture/review)
+- **Context packets** — a structured bundle (conventions, repo state, key snippets) included verbatim in every participant prompt so all lanes work from the same information
+- **Role differentiation** — each lane receives a distinct evaluation lens (Maintainer, Skeptic, Builder) to reduce shared blind spots
+- **Blind judging** — participant outputs are randomly labeled (A/B/C) during scoring to prevent identity bias (ask/plan/prompt/execute/architecture/review)
 - **Structured synthesis** — a five-step protocol (verify claims, score with rubric, adjudicate conflicts, converge, critic) backed by codebase evidence (ask/plan/prompt/execute/architecture/review)
 - **Judge-weave-distribute** — pick the best, incorporate strengths from runners-up, redistribute for another round (refine/brainstorm-and-refine)
 - **Consensus signal** — findings and disagreements carry per-lane agreement tags (unanimous/majority/split/single); split items are surfaced with both positions, never silently adjudicated away (ask/review; spec in `references/ensemble-techniques.md`)
@@ -72,13 +79,19 @@ the full specification.
 
 | Layer | Defense | Scope |
 |-------|---------|-------|
-| 1 | Native read-only sandbox (`-s read-only` / `--approval-mode plan`), or a disposable HEAD worktree for `agy` (no native read-only mode) | Read-only commands |
+| 1 | Isolated worktree per host-native participant; native CLI read-only sandbox or disposable worktree for model-CLI lanes | Read-only commands |
 | 2 | Pre-session repo fingerprint (HEAD + `git status`) | All commands |
-| 3 | Post-CLI repo state verification + auto-revert | All commands |
+| 3 | Post-CLI repo state verification + auto-revert | `model-clis` lanes |
 | 4 | Prompt hardening ("CRITICAL: Do NOT write files") | All commands |
 | 5 | Session-end verification against fingerprint | All commands |
 
-**Read-only commands** run external CLIs in their native read-only
+Default host-native sub-agents run in session-scoped isolated worktrees under
+the host's permissions and prompt hardening. Read-only worktrees are
+disposable; write participants retain separate branch worktrees through
+comparison and refinement. Native workers never receive the writable user
+checkout.
+
+With `--workers=model-clis`, **read-only commands** run external CLIs in their native read-only
 sandbox (codex `-s read-only`, gemini `--approval-mode plan`, agent
 `--mode plan`) pointed at the repo, so models can read but not write;
 the `cd "$SESSION_DIR"` wrapper is a backstop. The `agy` (Antigravity)
@@ -104,18 +117,21 @@ perspectives and synthesize a single best result.
 
 ### Write Commands
 
-**prompt**, **execute**, and **architecture** create isolated git worktrees for each external model, so implementations never interfere with each other. After comparison:
+With the default native backend, **prompt**, **execute**, and
+**architecture** create an isolated git worktree for every participant. The
+opt-in model-CLI backend preserves its existing host lane and isolates its
+external lanes in separate worktrees. After comparison:
 - **prompt** picks one winner
-- **execute** cherry-picks the best parts from each model
+- **execute** cherry-picks the best parts from each participant
 - **architecture** cherry-picks the best conventions, skills, agents, and scaffolding per file
 
 **fix-review** processes findings from a review, applying each as an atomic commit with test coverage. Multi-pass does not apply to fix-review since it is already iterative.
 
 ### Brainstorm & Refine Commands
 
-**brainstorm** generates independent originals from each model with no synthesis. Use `--variants=N` (1-3) to get multiple originals per model, each with a distinct creative-direction preamble (conventional, creative, contrarian). Override preambles with `--preamble='...'`.
+**brainstorm** generates independent originals from each participant with no synthesis. Use `--variants=N` (1-3) to get multiple originals per participant, each with a distinct creative-direction preamble (conventional, creative, contrarian). Override preambles with `--preamble='...'`.
 
-**refine** takes a single artifact (inline text or file path) and iteratively improves it. Each pass: all models critique and improve → judge picks the best → identifies strengths in runners-up → weaves a revised version → distributes back to all models. Uses `--passes=N` (1-5, default 2).
+**refine** takes a single artifact (inline text or file path) and iteratively improves it. Each pass: all participants critique and improve → judge picks the best → identifies strengths in runners-up → weaves a revised version → distributes back to all participants. Uses `--passes=N` (1-5, default 2).
 
 **brainstorm-and-refine** is the full pipeline: brainstorm originals, present them, let the user choose which enter refinement, then run the refine cycle. A transition gate always asks the user before proceeding.
 
@@ -130,7 +146,7 @@ orchestration strategy, present it for user approval, then **exit plan mode**
 before executing. This is the "plan then execute" pattern.
 
 **review** plans: branch summary, review focus areas, relevant conventions,
-known concerns, and model prompt strategy.
+known concerns, and worker prompt strategy.
 
 **fix-review** plans: findings inventory, validity pre-assessment, fix
 ordering, test strategy per finding, risk assessment, and expected commit
@@ -139,11 +155,9 @@ sequence.
 ### Persistent plan mode (plan)
 
 The **plan** command enters plan mode at the start and **stays in plan mode
-throughout** — the Claude plan file IS the deliverable. Sub-agents (spawned
-with `mode: "default"`) handle all non-readonly operations: git commands,
-session directory setup, external CLI execution, and artifact persistence.
-The main agent orchestrates from plan mode using Read, Grep, Glob, and the
-Task tool (all permitted in plan mode).
+throughout** — the host's plan file is the deliverable. Host-native
+sub-agents handle non-readonly operations such as git commands, session
+directory setup, optional model-CLI execution, and artifact persistence.
 
 ### Portable plan mode activation
 
@@ -168,32 +182,32 @@ presents a next-step panel that lets the user act on findings — including
 an active plan-mode handoff for commands whose results imply implementation
 work.
 
-## Sub-Agent Architecture
+## Worker Architecture
 
-All weave commands use the Task tool to delegate work to sub-agents. Each model execution runs in its own sub-agent,
-enabling true parallel dispatch when the host supports it.
+The default backend launches three independent host-native sub-agents:
+Maintainer, Skeptic, and Builder. They receive the same task and context
+packet but do not see one another's answers before producing their own.
+Native artifacts use the IDs `maintainer`, `skeptic`, and `builder`; this
+mode does not claim that the participants use different models. Each WorkItem
+runs in an isolated worktree; the orchestrator persists the returned artifact
+and removes only that exact worktree after use.
 
-| Role | Agent type | Mode | Purpose |
-|------|-----------|------|---------|
-| Claude model | `general-purpose` | default | Reads codebase, produces response |
-| Antigravity model | `general-purpose` | default | Runs `agy`/`gemini`/`agent` CLI via Bash |
-| GPT model | `general-purpose` | default | Runs `codex`/`agent` CLI via Bash |
-| Critic | `general-purpose` | default | Challenges synthesized result |
-| Context gather | `general-purpose` | default | Runs git commands (plan mode only) |
-| Session setup | `general-purpose` | default | Creates session dir, detects models (plan mode only) |
-
-Sub-agents run with `mode: "default"` so they can use Bash, Write, and Edit
-even when the parent agent is in plan mode. Each sub-agent receives all
-needed context in its prompt since sub-agents don't share the parent's
-conversation state.
+The opt-in `model-clis` backend preserves the host, Antigravity, and GPT
+lanes and their artifact IDs: `claude`, `agy`, and `gpt`. The GPT lane
+normally runs through the `codex` CLI. Wrapper sub-agents run the selected
+executors and keep their existing fallback chains.
 
 ## Cascade Mode
 
-`--cascade` (ask, review) inverts the cost model: a Claude-only first pass runs, self-verifies against the codebase, and fans out to the external models only when a confidence trigger fires — a contradicted or unverified load-bearing claim, an ambiguous request, a coverage gap, or a judgment call (for review, any Critical finding always escalates). On early exit the result is presented as Claude-lane-only with an "Escalate to full ensemble" option in the next-step panel. Trigger definitions live in `references/ensemble-techniques.md`.
+`--cascade` (ask, review) starts with the Maintainer lane through the selected
+worker backend. It self-verifies against the codebase and launches the Skeptic
+and Builder only when a confidence trigger fires or the user escalates. The
+worker backend never changes during escalation. Trigger definitions live in
+`references/ensemble-techniques.md`.
 
 ## Multi-Pass Refinement
 
-Multi-pass runs additional rounds after the first synthesis. For ask and review, pass N ≥ 2 is a residual re-attack: models receive only the unresolved items from the prior pass — conflicts evidence could not settle, failed claim verification, leftover critic findings, split-consensus items — and their resolutions merge back into the prior synthesis, which otherwise carries forward verbatim. An empty residual ledger means convergence and stops early. The refine command scopes each redistribution round's critique to the pass's residual focus. This deepens results at the cost of additional model invocations.
+Multi-pass runs additional rounds after the first synthesis. For ask and review, pass N ≥ 2 is a residual re-attack: participants receive only the unresolved items from the prior pass — conflicts evidence could not settle, failed claim verification, leftover critic findings, split-consensus items — and their resolutions merge back into the prior synthesis, which otherwise carries forward verbatim. An empty residual ledger means convergence and stops early. The refine command scopes each redistribution round's critique to the pass's residual focus.
 
 ### Flags
 
@@ -201,8 +215,9 @@ Control pass count, timeout, and execution mode with explicit flags:
 
 | Flag | Values | Default | Example |
 |------|--------|---------|---------|
+| `--workers=...` | `subagents` or `model-clis` | `subagents` | `/weave:ask question --workers=model-clis` |
 | `--passes=N` | 1–5 | 1 (refine: 2) | `/weave:plan add auth --passes=2` |
-| `--timeout=N\|none` | seconds or `none` | command-specific | `/weave:ask question --timeout=300` |
+| `--timeout=N\|none` | seconds or `none` | command-specific (`model-clis` only) | `/weave:ask question --timeout=300` |
 | `--mode=fast\|balanced\|deep` | mode preset | `balanced` | `/weave:execute task --mode=deep` |
 | `--cascade` | flag (ask, review) | off | `/weave:ask question --cascade` |
 | `--variants=N` | 1–3 | 1 | `/weave:brainstorm idea --variants=2` |
@@ -217,30 +232,27 @@ Legacy trigger words (`multipass`, `x<N>`, `timeout:<seconds>`) are still recogn
 
 ### Judge Modes
 
-The `--judge` flag controls who evaluates model outputs during refinement passes (refine
+The `--judge` flag controls who evaluates participant outputs during refinement passes (refine
 and brainstorm-and-refine commands only).
 
-`--judge=host` (default): The host agent (Claude) judges every pass. This is the most
-reliable mode since the host can read session files and parse varied output formats.
+`--judge=host` (default): The host agent judges every pass.
 
-`--judge=round-robin`: Judging rotates across available models — Claude, then Antigravity,
-then GPT, cycling back. External models receive a structured judge prompt with all
-model outputs inline and produce scores, winner selection, and runner-up analysis.
-The host agent always weaves regardless of who judged. If an external judge's output
-is unparseable, that pass falls back to host judging.
-
-The rotation is built from available models only. If only Claude and Antigravity are
-detected, the rotation is Claude → Antigravity → Claude → Antigravity. Pass 1 always starts
-with Claude (index 0).
+`--judge=round-robin`: Judging rotates across successful participants. Native
+mode launches a fresh role-matched sub-agent; model-CLI mode uses the resolved
+provider backend for that lane. The host always weaves and falls back to host
+judging when a judge response cannot be parsed.
 
 ### Interactive Configuration
 
 When flags are provided, the corresponding interactive question is skipped. Otherwise, commands prompt via `AskUserQuestion`:
 
-1. **Pass count** (skipped when `--passes` is provided) — choose single pass (1), multipass (2), or triple pass (3).
-2. **Timeout** (skipped when `--timeout` is provided) — choose the default, quick (0.5× default), long (1.5× default), or no timeout.
+1. **Workers** (skipped when `--workers` is provided) — choose recommended host-native sub-agents or separate model CLIs.
+2. **Pass count** (skipped when `--passes` is provided) — choose single pass (1), multipass (2), or triple pass (3).
+3. **Timeout** (`model-clis` only; skipped when `--timeout` is provided) — choose the default, quick (0.5× default), long (1.5× default), or no timeout.
 
-In headless mode (`claude -p`), pass count uses the flag value if provided, otherwise defaults to 1. Timeout uses the flag value if provided, otherwise the per-command default.
+Headless mode defaults to `subagents`. If the host cannot create native
+sub-agents, Weave stops and explains how to rerun with
+`--workers=model-clis`; it never launches separate CLIs implicitly.
 
 ## Deslop Pass
 
@@ -278,7 +290,7 @@ A 30% word-delta hard abort restores the original automatically. A 15% suspect-e
 
 ## Session Artifacts
 
-All commands persist model outputs, prompts, and synthesis results to a structured directory under `$AI_AIP_ROOT`. This enables post-session inspection, selective reference to prior pass artifacts during multi-pass refinement, and lightweight resume tracking.
+All commands persist participant outputs, prompts, and synthesis results to a structured directory under `$AI_AIP_ROOT`. This enables post-session inspection, selective reference to prior pass artifacts during multi-pass refinement, and lightweight resume tracking.
 
 ### Storage Root Resolution
 
@@ -308,6 +320,10 @@ Session IDs combine a UTC timestamp, PID, and random bytes to prevent collisions
 Example: `20260210-143022Z-12345-a1b2`
 
 ### Directory Hierarchy
+
+The tree below shows `model-clis` lane IDs. With the default `subagents`
+backend, replace `claude`, `agy`, and `gpt` with `maintainer`, `skeptic`, and
+`builder`; CLI stderr files are absent.
 
 ```
 $AI_AIP_ROOT/
@@ -405,7 +421,11 @@ pass-0001/
         └── ...
 ```
 
-Only files that differ from HEAD are snapshotted into `files/<model>/`. The directory structure mirrors the repository layout. Deleted files appear in the diff only, not as snapshots. This enables post-session inspection and multi-pass file-level cross-referencing without depending on worktree persistence.
+Only files that differ from HEAD are snapshotted into
+`files/<participant>/`. The directory structure mirrors the repository
+layout. Deleted files appear in the diff only, not as snapshots. This enables
+post-session inspection and multi-pass file-level cross-referencing without
+depending on worktree persistence.
 
 Pass directories use zero-padded 4-digit numbering (`pass-0001`, `pass-0002`, ...) for correct lexicographic sorting. Directories are created with `mkdir -p -m 700` and are preserved after the session for user inspection.
 
@@ -435,7 +455,13 @@ Each session directory contains a `session.json` that tracks session state. Upda
   "status": "in_progress",
   "branch": "feature/add-auth",
   "ref": "abc1234",
-  "models": ["claude", "agy", "gpt"],
+  "worker_backend": "subagents",
+  "participants": ["maintainer", "skeptic", "builder"],
+  "executors": {
+    "maintainer": "host-native",
+    "skeptic": "host-native",
+    "builder": "host-native"
+  },
   "completed_passes": 0,
   "prompt_summary": "How does the authentication middleware work?",
   "created_at": "2026-02-10T14:30:22Z",
@@ -451,7 +477,10 @@ Each session directory contains a `session.json` that tracks session state. Upda
 | `status` | `in_progress` or `completed` |
 | `branch` | Git branch at session start |
 | `ref` | Git commit ref (short SHA) at session start |
-| `models` | Which models participated |
+| `worker_backend` | `"subagents"` or `"model-clis"` |
+| `participants` | Successful role IDs (`subagents`) or lane artifact IDs (`model-clis`) |
+| `executors` | Participant ID to actual executor mapping |
+| `models` | Resolved providers or models; present only for `model-clis` |
 | `judge_mode` | `"host"` or `"round-robin"` (refine/brainstorm-and-refine only) |
 | `completed_passes` | How many passes finished |
 | `prompt_summary` | First 120 chars of the user's prompt |
@@ -465,17 +494,17 @@ The session is updated after each pass (`completed_passes` incremented, `updated
 Each session directory contains an `events.jsonl` file with one JSON object per line:
 
 ```json
-{"event":"session_start","timestamp":"2026-02-10T14:30:22Z","command":"ask","models":["claude","agy","gpt"]}
+{"event":"session_start","timestamp":"2026-02-10T14:30:22Z","command":"ask","worker_backend":"subagents","participants":["maintainer","skeptic","builder"]}
 ```
 
 ```json
-{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"models_completed":["claude","agy","gpt"]}
+{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"participants_completed":["maintainer","skeptic","builder"]}
 ```
 
 Refine and brainstorm-and-refine commands include additional fields in `pass_complete`:
 
 ```json
-{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"winner":"claude","winner_score":35,"woven":true,"judged_by":"claude"}
+{"event":"pass_complete","timestamp":"2026-02-10T14:32:45Z","pass":1,"winner":"maintainer","winner_score":35,"woven":true,"judged_by":"host"}
 ```
 
 ```json
@@ -486,7 +515,10 @@ To list sessions, scan `session.json` files under `$AI_AIP_ROOT/repos/<slug>--<h
 
 ## Prerequisites
 
-At minimum, Claude (this agent) is always available. For weave functionality, install one or more external CLIs:
+The default backend requires a host that can launch sub-agents. No separate
+provider CLI or account is required.
+
+To use `--workers=model-clis`, install one or more supported CLIs:
 
 | CLI | Model | Install |
 |-----|-------|---------|
@@ -497,7 +529,7 @@ At minimum, Claude (this agent) is always available. For weave functionality, in
 
 ### macOS timeout support
 
-External CLI commands are wrapped with `timeout` (GNU coreutils) to enforce time
+Model-CLI commands are wrapped with `timeout` (GNU coreutils) to enforce time
 limits. On macOS, install GNU coreutils to get `gtimeout`:
 
 ```console
@@ -506,9 +538,10 @@ brew install coreutils
 
 If neither `timeout` nor `gtimeout` is found, commands run without a time limit.
 
-If no external CLIs are available, commands fall back to Claude-only mode with a note about the limitation.
+If no model CLI resolves, Weave reports the unavailable lanes. It does not
+cross-fallback to host-native sub-agents.
 
-### Model selection and reasoning depth
+### Model-CLI selection and reasoning depth
 
 The Antigravity lane invokes `agy --model "Gemini 3.1 Pro (High)"` — the
 strongest Gemini Pro option reported by `agy models`. The `(High)` suffix
@@ -529,7 +562,12 @@ agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions -p "Report yo
 
 ## Shell Resilience
 
-All commands use `command -v` (POSIX-portable) instead of `which` for CLI detection. Prompts are written to the session directory (`$SESSION_DIR/pass-NNNN/prompt.md`) to avoid shell metacharacter injection while also persisting artifacts. stderr is captured per-pass (`$SESSION_DIR/pass-NNNN/stderr/<model>.txt`) for failure diagnostics. A structured retry protocol classifies failures (timeout, rate-limit, crash, empty output) and retries retryable failures once before marking a model unavailable.
+The `model-clis` backend uses `command -v` (POSIX-portable) instead of
+`which` for CLI detection. Prompts are written to the session directory
+(`$SESSION_DIR/pass-NNNN/prompt.md`) to avoid shell metacharacter injection
+while also persisting artifacts. stderr is captured per pass for failure
+diagnostics. A structured retry protocol classifies failures and retries
+within the selected lane before marking that participant unavailable.
 
 ## Language-Agnostic Design
 

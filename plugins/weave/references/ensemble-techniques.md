@@ -16,8 +16,8 @@ file is read only when `--cascade` is set or a pass N ≥ 2 begins.
 Without one of those, nothing in this file runs.
 
 Throughout, `M` = the number of lanes that produced an output this
-pass. When `M` = 1 (Claude-only fallback, or cascade early-exit) the
-residual and consensus procedures are skipped — both need multiple
+pass. When `M` = 1 (single-participant fallback or cascade early-exit)
+the residual and consensus procedures are skipped — both need multiple
 lanes to mean anything.
 
 ---
@@ -25,24 +25,27 @@ lanes to mean anything.
 ## Technique 1 — Cascade gate (`--cascade`)
 
 Every weave invocation normally pays full-ensemble price up front. With
-`--cascade`, a cheap Claude-only pass runs first, self-verifies, and
-fans out to the external lanes only when a confidence trigger fires or
-the user escalates.
+`--cascade`, a cheap Maintainer-only pass runs first, self-verifies, and
+fans out to the Skeptic and Builder lanes only when a confidence trigger
+fires or the user escalates. All lanes use the session's selected
+`worker_backend`.
 
 ### Caller contract
 
 The caller runs the gate after session-directory initialization and
-context-packet write, **before** launching any external lane. Inputs:
-`SESSION_DIR`, the command's Phase 3 Claude-lane prompt (verbatim,
-role preamble included), and the command's Verify Claims procedure.
+context-packet write, **before** launching the Skeptic or Builder lane.
+Inputs: `SESSION_DIR`, `worker_backend`, the command's Phase 3
+Maintainer prompt (verbatim, role preamble included), and the command's
+Verify Claims procedure.
 
 ### Step 1 — Cheap pass
 
-Run the command's Claude lane exactly as its Phase 3 specifies — same
-Task agent, same prompt, same context packet — and capture the output
-to `$SESSION_DIR/pass-0001/outputs/claude.md`. No external CLI runs
-yet. Running the lane verbatim means the output is reusable unchanged
-if the gate escalates.
+Run the command's Maintainer lane exactly as its Phase 3 specifies,
+using the selected worker backend, prompt, and context packet. Capture
+the output as `maintainer.md` in subagent mode or `claude.md` in
+model-CLI mode. Do not launch the Skeptic or Builder yet. Running the
+lane verbatim makes the output reusable unchanged if the gate
+escalates.
 
 ### Step 2 — Confidence gate
 
@@ -89,29 +92,31 @@ specific claim/reading/gap as evidence when fired. Append to
 ### Early-exit path
 
 Early-exit ends the run: any remaining configured passes are not run,
-making this pass the final pass. Skip the external lanes, blind
+making this pass the final pass. Skip the remaining lanes, blind
 judging, and rubric scoring (nothing to compare). Keep the command's
 Critic step — it is the only remaining error correction — and the
 deslop pass. Present via
 `references/present-results.md` with `CASCADE_STATE` = `early-exit`:
-the hero gains the suffix `— cascade early-exit (Claude lane only)` and
-the next-step panel gains **Escalate to full ensemble** as the first
-option. If the user picks it, continue below as if the gate had
-escalated. Record `models` as `["claude"]` in `session.json` until
+the hero identifies the Maintainer lane in subagent mode or the Claude
+lane in model-CLI mode, and the next-step panel gains **Escalate to full
+ensemble** as the first option. If the user picks it, continue below as
+if the gate had escalated. Record participants as `["maintainer"]` in
+subagent mode or `["claude"]` in model-CLI mode until
 escalation happens.
 
 ### Escalation path
 
-Launch the external lanes per the command's Phase 3, reusing the
-cheap-pass output as the Claude lane — do not re-run Claude. Include
-the fired triggers verbatim in the external prompts under a heading
-`Known weak points in one prior attempt` (do not attribute it to
-Claude — that would break blind judging). The command then proceeds
-normally: blind labels, synthesis, passes 2..N if configured.
+Launch the Skeptic and Builder per the command's Phase 3 through the
+same `worker_backend`, reusing the cheap-pass output as the Maintainer
+lane. Do not re-run the Maintainer or switch worker backends. Include
+the fired triggers verbatim in the two new prompts under a heading
+`Known weak points in one prior attempt`; do not attribute the prior
+attempt, which would break blind judging. The command then proceeds
+normally: blind labels, synthesis, and passes 2..N if configured.
 
 ### Headless
 
-Without `AskUserQuestion` (`claude -p`), the gate decides alone: no
+Without `AskUserQuestion`, the gate decides alone: no
 early-exit panel, no escalation prompt. The verdict line is emitted in
 the output.
 
@@ -171,7 +176,7 @@ outside these items is out of scope and will be discarded."
 Apply each resolved item as a local edit to the quoted region of the
 pass-N synthesis; every untouched passage carries into the pass N+1
 synthesis verbatim. Re-score only the rubric dimensions the resolved
-items affect. Content a model volunteered outside the ledger is
+items affect. Content a participant volunteered outside the ledger is
 discarded unread — scope discipline is what makes residual passes
 cheap.
 
@@ -190,10 +195,10 @@ or claim as **agree** (asserts it or a compatible position), **dissent**
 (asserts an incompatible position, including "not an issue"), or
 **silent** (does not address it). Count over the M participating lanes.
 
-On cascade-escalated runs the external lanes were primed with the
+On cascade-escalated runs the Skeptic and Builder were primed with the
 fired triggers, so for any item that restates a fired trigger, count
-only the external lanes — the cheap pass is not an independent source
-for its own weak points.
+only those two lanes — the cheap pass is not an independent source for
+its own weak points.
 
 ### Levels
 
@@ -210,8 +215,9 @@ contradicted outranks a split one.
 ### Artifacts
 
 Write the per-item consensus map into
-`$SESSION_DIR/pass-NNNN/consensus.md` using blind labels; model names
-are revealed there after scoring, alongside the label map.
+`$SESSION_DIR/pass-NNNN/consensus.md` using blind labels. Reveal role
+IDs after scoring in subagent mode; reveal lane artifact IDs after
+scoring in model-CLI mode.
 
 ### Surfacing in output
 

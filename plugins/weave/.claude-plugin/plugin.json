@@ -1,6 +1,6 @@
 {
   "name": "weave",
-  "description": "Weave prompts across Claude, Antigravity, and GPT in parallel — brainstorm, refine, plan, execute, architect, review, and synthesize the best of all models",
+  "description": "Run independent adversarial participants through host-native sub-agents by default or separate model CLIs by choice — brainstorm, refine, plan, execute, architect, review, and synthesize",
   "version": "0.0.2",
   "author": {
     "name": "Tony Narlock",

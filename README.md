@@ -13,7 +13,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | Plugin | Category | Description |
 |--------|----------|-------------|
 | [commit](plugins/commit/) | Development | Create git commits following project conventions with format enforcement and safety checks |
-| [weave](plugins/weave/) | Development | Weave prompts across Claude, Antigravity, and GPT in parallel — brainstorm, refine, plan, execute, architect, review, and synthesize the best of all models |
+| [weave](plugins/weave/) | Development | Run independent adversarial participants through host-native sub-agents by default or separate model CLIs by choice — brainstorm, refine, plan, execute, architect, review, and synthesize |
 | [rebase](plugins/rebase/) | Development | Automated rebase onto trunk with conflict prediction, resolution, and quality gate verification |
 | [changelog](plugins/changelog/) | Productivity | Generate categorized changelog entries from branch commits and PR context; refresh or recut a branch's own entries as it evolves |
 | [tdd](plugins/tdd/) | Testing | TDD bug-fix workflow — reproduce bugs as failing tests, find root cause, fix, and verify |

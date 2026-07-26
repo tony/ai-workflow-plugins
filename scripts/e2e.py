@@ -72,6 +72,11 @@ PLUGINS = [
     "situate",
 ]
 
+WEAVE_PRESENT_RESULTS = "${CLAUDE_PLUGIN_ROOT}/references/present-results.md"
+WEAVE_WORKER_REFERENCE = "${CLAUDE_PLUGIN_ROOT}/references/worker-backends.md"
+PORTABLE_HEADLESS_DEFAULT_MARKER = "<!-- portable: ask-user-choice=headless-default -->"
+WEAVE_MUTATING_COMMANDS = frozenset({"architecture.md", "execute.md", "prompt.md"})
+
 app = typer.Typer(help="E2E plugin lifecycle tests for ai-workflow-plugins.")
 console = rich.console.Console()
 
@@ -313,6 +318,359 @@ def _test_static_marketplace_json() -> list[TestCase]:
                 )
 
     tests.append(("marketplace.json validation", _check_marketplace))
+    return tests
+
+
+def _assert_weave_worker_reference(reference_path: Path) -> None:
+    """Assert the shared weave worker protocol's strategy boundary."""
+    _assert(reference_path.is_file(), "weave: missing references/worker-backends.md")
+    text = reference_path.read_text(encoding="utf-8")
+    subagent_label = "Adversarial sub-agents (Recommended)"
+    cli_label = "Separate model CLIs"
+    _assert(subagent_label in text, f"weave workers: missing '{subagent_label}'")
+    _assert(cli_label in text, f"weave workers: missing '{cli_label}'")
+    _assert(
+        text.index(subagent_label) < text.index(cli_label),
+        "weave workers: sub-agents must be the first choice",
+    )
+    _assert(
+        "headless" in text.lower() and "`subagents`" in text,
+        "weave workers: headless mode must default to subagents",
+    )
+
+    native_heading = "## Adversarial sub-agents"
+    cli_heading = "## Separate model CLIs"
+    _assert(native_heading in text, f"weave workers: missing '{native_heading}' section")
+    _assert(cli_heading in text, f"weave workers: missing '{cli_heading}' section")
+    native_text = text[text.index(native_heading) : text.index(cli_heading)]
+    _assert(
+        "host-native" in native_text and "independent" in native_text,
+        "weave workers: native lanes must use independent host-native sub-agents",
+    )
+    _assert(
+        "parallel" in native_text,
+        "weave workers: native lanes must request parallel dispatch",
+    )
+    forbidden_invocations = ("agy --", "gemini -m", "codex exec", "agent -p", "claude -p")
+    offenders = [token for token in forbidden_invocations if token in native_text]
+    _assert(
+        not offenders,
+        f"weave workers: native path invokes model CLIs: {', '.join(offenders)}",
+    )
+
+    cli_text = text[text.index(cli_heading) :]
+    _assert(
+        "explicit" in cli_text and "CLI detection" in cli_text,
+        "weave workers: model CLI detection must require explicit selection",
+    )
+    _assert(
+        "Never switch" in text,
+        "weave workers: backends must not cross-fallback without consent",
+    )
+    gpt_lanes = [line for line in text.splitlines() if line.startswith("- `gpt` carries")]
+    _assert(bool(gpt_lanes), "weave workers: gpt lane mapping is missing")
+    _assert(
+        "`codex` CLI" in gpt_lanes[0],
+        "weave workers: the gpt lane must name codex as its CLI executor",
+    )
+
+    role_ids = ("maintainer", "skeptic", "builder")
+    missing_roles = [role for role in role_ids if f"- `{role}`" not in native_text]
+    _assert(
+        not missing_roles,
+        f"weave workers: native artifact IDs are missing: {', '.join(missing_roles)}",
+    )
+    lifecycle_terms = ("<role>.md", "participants", "pass", "completion", "judg", "refinement")
+    missing_lifecycle = [term for term in lifecycle_terms if term not in text.lower()]
+    _assert(
+        not missing_lifecycle,
+        "weave workers: role artifacts do not span the full lifecycle: "
+        + ", ".join(missing_lifecycle),
+    )
+
+    read_only_start = native_text.find("For project-read-only commands")
+    mutating_start = native_text.find("For mutating commands")
+    _assert(
+        read_only_start >= 0 and mutating_start > read_only_start,
+        "weave workers: native isolation contracts are missing",
+    )
+    read_only_text = native_text[read_only_start:mutating_start]
+    mutating_text = native_text[mutating_start:]
+    _assert(
+        "isolated worktree" in read_only_text and "shared checkout" not in read_only_text,
+        "weave workers: read-only roles need isolated worktrees",
+    )
+    _assert(
+        "isolated worktree" in mutating_text,
+        "weave workers: mutating roles need isolated worktrees",
+    )
+    _assert(
+        "remove" in native_text and "worktree" in native_text,
+        "weave workers: native worktree cleanup is not declared",
+    )
+
+
+def _weave_result_commands(commands_dir: Path) -> tuple[Path, ...]:
+    """Derive weave commands that render through the shared result contract."""
+    return tuple(
+        path
+        for path in sorted(commands_dir.glob("*.md"))
+        if WEAVE_PRESENT_RESULTS in path.read_text(encoding="utf-8")
+    )
+
+
+def _weave_ensemble_commands(commands_dir: Path) -> tuple[Path, ...]:
+    """Derive ensemble commands from all shared result-rendering callers."""
+    return tuple(
+        path for path in _weave_result_commands(commands_dir) if path.name != "fix-review.md"
+    )
+
+
+def _worker_selection(text: str, rel: Path) -> str:
+    """Return a command's worker selection section."""
+    heading = "## Worker selection"
+    _assert(heading in text, f"{rel}: worker selection section is missing")
+    return text.split(heading, 1)[1].split("\n---", 1)[0].lower()
+
+
+def _session_contract_text(command_path: Path, text: str) -> str:
+    """Resolve a local or explicitly inherited session template."""
+    if '"session_id"' in text:
+        return text
+    inherited = re.search(
+        r"Follow Phase 2 .*?\$\{CLAUDE_PLUGIN_ROOT\}/commands/([^`]+\.md)`",
+        text,
+        re.DOTALL,
+    )
+    _assert(
+        inherited is not None,
+        f"{command_path.relative_to(REPO_ROOT)}: session template is neither local nor inherited",
+    )
+    inherited_match = t.cast("re.Match[str]", inherited)
+    inherited_path = command_path.parent / inherited_match.group(1)
+    _assert(
+        inherited_path.is_file(),
+        f"{command_path.relative_to(REPO_ROOT)}: inherited session command is missing",
+    )
+    return inherited_path.read_text(encoding="utf-8")
+
+
+def _result_call(text: str, rel: Path) -> str:
+    """Return the caller assignments immediately following present-results."""
+    _assert(WEAVE_PRESENT_RESULTS in text, f"{rel}: present-results caller is missing")
+    tail = text.split(WEAVE_PRESENT_RESULTS, 1)[1]
+    return "\n".join(tail.splitlines()[:24])
+
+
+def _assert_weave_fix_review_contract(command_path: Path) -> None:
+    """Assert fix-review supplies the non-ensemble result values."""
+    text = command_path.read_text(encoding="utf-8")
+    rel = command_path.relative_to(REPO_ROOT)
+    result_call = _result_call(text, rel)
+    expected = (
+        ("`WORKER_BACKEND`", "null"),
+        ("`PARTICIPANTS`", "[]"),
+        ("`MODELS`", "null"),
+    )
+    for variable, value in expected:
+        line = next(
+            (line for line in result_call.splitlines() if variable in line),
+            "",
+        )
+        _assert(
+            value in line,
+            f"{rel}: present-results requires {variable} = {value}",
+        )
+
+
+def _assert_weave_worker_command(command_path: Path) -> None:
+    """Assert one weave command resolves and gates its worker backend."""
+    text = command_path.read_text(encoding="utf-8")
+    rel = command_path.relative_to(REPO_ROOT)
+    _assert(WEAVE_WORKER_REFERENCE in text, f"{rel}: worker backend protocol is not cited")
+    operational_headings = (
+        heading
+        for heading in ("## Phase 0", "## Phase 1", "## Orchestration Plan")
+        if heading in text
+    )
+    first_operation = min(text.index(heading) for heading in operational_headings)
+    _assert(
+        text.index(WEAVE_WORKER_REFERENCE) < first_operation,
+        f"{rel}: worker backend must resolve before the first operational phase",
+    )
+    _assert(
+        "--workers=subagents|model-clis" in text,
+        f"{rel}: argument hint must expose --workers",
+    )
+    _assert(
+        "`worker_backend == model-clis`" in text,
+        f"{rel}: external model instructions are not gated",
+    )
+    _assert("agy --model" in text, f"{rel}: Antigravity CLI path was removed")
+    _assert("codex exec" in text, f"{rel}: Codex CLI path was removed")
+
+    selection = _worker_selection(text, rel)
+    lifecycle_terms = (
+        "whole session",
+        "dispatch",
+        "retry",
+        "judg",
+        "refinement",
+        "artifact",
+        "session metadata",
+    )
+    missing_lifecycle = [term for term in lifecycle_terms if term not in selection]
+    _assert(
+        not missing_lifecycle,
+        f"{rel}: worker backend does not govern the whole lifecycle: "
+        + ", ".join(missing_lifecycle),
+    )
+    _assert(
+        PORTABLE_HEADLESS_DEFAULT_MARKER in text,
+        f"{rel}: portable headless default needs a structured source marker",
+    )
+
+    session_text = _session_contract_text(command_path, text)
+    session_lines = session_text.splitlines()
+    session_id_line = next(
+        (index for index, line in enumerate(session_lines) if '"session_id"' in line),
+        -1,
+    )
+    session_start_line = next(
+        (index for index, line in enumerate(session_lines) if '"event":"session_start"' in line),
+        -1,
+    )
+    _assert(session_id_line >= 0, f"{rel}: session.json template is missing")
+    _assert(session_start_line >= 0, f"{rel}: session_start event template is missing")
+    session_template = "\n".join(session_lines[session_id_line : session_id_line + 24])
+    session_event = "\n".join(session_lines[session_start_line : session_start_line + 4])
+    for field in ('"worker_backend"', '"participants"'):
+        _assert(field in session_template, f"{rel}: session.json omits {field}")
+        _assert(field in session_event, f"{rel}: session_start event omits {field}")
+
+    result_call = _result_call(text, rel)
+    _assert(
+        "`WORKER_BACKEND`" in result_call and "`worker_backend`" in result_call,
+        f"{rel}: present-results omits WORKER_BACKEND",
+    )
+    _assert(
+        "`PARTICIPANTS`" in result_call,
+        f"{rel}: present-results omits PARTICIPANTS",
+    )
+    models_line = next(
+        (line for line in result_call.splitlines() if "`MODELS`" in line),
+        "",
+    )
+    _assert(
+        "model-clis" in models_line and "null" in models_line,
+        f"{rel}: MODELS must be conditional on model-clis and null otherwise",
+    )
+
+    if command_path.name in WEAVE_MUTATING_COMMANDS:
+        heading = "## Native mutating lifecycle"
+        _assert(heading in text, f"{rel}: native mutating lifecycle is missing")
+        native_lifecycle = text.split(heading, 1)[1].split("\n## ", 1)[0].lower()
+        required = (
+            "`worker_backend == subagents`",
+            "isolated worktree",
+            "<participant>",
+            "no worker runs in the main checkout",
+            "capture",
+            "adopt",
+            "cleanup",
+        )
+        missing = [term for term in required if term not in native_lifecycle]
+        _assert(
+            not missing,
+            f"{rel}: native mutating lifecycle is incomplete: {', '.join(missing)}",
+        )
+
+
+def _assert_weave_worker_portable_contract(commands_dir: Path) -> None:
+    """Assert portable weave skills retain the worker strategy contract."""
+    renderer_text = (REPO_ROOT / "scripts" / "_portable_render.py").read_text(encoding="utf-8")
+    _assert(
+        PORTABLE_HEADLESS_DEFAULT_MARKER in renderer_text,
+        "portable renderer must consume the structured headless-default marker",
+    )
+    _assert(
+        'if "documented headless default" in body' not in renderer_text,
+        "portable renderer must not infer behavior from prose",
+    )
+    source_worker_reference = (
+        REPO_ROOT / "plugins" / "weave" / "references" / "worker-backends.md"
+    ).read_text(encoding="utf-8")
+
+    for command_path in _weave_ensemble_commands(commands_dir):
+        skill_name = f"weave-{command_path.stem}"
+        skill_dir = REPO_ROOT / ".agents" / "skills" / skill_name
+        skill_path = skill_dir / "SKILL.md"
+        rel = skill_path.relative_to(REPO_ROOT)
+        _assert(skill_path.is_file(), f"{rel}: portable skill is missing")
+        text = skill_path.read_text(encoding="utf-8")
+        _assert(
+            "references/worker-backends.md" in text,
+            f"{rel}: portable skill omits the worker backend protocol",
+        )
+        _assert(
+            "Honor a documented headless default" in text,
+            f"{rel}: portable choice guidance conflicts with the headless default",
+        )
+        _assert(
+            (skill_dir / "references" / "worker-backends.md").is_file(),
+            f"{rel}: worker backend reference was not bundled",
+        )
+        bundled_worker_reference = (skill_dir / "references" / "worker-backends.md").read_text(
+            encoding="utf-8"
+        )
+        _assert(
+            bundled_worker_reference == source_worker_reference,
+            f"{rel}: bundled worker backend reference is stale",
+        )
+
+
+def _test_static_weave_worker_backends() -> list[TestCase]:
+    """Verify every weave ensemble resolves its worker backend before execution."""
+    weave_dir = REPO_ROOT / "plugins" / "weave"
+    commands_dir = weave_dir / "commands"
+    reference_path = weave_dir / "references" / "worker-backends.md"
+    result_commands = _weave_result_commands(commands_dir)
+    ensemble_commands = _weave_ensemble_commands(commands_dir)
+    tests: list[TestCase] = [
+        (
+            "weave worker backend: shared protocol",
+            lambda: _assert_weave_worker_reference(reference_path),
+        ),
+        (
+            "weave worker backend: command coverage",
+            lambda: _assert(
+                set(result_commands) == set(commands_dir.glob("*.md")),
+                "weave worker backend: every command must declare its result contract",
+            ),
+        ),
+    ]
+
+    tests.extend(
+        (
+            f"weave worker backend: {command_path.name}",
+            lambda p=command_path: _assert_weave_worker_command(p),
+        )
+        for command_path in ensemble_commands
+    )
+
+    fix_review_path = commands_dir / "fix-review.md"
+    tests.append(
+        (
+            "weave worker backend: fix-review result contract",
+            lambda: _assert_weave_fix_review_contract(fix_review_path),
+        ),
+    )
+    tests.append(
+        (
+            "weave worker backend: portable contract",
+            lambda: _assert_weave_worker_portable_contract(commands_dir),
+        ),
+    )
     return tests
 
 
@@ -674,6 +1032,7 @@ def main(
     static_tests.extend(_test_static_plugin_structure())
     static_tests.extend(_test_static_agent_skill_frontmatter())
     static_tests.extend(_test_static_marketplace_json())
+    static_tests.extend(_test_static_weave_worker_backends())
     static_tests.extend(_test_static_weave_timeouts())
     static_tests.extend(_test_static_weave_stderr_redirects())
     static_tests.extend(_test_static_agy_invocations())

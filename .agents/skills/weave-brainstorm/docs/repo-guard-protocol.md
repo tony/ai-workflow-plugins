@@ -6,22 +6,30 @@ read-only commands) or worktrees (for write commands). This protocol applies
 to every weave command except `fix-review` (which intentionally modifies the
 repository).
 
+The worker backend determines which defenses run. Host-native sub-agents are
+the default: every participant receives an isolated worktree, including
+read-only participants. The separate model-CLI backend additionally uses the
+CLI-specific sandbox and post-CLI checks in Layers 1 and 3. Layers 2, 4, and 5
+apply to both backends.
+
 ---
 
-## Layer 1: Native CLI Read-Only Sandbox
+## Layer 1: Model-CLI Read-Only Sandboxes
 
-Read-only commands run each external CLI in **its own read-only sandbox** so the
-model can read the repository but cannot modify it. Each native-sandbox CLI is
-launched from a `cd "$SESSION_DIR"` subshell as a backstop (any write that
-bypassed the sandbox would land in the session directory, not the repo), and the
-repository is exposed read-only through each CLI's own flags. All prompt input
-and output paths are absolute, so the working directory does not affect I/O.
+This layer runs only when `worker_backend == model-clis`. Read-only commands
+run each external CLI in **its own read-only sandbox** so the model can read
+the repository but cannot modify it. Each sandboxed CLI is launched from a
+`cd "$SESSION_DIR"` subshell as a backstop (any write that bypassed the
+sandbox would land in the session directory, not the repo), and the repository
+is exposed read-only through each CLI's own flags. All prompt input and output
+paths are absolute, so the working directory does not affect I/O.
 
 The `agy` (Antigravity) CLI is the exception: it has **no native read-only
 mode** — its print mode reads *and* writes — so it is isolated in a **disposable
 git worktree** rather than a native sandbox (see the `agy` block below).
 
-`$REPO_TOPLEVEL` is captured in Layer 2 and passed to every sub-agent.
+`$REPO_TOPLEVEL` is captured in Layer 2 and passed to every model-CLI wrapper
+sub-agent.
 
 **Read-only commands** (brainstorm, refine, brainstorm-and-refine,
 serene-bliss, ask, plan, review).
@@ -62,13 +70,20 @@ agent fallback — `--mode plan` is read-only mode, `--workspace` grants repo re
 (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model <model> "$(cat "$SESSION_DIR/...")" >"$SESSION_DIR/.../gpt.md" 2>"$SESSION_DIR/.../stderr.txt")
 ```
 
-The native read-only sandbox — or, for `agy`, the disposable worktree — is the
+The model CLI's read-only sandbox — or, for `agy`, the disposable worktree — is the
 primary write defense; the `cd "$SESSION_DIR"` working directory and the
 fingerprint/revert checks (Layers 2–5) are backstops.
 
-**Write commands** (execute, prompt, architecture) already wrap external CLIs
-in `(cd "$WORKTREE_PATH" && ...)` — no change needed for external model
-invocations.
+Host-native participants use a unique session-scoped worktree for every
+read-only WorkItem. The orchestrator points the participant at that exact path
+and removes only that worktree after capturing its response. Pre-existing
+working-tree changes stay in the context packet; the writable user checkout is
+never exposed to a native worker.
+
+**Write commands** (execute, prompt, architecture) wrap external CLIs in
+`(cd "$WORKTREE_PATH" && ...)`. In the default sub-agent backend, the
+Maintainer, Skeptic, and Builder also receive separate branch worktrees; they
+do not share or modify the main checkout.
 
 ---
 
@@ -103,15 +118,16 @@ status:
 For **write commands**: this step runs after stashing user changes (Step 4b),
 so the fingerprint reflects the clean stashed state.
 
-For **plan.md**: this runs inside the setup Task agent alongside other session
-initialization work.
+For **plan.md**: this runs inside the setup host-native sub-agent alongside
+other session initialization work.
 
 ---
 
-## Layer 3: Post-CLI Repo State Verification
+## Layer 3: Post-model-CLI Repo State Verification
 
-After each external CLI command (agy, gemini, codex, agent) returns, the sub-agent
-that invoked the CLI must immediately verify the repository is unchanged.
+This layer runs only when `worker_backend == model-clis`. After each external
+CLI command (agy, gemini, codex, agent) returns, the wrapper sub-agent that
+invoked it must immediately verify the repository is unchanged.
 
 Add these steps to each Antigravity/GPT sub-agent's instructions, after the CLI
 invocation and before returning. The sub-agent must receive `$REPO_TOPLEVEL`
@@ -137,10 +153,10 @@ fi
 The model output was already captured via stdout redirect, so the session
 continues normally after reverting.
 
-**Concurrency note**: Multiple sub-agents run external CLIs in parallel.
+**Concurrency note**: Multiple wrapper sub-agents run external CLIs in parallel.
 If two rogue writes happen concurrently, one sub-agent's verification may
-partially observe the other's changes. Layer 1 (native read-only sandbox)
-is the primary defense — the CLIs cannot write the repo at all. Layer 3 is a
+partially observe the other's changes. Layer 1 (model-CLI sandbox or disposable
+worktree) is the primary defense — the CLIs cannot write the repo at all. Layer 3 is a
 safety net for any write that bypasses the sandbox; the race window is
 acceptable because the worst case is a redundant revert.
 
@@ -163,7 +179,8 @@ All output must go to stdout. Any file modifications will be automatically
 detected and reverted.
 ```
 
-Strengthen Claude Task agent prompts with:
+Apply the same contract to every host-native read-only participant prompt,
+even though its isolated worktree contains accidental writes:
 
 > CRITICAL: Do NOT write, edit, create, or delete any files in the repository.
 > Do NOT use Write, Edit, or Bash commands that modify repository files. All
@@ -175,16 +192,18 @@ Strengthen Claude Task agent prompts with:
 ## Layer 5: Session-End Verification
 
 Before marking the session as completed (before updating `session.json` to
-`"status": "completed"`), run a final verification:
+`"status": "completed"`), run a final verification. This check is
+non-destructive: worker isolation should make drift impossible, and the guard
+must never erase user data while trying to repair an unexpected change.
 
 ```bash
 FINAL_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
 FINAL_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
 if [ "$FINAL_HEAD" != "$REPO_HEAD" ] || [ "$FINAL_STATUS" != "$REPO_FINGERPRINT" ]; then
-  git -C "$REPO_TOPLEVEL" checkout -- . 2>/dev/null || true
-  git -C "$REPO_TOPLEVEL" clean -fd 2>/dev/null || true
-  printf '{"event":"repo_guard_final","timestamp":"%s","repo_clean":false,"reverted":true}\n' \
+  printf '{"event":"repo_guard_final","timestamp":"%s","repo_clean":false,"reverted":false}\n' \
     "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >>"$SESSION_DIR/guard-events.jsonl"
+  printf '%s\n' "Repository drift detected; session stopped without modifying the checkout." >&2
+  exit 1
 else
   printf '{"event":"repo_guard_final","timestamp":"%s","repo_clean":true,"reverted":false}\n' \
     "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >>"$SESSION_DIR/guard-events.jsonl"
@@ -197,5 +216,5 @@ Append to `events.jsonl`:
 {"event":"repo_guard_final","timestamp":"<ISO 8601 UTC>","repo_clean":true,"reverted":false}
 ```
 
-For **plan.md**: this runs inside the sub-agent that persists session
-artifacts at session end.
+For **plan.md**: this runs inside the host-native sub-agent that persists
+session artifacts at session end.

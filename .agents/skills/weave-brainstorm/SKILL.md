@@ -2,13 +2,13 @@
 name: weave-brainstorm
 description: >-
   Use when the user wants multiple independent ideas, alternatives, or
-  approaches from different AI models for a creative prompt, design
+  approaches from adversarial participants for a creative prompt, design
   question, or open-ended problem. Triggers on phrases like "brainstorm",
   "give me ideas", "multiple approaches", "what are my options", or "explore
   alternatives"
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 metadata:
-  argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...]"
+  argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...] [--workers=subagents|model-clis]"
   source: "plugins/weave/commands/brainstorm.md, plugins/weave/skills/brainstorm/SKILL.md"
 ---
 
@@ -16,9 +16,28 @@ metadata:
 
 *Selection guidance for this skill is bundled at `references/overview.md`.*
 
-Generate independent original responses from multiple AI models (Claude, Antigravity, GPT) in parallel, with optional multiple variants per model. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, prompts, variant results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
+Generate original responses from independent adversarial workers in parallel, with optional multiple variants per worker. Host-native sub-agents are the default; separate model CLIs are optional. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (worker outputs, prompts, variant results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 
 The prompt comes from `$ARGUMENTS`. If no arguments are provided, ask the user what they want to brainstorm.
+
+## Worker selection
+
+
+
+Before any other unresolved configuration choice or operational step, read
+`references/worker-backends.md`. Resolve
+`worker_backend` from `--workers=subagents|model-clis` using that reference;
+if the flag is absent, ask its worker question first.
+If interactive choice is unavailable, honor its documented headless default.
+
+The selected backend governs the whole session: dispatch, retry, judging,
+refinement, artifacts, session metadata, and presentation. The shared reference
+adapts provider-named examples across every later phase to that backend.
+
+When `worker_backend == subagents`, use only the reference's native sub-agent
+path. Skip every model-CLI detection, timeout question, timeout resolution,
+retry, fallback, and dispatch instruction below. Every such instruction below
+is conditional on `worker_backend == model-clis`.
 
 ---
 
@@ -296,7 +315,9 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "status": "in_progress",
   "branch": "<current branch>",
   "ref": "<short SHA>",
-  "models": ["claude", "..."],
+  "worker_backend": "<subagents or model-clis>",
+  "participants": ["<participant artifact ID>", "..."],
+  "executors": {"<participant artifact ID>": "<executor>"},
   "variants_per_model": <N>,
   "total_outputs": <models × variants>,
   "completed_passes": 0,
@@ -306,19 +327,24 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
 }
 ```
 
+When `worker_backend == model-clis`, add a `"models"` array containing the
+resolved model for each participant. Omit `"models"` when
+`worker_backend == subagents`.
+
 #### Step 7: Append `events.jsonl`
 
 Append one event line to `$SESSION_DIR/events.jsonl`:
 
 ```json
-{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"brainstorm","models":["claude","..."],"variants_per_model":<N>}
+{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"brainstorm","worker_backend":"<subagents or model-clis>","participants":["<participant artifact ID>","..."],"variants_per_model":<N>}
 ```
 
 #### Step 8: Write `metadata.md`
 
 Write to `$SESSION_DIR/metadata.md` containing:
 - Command name, start time, configured variant count
-- Models detected, timeout setting
+- Worker backend, participant artifact IDs, and executor mapping
+- Resolved models only for `model-clis`, timeout setting when applicable
 - Git branch (`git branch --show-current`), commit ref (`git rev-parse --short HEAD`)
 
 Store `$SESSION_DIR` for use in all subsequent phases.
@@ -533,7 +559,10 @@ Read `references/present-results.md` and apply it with:
 - `SESSION_DIR` = `$SESSION_DIR`
 - `PASS_COUNT` = 1
 - `IN_PLAN_MODE` = false
-- `MODELS` = the models that participated
+- `WORKER_BACKEND` = `worker_backend`
+- `PARTICIPANTS` = the successful participant artifact IDs
+- `EXECUTORS` = the resolved participant artifact ID to executor mapping
+- `MODELS` = resolved models when `worker_backend == model-clis`; otherwise null
 - `LABEL_MAP_PATH` = null
 
 After the reference returns, finalize the session per the existing
@@ -543,7 +572,7 @@ Finalize Session block.
 
 After presenting the results:
 
-- **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation. Append a `repo_guard_final` event to `events.jsonl`.
+- **Repo Guard**: Run session-end verification (see `docs/repo-guard-protocol.md` Layer 5). If the repo differs from the pre-session fingerprint, stop and log the violation without modifying the checkout. Append a `repo_guard_final` event to `events.jsonl`.
 
 - Update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now.
 - Append a `session_complete` event to `events.jsonl`:
@@ -577,6 +606,6 @@ ln -sfn "$SESSION_ID" "$AIP_ROOT/repos/$REPO_DIR/sessions/brainstorm/latest"
 
 ## Portability notes
 
-- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `ask-user-choice` — follow the source's choice contract. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it. Honor a documented headless default when the source defines one; otherwise print a numbered list and wait for a numbered reply. Never invent a choice.
 - `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
 - Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.

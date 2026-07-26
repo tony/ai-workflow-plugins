@@ -2,12 +2,12 @@
 name: weave-refine
 description: >-
   Use when the user has an existing draft, text, code, or artifact and wants
-  it iteratively improved through multi-model critique and weaving across
-  multiple passes. Triggers on phrases like "refine this", "improve this",
-  "make this better", "iterate on this", or "polish this"
+  it iteratively improved through independent adversarial critique and
+  weaving across multiple passes. Triggers on phrases like "refine this",
+  "improve this", "make this better", "iterate on this", or "polish this"
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 metadata:
-  argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--no-deslop|--quiet-deslop|--verbose-deslop]"
+  argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
   source: "plugins/weave/commands/refine.md, plugins/weave/skills/refine/SKILL.md"
 ---
 
@@ -15,9 +15,28 @@ metadata:
 
 *Selection guidance for this skill is bundled at `references/overview.md`.*
 
-Iteratively improve an artifact across multiple AI models (Claude, Antigravity, GPT) using a judge-weave-distribute cycle. Each pass produces independent critiques and improved versions from all models, then the host agent judges, picks the best, incorporates strengths from runners-up, and distributes the woven result back for the next pass. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, judge assessments, woven results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
+Iteratively improve an artifact through independent adversarial workers using a judge-weave-distribute cycle. Host-native sub-agents are the default; separate model CLIs are optional. Each pass produces independent critiques and improved versions from all workers, then the host agent judges, picks the best, incorporates strengths from runners-up, and distributes the woven result back for the next pass. This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (worker outputs, judge assessments, woven results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 
 The artifact comes from `$ARGUMENTS`. If no arguments are provided, ask the user what artifact they want refined.
+
+## Worker selection
+
+
+
+Before any other unresolved configuration choice or operational step, read
+`references/worker-backends.md`. Resolve
+`worker_backend` from `--workers=subagents|model-clis` using that reference;
+if the flag is absent, ask its worker question first.
+If interactive choice is unavailable, honor its documented headless default.
+
+The selected backend governs the whole session: dispatch, retry, judging,
+refinement, artifacts, session metadata, and presentation. The shared reference
+adapts provider-named examples across every later phase to that backend.
+
+When `worker_backend == subagents`, use only the reference's native sub-agent
+path. Skip every model-CLI detection, timeout question, timeout resolution,
+retry, fallback, and dispatch instruction below. Every such instruction below
+is conditional on `worker_backend == model-clis`.
 
 ---
 
@@ -319,7 +338,9 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "status": "in_progress",
   "branch": "<current branch>",
   "ref": "<short SHA>",
-  "models": ["claude", "..."],
+  "worker_backend": "<subagents or model-clis>",
+  "participants": ["<participant artifact ID>", "..."],
+  "executors": {"<participant artifact ID>": "<executor>"},
   "judge_mode": "<host or round-robin>",
   "pass_count": <N>,
   "completed_passes": 0,
@@ -329,19 +350,24 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
 }
 ```
 
+When `worker_backend == model-clis`, add a `"models"` array containing the
+resolved model for each participant. Omit `"models"` when
+`worker_backend == subagents`.
+
 #### Step 7: Append `events.jsonl`
 
 Append one event line to `$SESSION_DIR/events.jsonl`:
 
 ```json
-{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"refine","models":["claude","..."],"pass_count":<N>}
+{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"refine","worker_backend":"<subagents or model-clis>","participants":["<participant artifact ID>","..."],"pass_count":<N>}
 ```
 
 #### Step 8: Write `metadata.md`
 
 Write to `$SESSION_DIR/metadata.md` containing:
 - Command name, start time, configured pass count
-- Models detected, timeout setting
+- Worker backend, participant artifact IDs, and executor mapping
+- Resolved models only for `model-clis`, timeout setting when applicable
 - Git branch (`git branch --show-current`), commit ref (`git rev-parse --short HEAD`)
 - Artifact source (file path or "inline text"), first 120 chars of artifact
 
@@ -848,12 +874,15 @@ Read `references/present-results.md` and apply it with:
 - `SESSION_DIR` = `$SESSION_DIR`
 - `PASS_COUNT` = the number of completed passes
 - `IN_PLAN_MODE` = false
-- `MODELS` = the models that participated
+- `WORKER_BACKEND` = `worker_backend`
+- `PARTICIPANTS` = the successful participant artifact IDs
+- `EXECUTORS` = the resolved participant artifact ID to executor mapping
+- `MODELS` = resolved models when `worker_backend == model-clis`; otherwise null
 - `LABEL_MAP_PATH` = `$SESSION_DIR/pass-NNNN/label-map.json`
 
 After the reference returns, finalize the session:
 
-- **Repo Guard**: Run session-end verification. Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation.
+- **Repo Guard**: Run session-end verification. If the repo differs from the pre-session fingerprint, stop and log the violation without modifying the checkout.
 - Write the final woven artifact to `$SESSION_DIR/final.md`
 - Update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now
 - Append a `session_complete` event to `events.jsonl`
@@ -881,6 +910,6 @@ After the reference returns, finalize the session:
 
 ## Portability notes
 
-- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `ask-user-choice` — follow the source's choice contract. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it. Honor a documented headless default when the source defines one; otherwise print a numbered list and wait for a numbered reply. Never invent a choice.
 - `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
 - Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.
