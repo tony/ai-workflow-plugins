@@ -304,7 +304,9 @@
         "email": "tony@git-pull.com"
       },
       "source": "./plugins/ruff",
-      "category": "development"
+      "category": "development",
+      "homepage": "https://github.com/tony/ai-workflow-plugins/tree/main/plugins/ruff",
+      "license": "MIT"
     }
   ]
 }
