@@ -936,6 +936,46 @@ def lint() -> None:
     console.print("[green bold]0 errors found.[/green bold]")
 
 
+def _serialize_manifest(manifest: MarketplaceManifest) -> str:
+    """Render *manifest* as the JSON text ``sync --write`` puts on disk.
+
+    Unset optional fields are omitted rather than written as ``null``.
+    ``claude plugin validate`` rejects a null wherever the schema expects a
+    concrete type, so serializing them makes ``lint`` fail on this writer's
+    own output. Dropping them loses nothing: every optional is declared
+    ``... | None = None``, and the validator refuses null for all of them, so
+    no field can carry a null worth round-tripping.
+
+    Non-ASCII is written through instead of escaped, keeping em dashes in
+    descriptions readable rather than rewriting every one of them.
+
+    Examples
+    --------
+    >>> manifest = MarketplaceManifest(
+    ...     name="test-marketplace",
+    ...     metadata=MarketplaceMetadata(description="One — two"),
+    ...     owner=Author(name="Test"),
+    ...     plugins=[],
+    ... )
+    >>> text = _serialize_manifest(manifest)
+
+    Unset optionals are absent, not null:
+
+    >>> "null" in text
+    False
+    >>> '"pluginRoot"' in text
+    False
+
+    Set values survive, with the em dash written through rather than escaped:
+
+    >>> "One — two" in text
+    True
+    """
+    raw_out: dict[str, t.Any] = manifest.model_dump(mode="json", exclude_none=True)
+    raw_out["$schema"] = "https://anthropic.com/claude-code/marketplace.schema.json"
+    return json.dumps(raw_out, indent=2, ensure_ascii=False) + "\n"
+
+
 @app.command()
 def sync(*, write: bool = False, check: bool = False) -> None:
     """Compare discovered plugins with marketplace manifest.
@@ -1025,10 +1065,7 @@ def sync(*, write: bool = False, check: bool = False) -> None:
     manifest.plugins = [e for e in manifest.plugins if e.name not in removals]
 
     # Write updated manifest
-    raw_out: dict[str, t.Any] = manifest.model_dump(mode="json")
-    raw_out["$schema"] = "https://anthropic.com/claude-code/marketplace.schema.json"
-    output = json.dumps(raw_out, indent=2) + "\n"
-    _ = MARKETPLACE_PATH.write_text(output, encoding="utf-8")
+    _ = MARKETPLACE_PATH.write_text(_serialize_manifest(manifest), encoding="utf-8")
     console.print(f"\n[green]Updated {PrivatePath(MARKETPLACE_PATH)}[/green]")
 
 
