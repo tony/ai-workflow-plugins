@@ -50,7 +50,7 @@ jobs:
         run: uv run scripts/marketplace.py portable --check
 
       - name: Skill routing check
-        run: uv run scripts/skill_evals.py check --min-rank1 80
+        run: uv run scripts/skill_evals.py check
 
   e2e:
     runs-on: ubuntu-latest

@@ -78,8 +78,8 @@ NAME_TOKEN_WEIGHT = 2
 TOP_N = 5
 
 NEGATIVE_MIN_SCORE = 0.2
-"""A negative prompt only fails when the skill ranks first *and* clears this
-score. Not every prompt has an owner in the catalog, and ranking first at 0.13
+"""A negative prompt asserts nothing about routing unless its winner clears
+this score. Not every prompt has an owner in the catalog, and winning at 0.13
 out of a field of near-zeros is noise, not a mis-route."""
 
 _WHEN = r"(?:when(?:ever)?|while|before|after|during)"
@@ -108,6 +108,10 @@ class SkillDoc:
 
     name: str
     description: str
+    model_invocable: bool = True
+    """False when the skill sets ``disable-model-invocation``. Such a skill is
+    reachable only as an explicit slash command, so it never competes for a
+    prompt and does not belong in the corpus a router is scored against."""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -290,42 +294,83 @@ def discover_skills() -> list[SkillDoc]:
         data = t.cast("dict[str, object]", loaded)
         name = data.get("name") or skill_file.parent.name
         description = data.get("description") or ""
-        skills.append(SkillDoc(name=str(name), description=str(description).strip()))
+        skills.append(
+            SkillDoc(
+                name=str(name),
+                description=str(description).strip(),
+                model_invocable=not data.get("disable-model-invocation", False),
+            )
+        )
     return skills
 
 
-def _load_cases() -> list[dict[str, object]]:
-    """Load skill-creator-compatible eval cases, if any are present."""
+def routable(skills: Iterable[SkillDoc]) -> list[SkillDoc]:
+    """Keep only the skills a host can route a prompt to."""
+    return [s for s in skills if s.model_invocable]
+
+
+def _load_cases(known: set[str] | None = None) -> tuple[list[dict[str, object]], list[str]]:
+    """Load eval cases, reporting any that would silently assert nothing.
+
+    A case file is only useful if the checker can find its assertions. A
+    misspelled key, a top-level array, or a ``skill_name`` no longer in the
+    catalog all parse cleanly and contribute zero assertions, so a rename can
+    retire a file's negatives without failing anything.
+
+    Parameters
+    ----------
+    known : set[str] | None
+        Catalog skill names. When given, a case naming something else is an
+        error rather than a silent no-op.
+    """
     if not CASES_DIR.is_dir():
-        return []
+        return [], []
     cases: list[dict[str, object]] = []
+    errors: list[str] = []
     for path in sorted(CASES_DIR.glob("*.json")):
         loaded = t.cast("object", json.loads(path.read_text(encoding="utf-8")))
-        if isinstance(loaded, dict):
-            cases.append(t.cast("dict[str, object]", loaded))
-    return cases
+        if not isinstance(loaded, dict):
+            errors.append(f"{path.name}: expected a JSON object, found {type(loaded).__name__}")
+            continue
+        case = t.cast("dict[str, object]", loaded)
+
+        name = case.get("skill_name")
+        if not isinstance(name, str) or not name:
+            errors.append(f"{path.name}: missing 'skill_name'")
+            continue
+        if known is not None and name not in known:
+            errors.append(f"{path.name}: 'skill_name' {name!r} is not a routable skill")
+
+        trigger = case.get("trigger")
+        if not isinstance(trigger, dict):
+            errors.append(f"{path.name}: missing 'trigger' object")
+            continue
+        trigger_map = t.cast("dict[str, object]", trigger)
+        if not any(isinstance(trigger_map.get(k), list) for k in ("positive", "negative")):
+            errors.append(f"{path.name}: 'trigger' has no 'positive' or 'negative' list")
+            continue
+
+        cases.append(case)
+    return cases, errors
 
 
-def _check_triggers(corpus: Corpus) -> tuple[int, int, list[str]]:
+def _check_triggers(corpus: Corpus, cases: list[dict[str, object]]) -> tuple[int, int, list[str]]:
     """Rank each case's positive and negative prompts. Returns hits, total, failures."""
     failures: list[str] = []
     hits = 0
     total = 0
-    for case in _load_cases():
+    for case in cases:
         skill_name = str(case.get("skill_name", ""))
-        trigger = case.get("trigger")
-        if not isinstance(trigger, dict):
-            continue
-        trigger_map = t.cast("dict[str, object]", trigger)
+        trigger = t.cast("dict[str, object]", case["trigger"])
 
-        positives = trigger_map.get("positive")
+        positives = trigger.get("positive")
         if isinstance(positives, list):
             for entry in t.cast("list[object]", positives):
                 if not isinstance(entry, dict):
                     continue
                 item = t.cast("dict[str, object]", entry)
                 prompt = str(item.get("prompt", ""))
-                top_k = int(t.cast("int", item.get("top_k", 3)))
+                top_k = int(t.cast("int", item.get("top_k", 1)))
                 total += 1
                 ranked = [row.name for row in rank_skills(prompt, corpus)[:top_k]]
                 if skill_name in ranked:
@@ -333,27 +378,46 @@ def _check_triggers(corpus: Corpus) -> tuple[int, int, list[str]]:
                 else:
                     failures.append(f"{skill_name}: not in top {top_k} for {prompt!r}")
 
-        negatives = trigger_map.get("negative")
+        negatives = trigger.get("negative")
         if isinstance(negatives, list):
             for entry in t.cast("list[object]", negatives):
                 if not isinstance(entry, dict):
                     continue
                 item = t.cast("dict[str, object]", entry)
                 prompt = str(item.get("prompt", ""))
+                owner = item.get("owner")
+                if not isinstance(owner, str) or not owner:
+                    failures.append(f"{skill_name}: negative {prompt!r} names no owner")
+                    continue
+
                 ranked = rank_skills(prompt, corpus)
-                if (
-                    ranked
-                    and ranked[0].name == skill_name
-                    and ranked[0].score >= NEGATIVE_MIN_SCORE
-                ):
+                if not ranked or ranked[0].score < NEGATIVE_MIN_SCORE:
+                    continue
+
+                if ranked[0].name == skill_name:
                     failures.append(f"{skill_name}: ranks first for negative prompt {prompt!r}")
+                    continue
+
+                order = [row.name for row in ranked]
+                if owner not in order:
+                    failures.append(
+                        f"{skill_name}: owner {owner!r} is unranked for negative {prompt!r}"
+                    )
+                elif skill_name in order and order.index(owner) > order.index(skill_name):
+                    detail = f"outranks its declared owner {owner!r} for negative {prompt!r}"
+                    failures.append(f"{skill_name}: {detail}")
 
     return hits, total, failures
 
 
 @app.command()
-def check(min_rank1: int = 0) -> None:
-    """Lint every description and fail on colliding or unroutable skills."""
+def check(*, require_cases: bool = True) -> None:
+    """Lint every description and fail on colliding or unroutable skills.
+
+    Every description is linted. Only model-invocable skills are scored against
+    each other: a slash-command-only skill cannot win a prompt, so including it
+    would report collisions the router can never act on.
+    """
     skills = discover_skills()
     if not skills:
         console.print("[red]No skills discovered.[/red]")
@@ -363,7 +427,8 @@ def check(min_rank1: int = 0) -> None:
     for skill in skills:
         errors.extend(lint_description(skill))
 
-    corpus = build_corpus(skills)
+    competing = routable(skills)
+    corpus = build_corpus(competing)
 
     for left, right, score in find_collisions(corpus, COLLISION_ERROR):
         errors.append(f"{left} and {right} descriptions are {score:.2f} similar")
@@ -371,13 +436,18 @@ def check(min_rank1: int = 0) -> None:
         if score < COLLISION_ERROR:
             console.print(f"[yellow]warn[/yellow] {left} / {right} similarity {score:.2f}")
 
-    hits, total, failures = _check_triggers(corpus)
+    known = {skill.name for skill in competing}
+    cases, case_errors = _load_cases(known)
+    errors.extend(case_errors)
+
+    hits, total, failures = _check_triggers(corpus, cases)
     errors.extend(failures)
 
-    if total and min_rank1:
-        rate = hits / total * 100
-        if rate < min_rank1:
-            errors.append(f"trigger hit rate {rate:.0f}% is below the {min_rank1}% floor")
+    if require_cases:
+        covered = {str(case.get("skill_name", "")) for case in cases}
+        errors.extend(
+            f"{name}: no routing case in {CASES_DIR.name}/" for name in sorted(known - covered)
+        )
 
     for error in errors:
         console.print(f"[red]error[/red] {error}")
@@ -386,7 +456,7 @@ def check(min_rank1: int = 0) -> None:
         console.print(f"\n{len(errors)} error(s) found.")
         raise typer.Exit(code=1)
 
-    summary = f"{len(skills)} skills checked"
+    summary = f"{len(competing)} skills checked"
     if total:
         summary += f", {hits}/{total} trigger prompts routed"
     console.print(f"{summary}. 0 errors found.")
@@ -395,7 +465,7 @@ def check(min_rank1: int = 0) -> None:
 @app.command()
 def route(prompt: str) -> None:
     """Show how a prompt ranks against the catalog."""
-    corpus = build_corpus(discover_skills())
+    corpus = build_corpus(routable(discover_skills()))
     for ranking in rank_skills(prompt, corpus)[:TOP_N]:
         console.print(f"{ranking.score:.3f}  {ranking.name}")
 
