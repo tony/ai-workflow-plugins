@@ -1,11 +1,11 @@
 ---
 name: double-check
 description: >-
-  Use whenever the user asks to double-check, cross-check, verify, recheck,
-  sanity-check, or confirm prior analysis or results — including "are you
-  sure", "are you confident", "is this true", "still true?", "prove it",
-  "triple check", "check against" some artifact, "look again", "repeat the
-  analysis", or "repeat your findings in full". Re-derives the answer from
+  Use when the user challenges an answer you already gave and wants it
+  rebuilt from source — "are you sure", "are you confident", "is that still
+  true", "prove it", "look again", "repeat the analysis", or "repeat your
+  findings in full", as well as any request to revisit or re-derive your own
+  prior claim, conclusion, or reported finding. Re-derives the answer from
   source artifacts and returns it standalone in the original request's
   structure — never a revision log of the prior turn. Also invoke before
   re-running any analysis whose output the user has already seen once. To
