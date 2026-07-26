@@ -483,7 +483,7 @@
         "references/signatures.yml": "plugins/slop/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/slop/references/slop-taxonomy.md"
       },
-      "bytes": 63589
+      "bytes": 63644
     },
     {
       "name": "spike-bakeoff",

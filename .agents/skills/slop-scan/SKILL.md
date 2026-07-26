@@ -132,7 +132,7 @@ structure still guides analysis-before-execution.
 ## Step 1: Snapshot state and lock baseline
 
 Detect trunk using the same pattern as the sibling `/rebase` and
-the `pr-deslop` skill skills (the `rebase` skill):
+the `pr-deslop` skill skills (the `rebase` skill § Context):
 
 ```bash
 git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}'
@@ -463,7 +463,7 @@ the finding's `.patch` file.
 git add -- "<file>"
 ```
 
-Per the `commit` skill (rule line 187):
+Per the `commit` skill § Rules:
 **never `git add -A` or `git add .`** — explicit paths only.
 
 ### 10c. Run touched-file gates
@@ -671,20 +671,21 @@ For detailed catalogs and procedures, consult:
   branch-scoped slop cleanup via fixup commits and autosquash. This
   command (this skill) and that one share the registry, taxonomy,
   and quality-gate procedure.
-- the `pr-review-pr` skill — "No brittle details"
-  rubric; the underlying source for several Tier B signatures.
-- the `pr-review-pr` skill — "Never modify the PR — only
-  report findings" posture; mirrored here as
+- the `pr-review-pr` skill § Evaluate Against Quality
+  Patterns — "No brittle details" rubric; the underlying source for
+  several Tier B signatures.
+- the `pr-review-pr` skill § Rules — "Never modify the PR —
+  only report findings" posture; mirrored here as
   this skill's never-rewrite-history rule.
-- the `rebase` skill — trunk detection
+- the `rebase` skill § Context — trunk detection
   pattern; reused for `BASELINE_SHA` resolution.
 - the `research-study-deps` skill — procedural skill
   archetype.
 - the `tailwind-spacing-audit` skill — references-
   directory progressive-disclosure pattern.
-- the `commit` skill — Rules section
-  forbidding `git add -A`, `--amend`, `--no-verify`, empty commits;
-  this skill honors all of them.
+- the `commit` skill § Rules — forbids `git add -A`,
+  `--amend`, `--no-verify`, empty commits; this skill honors all of
+  them.
 - `CLAUDE.md` Git Commit Standards — `Scope(type[detail])` subject
   + `why:` / `what:` body shape; templates in
   `references/commit-template.md` follow this exactly.
