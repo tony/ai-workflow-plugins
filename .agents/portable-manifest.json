@@ -451,6 +451,17 @@
       "bytes": 16104
     },
     {
+      "name": "ruff-bump",
+      "sources": [
+        "plugins/ruff/commands/bump.md"
+      ],
+      "bundled": {
+        "references/pin-sites-and-gating.md": "plugins/ruff/references/pin-sites-and-gating.md",
+        "references/release-triage.md": "plugins/ruff/references/release-triage.md"
+      },
+      "bytes": 22358
+    },
+    {
       "name": "situate",
       "sources": [
         "plugins/situate/commands/situate.md"
@@ -794,6 +805,8 @@
     "plugins/pr/references/slop-taxonomy.md": 1,
     "plugins/pytest-optimizer/templates/conftest_cache_snippet.py": 1,
     "plugins/review/references/verification-gates.md": 1,
+    "plugins/ruff/references/pin-sites-and-gating.md": 1,
+    "plugins/ruff/references/release-triage.md": 1,
     "plugins/slop/references/commit-template.md": 1,
     "plugins/slop/references/quality-gates.md": 1,
     "plugins/slop/references/slop-taxonomy.md": 1,
