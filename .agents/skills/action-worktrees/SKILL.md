@@ -150,8 +150,9 @@ evidence:
 units are crosscutting branches: naming skips the ticket-system rung
 and proposes a theme slug (ticket-detection.md § Branch-name
 precedence ladder), and every ticket's ID rides in the unit's
-commits and PR per § Server-side linking. Every grouping — proposed
-or explicit — is confirmed at the Phase 3 plan gate.
+commits and PR per ticket-detection.md § Server-side linking. Every
+grouping — proposed or explicit — is confirmed at the Phase 3 plan
+gate.
 
 ## Phase 3: Orchestration plan
 
