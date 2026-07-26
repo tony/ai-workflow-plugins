@@ -31,6 +31,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [release](plugins/release/) | Development | Cut and bump releases with safe defaults — no push, no tag, no tag push without an explicit flag — and roll new releases out to every downstream consumer repo with CI verification |
 | [merge-pr](plugins/merge-pr/) | Development | Merge PRs via gh with merge commits matching the repo's own git history — readiness checks and CI watch before every merge, plus multi-PR runs with stack detection, rebase, and conflict resolution between merges |
 | [business](plugins/business/) | Productivity | Measure and report the business value of AI skills and agentic workflows — provenance-tagged data collection and audience-tiered reports in engineer-hours and cycle time, never currency |
+| [github-actions](plugins/github-actions/) | Development | Update GitHub Actions pins across one repo or a whole fleet — verify every target tag exists before writing it, research each upgrade against real release notes, land one commit per action on trunk, then close dependabot's PRs by citing the commit that superseded them |
 
 ## Installation
 

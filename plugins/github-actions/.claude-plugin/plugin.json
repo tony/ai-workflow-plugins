@@ -1,0 +1,9 @@
+{
+  "name": "github-actions",
+  "description": "Update GitHub Actions pins across one repo or a whole fleet — verify every target tag exists before writing it, research each upgrade against real release notes, land one commit per action on trunk, then close dependabot's PRs by citing the commit that superseded them",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}
