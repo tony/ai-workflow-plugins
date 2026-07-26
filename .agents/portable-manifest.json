@@ -566,7 +566,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 28675
+      "bytes": 28761
     },
     {
       "name": "terraform-refresh-lock",
@@ -577,7 +577,7 @@
         "references/layout-discovery.md": "plugins/terraform/references/layout-discovery.md",
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md"
       },
-      "bytes": 18559
+      "bytes": 18621
     },
     {
       "name": "weave-architecture",

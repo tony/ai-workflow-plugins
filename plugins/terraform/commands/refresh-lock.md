@@ -86,9 +86,10 @@ Read each lock back and compare the selected versions to the starting
 state. Report per root module what moved, what did not, and — where a
 provider stayed put — whether a constraint is holding it.
 
-Run `terraform fmt -check -recursive` and whatever gates the repository
-defines for itself. Never report a gate as passing without reading the
-output that says so.
+Run the detected tool's `fmt -check -recursive` — `tofu` where OpenTofu
+drives the repository — and whatever gates the repository defines for
+itself. Never report a gate as passing without reading the output that
+says so.
 
 ## Rules
 

@@ -134,9 +134,10 @@ Confirm the selected version actually moved, per root module, by
 reading it back out of the lock file rather than inferring it from an
 exit code. Name the root modules that did not move and why.
 
-Run `terraform fmt -check -recursive` and, per initialised root module,
-`terraform validate`. Then run whatever gates the repository defines
-for itself. If something fails, establish whether it failed before the
+Run the detected tool's `fmt -check -recursive`, and its `validate` per
+initialised root module — `tofu` where OpenTofu drives the repository,
+which is what phase 1 established. Then run whatever gates the
+repository defines for itself. If something fails, establish whether it failed before the
 bump too; pre-existing failures are reported, not concealed and not
 fixed as a side effect.
 
