@@ -451,6 +451,28 @@
       "bytes": 16104
     },
     {
+      "name": "situate",
+      "sources": [
+        "plugins/situate/commands/situate.md"
+      ],
+      "bundled": {
+        "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
+        "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
+      },
+      "bytes": 14258
+    },
+    {
+      "name": "situate-situational-awareness",
+      "sources": [
+        "plugins/situate/skills/situational-awareness/SKILL.md"
+      ],
+      "bundled": {
+        "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
+        "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
+      },
+      "bytes": 13528
+    },
+    {
       "name": "slop-scan",
       "sources": [
         "plugins/slop/commands/scan.md"
@@ -700,6 +722,8 @@
     "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py": 2,
     "plugins/pytest-optimizer/templates/state.schema.json": 2,
     "plugins/release/references/release-conventions.md": 2,
+    "plugins/situate/references/prior-conversations.md": 2,
+    "plugins/situate/references/situation-sweep.md": 2,
     "plugins/spike/references/verification-gates.md": 2,
     "plugins/action/references/ticket-detection.md": 1,
     "plugins/business/references/instruments.md": 1,
