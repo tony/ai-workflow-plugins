@@ -49,28 +49,26 @@ from _private_path import PrivatePath  # pyright: ignore[reportImplicitRelativeI
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_NAME = "ai-workflow-plugins"
 GITHUB_SOURCE = "tony/ai-workflow-plugins"
-PLUGINS = [
-    "commit",
-    "weave",
-    "rebase",
-    "changelog",
-    "tdd",
-    "model-cli",
-    "research",
-    "slop",
-    "pytest-optimizer",
-    "spike",
-    "review",
-    "action",
-    "lean",
-    "double-check",
-    "pr",
-    "release",
-    "merge-pr",
-    "business",
-    "github-actions",
-    "situate",
-]
+
+
+def _discover_plugins() -> list[str]:
+    """Find every plugin directory under ``plugins/``.
+
+    Discovered rather than enumerated. Every static test iterates this list, so
+    a hand-maintained roster does not fail when it falls behind — it silently
+    stops testing whatever is missing from it.
+    """
+    plugins_dir = REPO_ROOT / "plugins"
+    if not plugins_dir.is_dir():
+        return []
+    return sorted(
+        d.name
+        for d in plugins_dir.iterdir()
+        if d.is_dir() and (d / ".claude-plugin" / "plugin.json").is_file()
+    )
+
+
+PLUGINS = _discover_plugins()
 
 WEAVE_PRESENT_RESULTS = "${CLAUDE_PLUGIN_ROOT}/references/present-results.md"
 WEAVE_WORKER_REFERENCE = "${CLAUDE_PLUGIN_ROOT}/references/worker-backends.md"
