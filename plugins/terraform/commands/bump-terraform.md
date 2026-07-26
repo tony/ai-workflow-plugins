@@ -30,7 +30,7 @@ Repository:
 `!git grep -nE '^[[:space:]]*required_version' -- '*.tf' '*.tofu' 2>/dev/null | sed -E 's/[[:space:]]+/ /g' | grep . || echo "(none declared)"`
 
 Pin sites outside the configuration:
-`!{ git ls-files -- '*.terraform-version' '*.tool-versions' '*mise.toml' 2>/dev/null | xargs -r git grep -n '' -- 2>/dev/null; git ls-files -- '.github/workflows/*' 'Dockerfile*' '**/Dockerfile*' '.devcontainer/*' 'Makefile*' 2>/dev/null | xargs -r git grep -nEi 'terraform|opentofu|tofu' -- 2>/dev/null; } | head -30 | grep . || echo "(none found)"`
+`!{ git ls-files -- '*.terraform-version' '*.tool-versions' '*mise.toml' 2>/dev/null | xargs -r git grep -n '' -- 2>/dev/null; git ls-files -- '.github/workflows/*' '.devcontainer/*' ':(icase)*dockerfile*' ':(icase)*makefile*' ':(icase)*justfile*' 2>/dev/null | xargs -r git grep -nEi '(terraform|opentofu|tofu|tf[_-]?version).*[0-9]+\.[0-9]+' -- 2>/dev/null; } | head -30 | grep . || echo "(none found)"`
 
 Installed and available:
 `!{ command -v terraform >/dev/null 2>&1 && terraform -version | head -1; command -v tofu >/dev/null 2>&1 && tofu -version | head -1; } 2>/dev/null | grep . || echo "(neither terraform nor tofu on PATH)"`

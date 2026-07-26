@@ -89,7 +89,37 @@ rule. Beyond those:
 - Workflow files — `hashicorp/setup-terraform` with `terraform_version`,
   `opentofu/setup-opentofu` with `tofu_version`, and any container image
   tag that carries the version in its name.
-- `Dockerfile`, `devcontainer.json`, and `Makefile` variables.
+- `Dockerfile` and `devcontainer.json` image tags, and task-runner
+  variables in a `Makefile` or `justfile`.
+
+Two things make these easy to miss, and both have to be got right or
+the search reports a clean repository that is not one.
+
+**Match at any depth.** A git pathspec with no leading wildcard anchors
+to the repository root, so `Makefile` finds the top-level one and
+silently skips the per-module one sitting beside a root module — which,
+in a repository whose root modules live in subdirectories, is the one
+that matters. A leading `*` covers both. `just` also searches
+case-insensitively and accepts a leading dot, so `justfile`, `Justfile`,
+and `.justfile` are all live names; `:(icase)` handles the variants
+without listing them.
+
+**Filter on a version, not on the tool's name.** A task runner pins
+through a variable named for the tool's abbreviation rather than the
+tool, so `TF_VERSION := 1.11.0` contains no substring a
+`terraform|tofu` filter matches, and the file is found and then
+discarded. Widening the filter to the abbreviation alone fails the
+other way: a `justfile` that wraps `terraform init`, `terraform plan`,
+and `terraform apply` matches on every line and buries the real pins.
+
+Require the tool name *and* a version-shaped number on the same line.
+That keeps `TF_VERSION := 1.11.0`, `terraform_version: 1.14.0`, and
+`FROM hashicorp/terraform:1.13.0`, and drops a task runner that only
+invokes the CLI.
+
+The dedicated version files fail differently again: `.terraform-version`
+holds a bare version number and nothing else, matching no name-based
+filter at all. Read those by path and take every line.
 
 These drift apart quietly. The configuration says one version, the
 version manager installs another, and CI installs a third; whichever

@@ -542,7 +542,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 26556
+      "bytes": 28125
     },
     {
       "name": "terraform-bump-terraform",
@@ -554,7 +554,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 26785
+      "bytes": 28409
     },
     {
       "name": "terraform-bumping-terraform",
@@ -566,7 +566,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 27106
+      "bytes": 28675
     },
     {
       "name": "terraform-refresh-lock",
