@@ -20,7 +20,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 15844
+      "bytes": 15864
     },
     {
       "name": "business-case-study-internal",
