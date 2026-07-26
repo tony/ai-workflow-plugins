@@ -50,15 +50,38 @@ open pull requests instead, and say that is what happened.
 
 What the branch does, not which files it touched.
 
-Resolve the base commit before logging anything. Prefer the branch's
-own upstream, and fall back to the trunk resolved in the previous
-phase:
+Resolve the base commit before logging anything. The base is where this
+branch diverged from what it will merge into.
+
+Trunk is that base in the ordinary case. An upstream is a better base
+only when it names a *different* branch — a stacked branch whose
+upstream is its parent. Check which one it is:
 
 ```console
-git merge-base HEAD '@{upstream}' 2>/dev/null || git merge-base HEAD "$TRUNK" 2>/dev/null
+git rev-parse --abbrev-ref '@{upstream}'
 ```
 
-Guard both halves. Both fail in practice — a branch pushed with no
+When that comes back as the branch's own remote counterpart —
+`origin/<branch>`, what `git push -u` sets — ignore it. Its merge-base
+is the last pushed commit rather than the divergence point: a fully
+pushed branch resolves a base equal to `HEAD`, and a branch carrying
+unpushed work narrows the range to only those commits, hiding
+everything already on the remote.
+
+For a stacked branch, take the parent:
+
+```console
+git merge-base HEAD '@{upstream}' 2>/dev/null
+```
+
+Otherwise, and whenever that lookup fails or returns `HEAD`, take
+trunk:
+
+```console
+git merge-base HEAD "$TRUNK" 2>/dev/null
+```
+
+Guard both lookups. Both fail in practice — a branch pushed with no
 upstream set, and a clone whose `refs/remotes/origin/HEAD` was never
 populated — and an unguarded `origin/HEAD` fails hard rather than
 falling through.
