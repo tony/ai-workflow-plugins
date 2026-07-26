@@ -1,7 +1,7 @@
 ---
-description: Weave serene bliss — three-lens DX brainstorm-and-refine with multi-model panel judging
+description: Weave serene bliss — three-lens DX refinement with independent adversarial workers and panel judging
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
-argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop]"
+argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
 ---
 
 # Weave Serene Bliss
@@ -10,9 +10,10 @@ A first-class three-lens brainstorm-and-refine command for
 developer-experience, documentation, and tooling-UX design work. Three
 variant slots are fixed to three serene-DX aesthetic lenses — **DX
 Bliss**, **DX Serenity**, and **DX Sublimity** — and dispatched across
-all available models in parallel. Each refine pass is judged by a
-**multi-model panel** (Claude + Antigravity + GPT in parallel), with verdicts
-merged via **peer-only averaging** to neutralize self-favoritism.
+independent adversarial workers in parallel. Host-native sub-agents are
+the default; separate model CLIs are optional. Each refine pass is
+judged by an adversarial worker panel, with verdicts merged via
+**peer-only averaging** to neutralize self-favoritism.
 
 This is the only weave command that uses panel judging. For host or
 round-robin judging on user-defined variants, use
@@ -24,6 +25,25 @@ This is a **project-read-only** command. Session artifacts land under
 The prompt comes from `$ARGUMENTS`. If no prompt is provided, ask the
 user what DX artifact, docs page, or tooling surface they want to
 brainstorm and refine under the serene lens.
+
+## Worker selection
+
+<!-- portable: ask-user-choice=headless-default -->
+
+Before any other unresolved configuration choice or operational step, read
+`${CLAUDE_PLUGIN_ROOT}/references/worker-backends.md`. Resolve
+`worker_backend` from `--workers=subagents|model-clis` using that reference;
+if the flag is absent, ask its worker question first.
+If interactive choice is unavailable, honor its documented headless default.
+
+The selected backend governs the whole session: dispatch, retry, judging,
+refinement, artifacts, session metadata, and presentation. The shared reference
+adapts provider-named examples across every later phase to that backend.
+
+When `worker_backend == subagents`, use only the reference's native sub-agent
+path. Skip every model-CLI detection, timeout question, timeout resolution,
+retry, fallback, and dispatch instruction below. Every such instruction below
+is conditional on `worker_backend == model-clis`.
 
 ---
 
@@ -117,6 +137,10 @@ mode/timeout/passes resolution, model
 detection (Claude, Antigravity, GPT), session directory setup — with these
 **serene-bliss overrides** applied after the standard parsing:
 
+- Preserve the inherited `worker_backend`, participant artifact IDs, and
+  executor mapping in `session.json`, plus `worker_backend` and participants in
+  the `session_start` event. Record resolved models only for `model-clis`; omit
+  the `models` field for `subagents`.
 - `variant_count = 3` (forced; override any `--variants` from
   `$ARGUMENTS` and emit the reserved-flag warning per the Argument
   Handling section above).
@@ -149,7 +173,8 @@ After model detection completes, count the available models:
   `${CLAUDE_PLUGIN_ROOT}/commands/brainstorm-and-refine.md` (Phase 5 Step 1,
   Host Judge Protocol).
 
-Record the resolved `judge_mode` and panel member set in
+Record the worker backend, participant artifact IDs, executor mapping, resolved
+models only for `model-clis`, resolved `judge_mode`, and panel member set in
 `$SESSION_DIR/metadata.md`.
 
 ---
@@ -633,7 +658,10 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 - `SESSION_DIR` = `$SESSION_DIR`
 - `PASS_COUNT` = the number of completed refine passes
 - `IN_PLAN_MODE` = false
-- `MODELS` = the models that participated
+- `WORKER_BACKEND` = `worker_backend`
+- `PARTICIPANTS` = the successful participant artifact IDs
+- `EXECUTORS` = the resolved participant artifact ID to executor mapping
+- `MODELS` = resolved models when `worker_backend == model-clis`; otherwise null
 - `LABEL_MAP_PATH` = `$SESSION_DIR/refine/pass-NNNN/label-map.json`
 
 In the presentation, include one additional line: "Judged by: Panel

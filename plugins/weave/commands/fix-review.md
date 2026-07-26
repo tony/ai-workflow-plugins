@@ -205,6 +205,9 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/present-results.md` and apply it with:
 - `SESSION_DIR` = `$SESSION_DIR`
 - `PASS_COUNT` = 1
 - `IN_PLAN_MODE` = true
+- `WORKER_BACKEND` = null
+- `PARTICIPANTS` = []
+- `EXECUTORS` = null
 - `MODELS` = null
 - `LABEL_MAP_PATH` = null
 

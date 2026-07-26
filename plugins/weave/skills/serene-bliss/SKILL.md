@@ -8,11 +8,11 @@ description: >-
   Triggers on phrases like "serene bliss", "DX bliss", "DX serenity",
   "DX sublimity", "reader happiness", "make this serene", "serene
   developer experience", or "serene DX". Runs the /weave:serene-bliss
-  command, which dispatches three lens variants across all available
-  models in parallel and judges each refine pass with a multi-model
-  panel (Claude + Antigravity + GPT, peer-only averaging).
+  command, which dispatches three lens variants across independent
+  adversarial participants and judges each refine pass with a
+  peer-scored panel.
 user-invocable: true
-argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]"
+argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--workers=subagents|model-clis]"
 ---
 
 # Weave Serene Bliss
@@ -21,7 +21,8 @@ A three-lens aesthetic brainstorm-and-refine pipeline for DX, documentation,
 and developer-tooling UX work. Each of the three weave variant slots carries
 a different serene-DX lens, so a single invocation yields three
 independent aesthetic takes before the refine phase picks and polishes the
-strongest.
+strongest. Host-native sub-agents are the default; separate model CLIs are
+available by explicit choice.
 
 ## When to Use
 
@@ -39,7 +40,7 @@ compare against.
 
 ## The Three Serene Lenses
 
-| Slot | Lens | Aesthetic | Ask of each model |
+| Slot | Lens | Aesthetic | Ask of each participant |
 |------|------|-----------|-------------------|
 | 1 | **DX Bliss** | Frictionless, delightful, zero-friction | "Make this feel effortless. Does every interaction feel weightless?" |
 | 2 | **DX Serenity** | Calm, unhurried, information-architectural clarity | "Make this feel like a quiet library. Does the reader's eye rest naturally?" |
@@ -57,7 +58,7 @@ Run the `/weave:serene-bliss` command. It is a locked preset of
 preamble mapping each variant slot to one of the three lenses.
 
 ```
-/weave:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin]
+/weave:serene-bliss "<user-prompt>" [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--workers=subagents|model-clis]
 ```
 
 The command locks `--variants` and `--preamble`; do not override
@@ -84,7 +85,7 @@ invoking, so each lens has something concrete to react to:
 - **Technology stack** — Sphinx + MyST, Furo variables, React +
   Tailwind, Python stdlib-only, etc. Each lens responds differently
   to what's idiomatic in the stack.
-- **Known gaps / unknowns** — open questions the models should
+- **Known gaps / unknowns** — open questions the participants should
   address rather than hand-wave past.
 
 ## Anti-Patterns

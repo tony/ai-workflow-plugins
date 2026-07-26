@@ -1,14 +1,14 @@
 ---
 name: weave-brainstorm-and-refine
 description: >-
-  Use when the user wants to generate multiple original ideas from different
-  AI models then iteratively judge, weave, and refine them into the best
-  possible result across multiple passes. Triggers on phrases like
-  "brainstorm and refine", "generate ideas then improve", "explore options
-  then synthesize", or "brainstorm then polish"
+  Use when the user wants to generate multiple original ideas from
+  independent adversarial participants, then iteratively judge, weave, and
+  refine them across multiple passes. Triggers on phrases like "brainstorm
+  and refine", "generate ideas then improve", "explore options then
+  synthesize", or "brainstorm then polish"
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 metadata:
-  argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...] [--no-deslop|--quiet-deslop|--verbose-deslop]"
+  argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
   source: "plugins/weave/commands/brainstorm-and-refine.md, plugins/weave/skills/brainstorm-and-refine/SKILL.md"
 ---
 
@@ -16,11 +16,30 @@ metadata:
 
 *Selection guidance for this skill is bundled at `references/overview.md`.*
 
-The full pipeline: generate independent originals from multiple AI models (Claude, Antigravity, GPT), then iteratively refine them through a judge-weave-distribute cycle. Phase 1 brainstorms diverse responses with optional multiple variants per model. Phase 2 takes the best originals through iterative refinement where each pass picks the best, incorporates strengths from runners-up, and distributes the woven result back for another round.
+The full pipeline: generate originals from independent adversarial workers, then iteratively refine them through a judge-weave-distribute cycle. Host-native sub-agents are the default; separate model CLIs are optional. Phase 1 brainstorms diverse responses with optional multiple variants per worker. Phase 2 takes the best originals through iterative refinement where each pass picks the best, incorporates strengths from runners-up, and distributes the woven result back for another round.
 
 This is a **project-read-only** command — no files in your repository are written, edited, or deleted. Session artifacts (model outputs, judge assessments, woven results) are persisted to `$AI_AIP_ROOT` for post-session inspection; this directory is outside your repository.
 
 The prompt comes from `$ARGUMENTS`. If no arguments are provided, ask the user what they want to brainstorm and refine.
+
+## Worker selection
+
+
+
+Before any other unresolved configuration choice or operational step, read
+`references/worker-backends.md`. Resolve
+`worker_backend` from `--workers=subagents|model-clis` using that reference;
+if the flag is absent, ask its worker question first.
+If interactive choice is unavailable, honor its documented headless default.
+
+The selected backend governs the whole session: dispatch, retry, judging,
+refinement, artifacts, session metadata, and presentation. The shared reference
+adapts provider-named examples across every later phase to that backend.
+
+When `worker_backend == subagents`, use only the reference's native sub-agent
+path. Skip every model-CLI detection, timeout question, timeout resolution,
+retry, fallback, and dispatch instruction below. Every such instruction below
+is conditional on `worker_backend == model-clis`.
 
 ---
 
@@ -321,7 +340,9 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
   "phase": "brainstorm",
   "branch": "<current branch>",
   "ref": "<short SHA>",
-  "models": ["claude", "..."],
+  "worker_backend": "<subagents or model-clis>",
+  "participants": ["<participant artifact ID>", "..."],
+  "executors": {"<participant artifact ID>": "<executor>"},
   "judge_mode": "<host or round-robin>",
   "variants_per_model": <N>,
   "pass_count": <M>,
@@ -332,19 +353,24 @@ Write to `$SESSION_DIR/session.json.tmp`, then `mv session.json.tmp session.json
 }
 ```
 
+When `worker_backend == model-clis`, add a `"models"` array containing the
+resolved model for each participant. Omit `"models"` when
+`worker_backend == subagents`.
+
 #### Step 7: Append `events.jsonl`
 
 Append one event line to `$SESSION_DIR/events.jsonl`:
 
 ```json
-{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"brainstorm-and-refine","models":["claude","..."],"variants_per_model":<N>,"pass_count":<M>}
+{"event":"session_start","timestamp":"<ISO 8601 UTC>","command":"brainstorm-and-refine","worker_backend":"<subagents or model-clis>","participants":["<participant artifact ID>","..."],"variants_per_model":<N>,"pass_count":<M>}
 ```
 
 #### Step 8: Write `metadata.md`
 
 Write to `$SESSION_DIR/metadata.md` containing:
 - Command name, start time, configured variant count and pass count
-- Models detected, timeout setting, judge mode
+- Worker backend, participant artifact IDs, and executor mapping
+- Resolved models only for `model-clis`, timeout setting when applicable, judge mode
 - Git branch (`git branch --show-current`), commit ref (`git rev-parse --short HEAD`)
 
 Store `$SESSION_DIR` for use in all subsequent phases.
@@ -909,12 +935,15 @@ Read `references/present-results.md` and apply it with:
 - `SESSION_DIR` = `$SESSION_DIR`
 - `PASS_COUNT` = the number of completed refine passes
 - `IN_PLAN_MODE` = false
-- `MODELS` = the models that participated
+- `WORKER_BACKEND` = `worker_backend`
+- `PARTICIPANTS` = the successful participant artifact IDs
+- `EXECUTORS` = the resolved participant artifact ID to executor mapping
+- `MODELS` = resolved models when `worker_backend == model-clis`; otherwise null
 - `LABEL_MAP_PATH` = `$SESSION_DIR/refine/pass-NNNN/label-map.json`
 
 After the reference returns, finalize the session:
 
-- **Repo Guard**: Run session-end verification. Compare repo state against the pre-session fingerprint. If the repo was modified, revert and log the violation.
+- **Repo Guard**: Run session-end verification. If the repo differs from the pre-session fingerprint, stop and log the violation without modifying the checkout.
 - Write the final woven artifact to `$SESSION_DIR/final.md`
 - Update `session.json` via atomic replace: set `status` to `"completed"`, `updated_at` to now
 - Append a `session_complete` event to `events.jsonl`
@@ -945,6 +974,6 @@ After the reference returns, finalize the session:
 
 ## Portability notes
 
-- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `ask-user-choice` — follow the source's choice contract. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it. Honor a documented headless default when the source defines one; otherwise print a numbered list and wait for a numbered reply. Never invent a choice.
 - `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
 - Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.
