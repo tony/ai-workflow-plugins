@@ -313,16 +313,28 @@ Each component type has specific frontmatter requirements:
 **Agents** (`agents/*.md`):
 - `name` (required) — agent identifier (lowercase letters and hyphens)
 - `description` (required) — when to delegate to this agent; include `<example>` blocks
-- `tools` (optional) — comma-separated tool access list
+- `tools` (optional) — comma-separated tool access list; inherits every
+  tool available to subagents when omitted
 - `disallowedTools` (optional) — comma-separated tools to deny
-- `model` (optional) — `sonnet`, `opus`, `haiku`, or `inherit`
-- `permissionMode` (optional) — `default`, `acceptEdits`, `delegate`, `dontAsk`, `bypassPermissions`, `plan`
+- `model` (optional) — `sonnet`, `opus`, `haiku`, `fable`, a full model
+  ID, or `inherit`; defaults to `inherit`
+- `effort` (optional) — `low`, `medium`, `high`, `xhigh`, or `max`;
+  inherits the session level when unset
 - `maxTurns` (optional) — max agentic turns before agent stops
 - `skills` (optional) — skill names to preload into agent context
-- `mcpServers` (optional) — MCP servers available to this agent
-- `hooks` (optional) — lifecycle hooks scoped to this agent
 - `memory` (optional) — persistent memory scope: `user`, `project`, `local`
-- `color` (optional) — visual indicator: `yellow`, `green`, `red`, `cyan`, `pink`
+- `background` (optional) — `true` always runs the agent as a background
+  task; Claude chooses when unset
+- `isolation` (optional) — `worktree`, the only valid value, runs the
+  agent in a temporary git worktree off the default branch
+- `color` (optional) — visual indicator: `red`, `blue`, `green`,
+  `yellow`, `purple`, `orange`, `pink`, or `cyan`
+
+Plugin subagents drop `hooks`, `mcpServers`, and `permissionMode` — the
+host ignores all three when an agent loads from a plugin, for security.
+An agent shipped from this marketplace is a plugin subagent, so setting
+them here does nothing; they only take effect once the file is copied
+into a project's `.claude/agents/` or a user's `~/.claude/agents/`.
 
 **Skills** (`skills/*/SKILL.md`):
 - `name` (required here) — skill display name; upstream it defaults to
