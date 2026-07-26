@@ -1,0 +1,17 @@
+{
+  "skill_name": "codex",
+  "trigger": {
+    "positive": [
+      { "prompt": "have codex read this stack trace and find the bug", "top_k": 2 },
+      { "prompt": "ask gpt whether this regex handles unicode", "top_k": 2 },
+      { "prompt": "let openai's model take a crack at the failing test", "top_k": 2 },
+      { "prompt": "run it by codex before i push", "top_k": 2 }
+    ],
+    "negative": [
+      { "prompt": "have gemini look at this migration and tell me what breaks", "owner": "agy" },
+      { "prompt": "ask antigravity whether my auth refactor is sound", "owner": "agy" },
+      { "prompt": "have cursor take a pass at this component", "owner": "cursor" },
+      { "prompt": "run this prompt through the agent binary instead", "owner": "cursor" }
+    ]
+  }
+}

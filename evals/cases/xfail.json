@@ -1,0 +1,16 @@
+{
+  "skill_name": "xfail",
+  "trigger": {
+    "positive": [
+      { "prompt": "write a failing test that proves this bug before we touch the code", "top_k": 3 },
+      { "prompt": "mark the test as expected to fail until the fix lands", "top_k": 3 },
+      { "prompt": "prove the test fails because of the bug and not because of a mock", "top_k": 3 },
+      { "prompt": "reproduce this crash as a test first, then fix it and drop the marker", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "my pytest suite takes too long, can you speed it up", "owner": "pytest-optimizer" },
+      { "prompt": "which fixtures are unused or mis-scoped", "owner": "pytest-optimizer" },
+      { "prompt": "verify your earlier analysis of that failure was right", "owner": "double-check" }
+    ]
+  }
+}

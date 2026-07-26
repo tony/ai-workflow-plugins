@@ -1,0 +1,16 @@
+{
+  "skill_name": "bumping-github-actions",
+  "trigger": {
+    "positive": [
+      { "prompt": "dependabot opened a stack of PRs to bump the actions in my workflows", "top_k": 1 },
+      { "prompt": "upgrade actions/checkout and the other pinned actions in my CI workflows", "top_k": 1 },
+      { "prompt": "which of my repos are still running out-of-date workflow actions", "top_k": 1 },
+      { "prompt": "go through every workflow file and move each action to its latest release", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "set up worktrees for our dependencies pinned to the versions in the lockfile", "owner": "study-deps" },
+      { "prompt": "clone the exact version of the library we depend on so I can read its source", "owner": "study-deps" },
+      { "prompt": "catch me up on this branch and what its pull request still needs", "owner": "situational-awareness" }
+    ]
+  }
+}

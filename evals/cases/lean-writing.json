@@ -1,0 +1,16 @@
+{
+  "skill_name": "lean-writing",
+  "trigger": {
+    "positive": [
+      { "prompt": "keep this commit message tight, no filler and no story of what I tried", "top_k": 3 },
+      { "prompt": "how do I write this ticket body without the AI fluff", "top_k": 3 },
+      { "prompt": "I'm writing release notes, keep the prose lean and lead with the result", "top_k": 1 },
+      { "prompt": "keep the padding and preamble out of this doc while I write it", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "polish this README until it reads well", "owner": "refine" },
+      { "prompt": "iterate on this draft with critique passes until it's better", "owner": "refine" },
+      { "prompt": "improve the documentation experience for new readers", "owner": "serene-bliss" }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "skill_name": "double-check",
+  "trigger": {
+    "positive": [
+      { "prompt": "I don't trust that answer, work it out again from the files", "top_k": 3 },
+      { "prompt": "can you confirm those numbers actually hold up against the source", "top_k": 3 },
+      { "prompt": "run that analysis one more time and give me the whole thing again, not just what changed", "top_k": 3 },
+      { "prompt": "are you certain about that? go look at the code again", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "check what state this repo is in before I start working", "owner": "situational-awareness" },
+      { "prompt": "prove the test fails because of the bug and not because of a mock", "owner": "xfail" }
+    ]
+  }
+}

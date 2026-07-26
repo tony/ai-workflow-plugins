@@ -1,0 +1,17 @@
+{
+  "skill_name": "agy",
+  "trigger": {
+    "positive": [
+      { "prompt": "have gemini look at this migration and tell me what breaks", "top_k": 2 },
+      { "prompt": "ask antigravity whether my auth refactor is sound", "top_k": 2 },
+      { "prompt": "get a second opinion from google's model on this schema change", "top_k": 2 },
+      { "prompt": "use agy for this one, i want a different take", "top_k": 1 }
+    ],
+    "negative": [
+      { "prompt": "have codex run through the failing tests", "owner": "codex" },
+      { "prompt": "ask gpt whether this regex handles unicode", "owner": "codex" },
+      { "prompt": "have cursor take a pass at this component", "owner": "cursor" },
+      { "prompt": "run this prompt through the agent binary instead", "owner": "cursor" }
+    ]
+  }
+}
