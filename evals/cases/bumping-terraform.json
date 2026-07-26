@@ -1,0 +1,15 @@
+{
+  "skill_name": "bumping-terraform",
+  "trigger": {
+    "positive": [
+      { "prompt": "the aws provider constraint in our terraform config is way behind, move it up", "top_k": 1 },
+      { "prompt": "refresh the .terraform.lock.hcl files in this repo", "top_k": 1 },
+      { "prompt": "move required_version to the newest terraform release everywhere it is pinned", "top_k": 1 },
+      { "prompt": "which root modules here are stuck on an old provider version", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "dependabot opened a stack of PRs to bump the actions in my workflows", "owner": "bumping-github-actions" },
+      { "prompt": "catch me up on this branch and what its pull request still needs", "owner": "situational-awareness" }
+    ]
+  }
+}

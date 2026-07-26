@@ -533,6 +533,53 @@
       "bytes": 12917
     },
     {
+      "name": "terraform-bump-provider",
+      "sources": [
+        "plugins/terraform/commands/bump-provider.md"
+      ],
+      "bundled": {
+        "references/layout-discovery.md": "plugins/terraform/references/layout-discovery.md",
+        "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
+        "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
+      },
+      "bytes": 28125
+    },
+    {
+      "name": "terraform-bump-terraform",
+      "sources": [
+        "plugins/terraform/commands/bump-terraform.md"
+      ],
+      "bundled": {
+        "references/layout-discovery.md": "plugins/terraform/references/layout-discovery.md",
+        "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
+        "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
+      },
+      "bytes": 28409
+    },
+    {
+      "name": "terraform-bumping-terraform",
+      "sources": [
+        "plugins/terraform/skills/bumping-terraform/SKILL.md"
+      ],
+      "bundled": {
+        "references/layout-discovery.md": "plugins/terraform/references/layout-discovery.md",
+        "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
+        "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
+      },
+      "bytes": 28761
+    },
+    {
+      "name": "terraform-refresh-lock",
+      "sources": [
+        "plugins/terraform/commands/refresh-lock.md"
+      ],
+      "bundled": {
+        "references/layout-discovery.md": "plugins/terraform/references/layout-discovery.md",
+        "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md"
+      },
+      "bytes": 18621
+    },
+    {
       "name": "weave-architecture",
       "sources": [
         "plugins/weave/commands/architecture.md"
@@ -712,10 +759,13 @@
     "plugins/weave/references/deslop-pass.md": 6,
     "plugins/business/references/audiences.md": 5,
     "plugins/pytest-optimizer/references/output-contract.md": 5,
+    "plugins/terraform/references/layout-discovery.md": 4,
+    "plugins/terraform/references/lock-and-init.md": 4,
     "plugins/business/references/measurement.md": 3,
     "plugins/github-actions/references/action-pinning.md": 3,
     "plugins/github-actions/references/dependabot-closeout.md": 3,
     "plugins/pytest-optimizer/references/heuristic-catalog.md": 3,
+    "plugins/terraform/references/pin-sites.md": 3,
     "plugins/action/references/verification-gates.md": 2,
     "plugins/business/references/evidence.md": 2,
     "plugins/double-check/references/verification-contract.md": 2,
