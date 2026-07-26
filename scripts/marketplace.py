@@ -970,6 +970,13 @@ def _serialize_manifest(manifest: MarketplaceManifest) -> str:
 
     >>> "One — two" in text
     True
+
+    A set optional round-trips, ``pluginRoot`` above all: third-party skill
+    installers key off its exact spelling, so dropping it would break them.
+
+    >>> manifest.metadata.pluginRoot = "."
+    >>> '"pluginRoot": "."' in _serialize_manifest(manifest)
+    True
     """
     raw_out: dict[str, t.Any] = manifest.model_dump(mode="json", exclude_none=True)
     raw_out["$schema"] = "https://anthropic.com/claude-code/marketplace.schema.json"
