@@ -1,0 +1,13 @@
+{
+  "skill_name": "serene-bliss",
+  "trigger": {
+    "positive": [
+      { "prompt": "make the developer experience more serene", "top_k": 3 },
+      { "prompt": "improve the documentation experience for new readers", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "refine this draft", "owner": "refine" },
+      { "prompt": "brainstorm some ideas for this feature", "owner": "brainstorm" }
+    ]
+  }
+}
