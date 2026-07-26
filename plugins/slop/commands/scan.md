@@ -131,7 +131,7 @@ structure still guides analysis-before-execution.
 ## Step 1: Snapshot state and lock baseline
 
 Detect trunk using the same pattern as the sibling `/rebase` and
-`/pr:deslop` skills (`plugins/rebase/commands/rebase.md:9-12`):
+`/pr:deslop` skills (`plugins/rebase/commands/rebase.md` § Context):
 
 ```bash
 git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}'
@@ -462,7 +462,7 @@ the finding's `.patch` file.
 git add -- "<file>"
 ```
 
-Per `plugins/commit/commands/commit.md:181-191` (rule line 187):
+Per `plugins/commit/commands/commit.md` § Rules:
 **never `git add -A` or `git add .`** — explicit paths only.
 
 ### 10c. Run touched-file gates
@@ -670,20 +670,21 @@ For detailed catalogs and procedures, consult:
   branch-scoped slop cleanup via fixup commits and autosquash. This
   command (`/slop:scan`) and that one share the registry, taxonomy,
   and quality-gate procedure.
-- `plugins/pr/commands/review-pr.md:55` — "No brittle details"
-  rubric; the underlying source for several Tier B signatures.
-- `plugins/pr/commands/review-pr.md:78` — "Never modify the PR — only
-  report findings" posture; mirrored here as
+- `plugins/pr/commands/review-pr.md` § Evaluate Against Quality
+  Patterns — "No brittle details" rubric; the underlying source for
+  several Tier B signatures.
+- `plugins/pr/commands/review-pr.md` § Rules — "Never modify the PR —
+  only report findings" posture; mirrored here as
   `/slop:scan`'s never-rewrite-history rule.
-- `plugins/rebase/commands/rebase.md:9-12` — trunk detection
+- `plugins/rebase/commands/rebase.md` § Context — trunk detection
   pattern; reused for `BASELINE_SHA` resolution.
 - `plugins/research/skills/deps/SKILL.md` — procedural skill
   archetype.
 - `plugins/tailwind/skills/spacing-audit/SKILL.md` — references-
   directory progressive-disclosure pattern.
-- `plugins/commit/commands/commit.md:181-191` — Rules section
-  forbidding `git add -A`, `--amend`, `--no-verify`, empty commits;
-  this skill honors all of them.
+- `plugins/commit/commands/commit.md` § Rules — forbids `git add -A`,
+  `--amend`, `--no-verify`, empty commits; this skill honors all of
+  them.
 - `CLAUDE.md` Git Commit Standards — `Scope(type[detail])` subject
   + `why:` / `what:` body shape; templates in
   `${CLAUDE_PLUGIN_ROOT}/references/commit-template.md` follow this exactly.
