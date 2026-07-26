@@ -683,17 +683,22 @@ def _test_static_weave_timeouts() -> list[TestCase]:
         r'"Default \((\d+)s\)".*\n.*"Quick — (\d+)s".*\n.*"Long — (\d+)s"',
     )
 
-    for cmd_file in sorted(weave_commands_dir.glob("*.md")):
+    for cmd_file in _weave_ensemble_commands(weave_commands_dir):
 
         def _check_timeouts(p: Path = cmd_file) -> None:
+            rel = p.relative_to(REPO_ROOT)
             text = p.read_text(encoding="utf-8")
-            m = timeout_pattern.search(text)
-            if not m:
-                return
+            # A command may carry the block itself or inherit the phase that
+            # holds it. Returning on a miss would exempt whichever commands the
+            # pattern cannot follow, which is the opposite of a check.
+            found = timeout_pattern.search(text) or timeout_pattern.search(
+                _session_contract_text(p, text),
+            )
+            _assert(found is not None, f"{rel}: no timeout block, local or inherited")
+            m = t.cast("re.Match[str]", found)
             default = int(m.group(1))
             quick = int(m.group(2))
             long_ = int(m.group(3))
-            rel = p.relative_to(REPO_ROOT)
             _assert(
                 quick == default // 2,
                 f"{rel}: Quick={quick}s but expected {default // 2}s (0.5x {default}s)",
