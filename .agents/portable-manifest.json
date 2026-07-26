@@ -460,7 +460,7 @@
         "references/pin-sites-and-gating.md": "plugins/ruff/references/pin-sites-and-gating.md",
         "references/release-triage.md": "plugins/ruff/references/release-triage.md"
       },
-      "bytes": 30887
+      "bytes": 32288
     },
     {
       "name": "situate",

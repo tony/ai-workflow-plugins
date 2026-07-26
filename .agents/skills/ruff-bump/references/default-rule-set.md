@@ -12,6 +12,10 @@ Get the default set from the binary itself rather than from documentation, which
 
 Then run the linter twice — once as configured, once with the default codes added via `--extend-select` — and take the difference. That difference, per repository and broken down per rule, is the real cost. Do this for every repository in scope before proposing anything, because the number varies enormously: repos with disciplined codebases often land at zero, while one with an unusual file layout can produce hundreds of findings from a single rule.
 
+**A local measurement is a lower bound, not the answer.** Some rules are gated on the host platform and go silent where you are measuring, then fire on the CI runner. The clearest case: rules that check a file's executable permission bit are skipped entirely under WSL, because Windows filesystems have no executable bit and everything reports as executable — ruff's `shebang-not-executable` opens with an explicit early return for exactly this reason. Measure on WSL and those rules report zero; the Linux runner then fails the lint step on a finding that was invisible to the whole pre-flight. Filesystem-sensitive checks generally are suspect this way: permission bits, symlinks, case-sensitivity, line endings.
+
+Treat a CI failure on a rule your measurement said would not fire as a platform gap first and a mistake second. Confirm it by reading the rule's implementation for a platform guard rather than guessing, and say in the report that the measurement under-reported that class.
+
 ## The three config shapes, and why two of them are wrong
 
 **Enumerate every default code in `select`.** Explicit and frozen: a future release can never change the enabled set silently. Costs hundreds of config lines per repository, must be regenerated and re-reviewed on every release, and it fights what the curated default set exists to provide. Reasonable only for a repository under a change-control regime that genuinely requires a frozen, auditable rule list.
@@ -37,6 +41,8 @@ Read the code at every site before deciding. Sort each rule into:
 **Load-bearing patterns that look redundant.** The dangerous class, because the "fix" is silently destructive. The clearest example: an import aliased to its own name reads as pure redundancy, and a rule will say so, but it is the standard explicit re-export form — under a strict type-checking configuration, removing the alias stops the symbol being re-exported and breaks downstream consumers with no local test failure. Before fixing anything that looks merely redundant, check whether another tool in the project depends on the shape.
 
 **Vendored code.** Not yours. Exclude the tree or scope an ignore to it, matching whatever the repo already does.
+
+**Coverage gates react to fixes.** Touching a line that no test exercises turns it into a "patch" line, and a patch-coverage gate that was green before the bump can go red purely because a one-token lint fix landed in an uncovered constructor. The fix is a test that pins the behaviour the lint change had to preserve — which is worth having anyway, since it is the only thing proving the change was safe.
 
 When a rule fires broadly and *none* of its findings are real, the answer is a documented `ignore` entry in the config, not a scattering of inline suppressions and not code contorted to satisfy a rule the project does not want.
 
