@@ -18,7 +18,7 @@ read. Work from the refs already in the repository and say how old they
 are:
 
 ```console
-git log -1 --format='%cr' "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)"
+git log -1 --format='%cr' "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null || echo "(unknown)"
 ```
 
 If that date is old, the comparison against trunk may be stale. Say so
@@ -50,8 +50,28 @@ open pull requests instead, and say that is what happened.
 
 What the branch does, not which files it touched.
 
+Resolve the base commit before logging anything. Prefer the branch's
+own upstream, and fall back to the trunk resolved in the previous
+phase:
+
 ```console
-git log --no-merges --format='%h %s' "$(git merge-base HEAD @{upstream} 2>/dev/null || git merge-base HEAD origin/HEAD)"..HEAD
+git merge-base HEAD '@{upstream}' 2>/dev/null || git merge-base HEAD "$TRUNK" 2>/dev/null
+```
+
+Guard both halves. Both fail in practice — a branch pushed with no
+upstream set, and a clone whose `refs/remotes/origin/HEAD` was never
+populated — and an unguarded `origin/HEAD` fails hard rather than
+falling through.
+
+When neither resolves there is no base to compare against. Report the
+layer unavailable and say which lookups failed. Do not substitute
+`HEAD` and log an empty range: that reports a branch with commits as
+having none, which is worse than reporting nothing at all.
+
+With a base in hand:
+
+```console
+git log --no-merges --format='%h %s' "$BASE..HEAD"
 ```
 
 Read the diff, not just the stat. A file list is an inventory; the
