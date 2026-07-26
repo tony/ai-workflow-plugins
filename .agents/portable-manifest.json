@@ -152,6 +152,39 @@
       "bytes": 7580
     },
     {
+      "name": "github-actions-bumping-github-actions",
+      "sources": [
+        "plugins/github-actions/skills/bumping-github-actions/SKILL.md"
+      ],
+      "bundled": {
+        "references/action-pinning.md": "plugins/github-actions/references/action-pinning.md",
+        "references/dependabot-closeout.md": "plugins/github-actions/references/dependabot-closeout.md"
+      },
+      "bytes": 13917
+    },
+    {
+      "name": "github-actions-update-action",
+      "sources": [
+        "plugins/github-actions/commands/update-action.md"
+      ],
+      "bundled": {
+        "references/action-pinning.md": "plugins/github-actions/references/action-pinning.md",
+        "references/dependabot-closeout.md": "plugins/github-actions/references/dependabot-closeout.md"
+      },
+      "bytes": 12954
+    },
+    {
+      "name": "github-actions-update-actions",
+      "sources": [
+        "plugins/github-actions/commands/update-actions.md"
+      ],
+      "bundled": {
+        "references/action-pinning.md": "plugins/github-actions/references/action-pinning.md",
+        "references/dependabot-closeout.md": "plugins/github-actions/references/dependabot-closeout.md"
+      },
+      "bytes": 13379
+    },
+    {
       "name": "lean-tighten",
       "sources": [
         "plugins/lean/commands/tighten.md"
@@ -647,6 +680,8 @@
     "plugins/business/references/audiences.md": 5,
     "plugins/pytest-optimizer/references/output-contract.md": 5,
     "plugins/business/references/measurement.md": 3,
+    "plugins/github-actions/references/action-pinning.md": 3,
+    "plugins/github-actions/references/dependabot-closeout.md": 3,
     "plugins/pytest-optimizer/references/heuristic-catalog.md": 3,
     "plugins/action/references/verification-gates.md": 2,
     "plugins/business/references/evidence.md": 2,
