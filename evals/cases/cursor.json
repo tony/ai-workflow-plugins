@@ -1,0 +1,16 @@
+{
+  "skill_name": "cursor",
+  "trigger": {
+    "positive": [
+      { "prompt": "have cursor take a pass at this component", "top_k": 1 },
+      { "prompt": "let cursor's cli handle the boring refactor", "top_k": 1 },
+      { "prompt": "run this prompt through the agent binary instead", "top_k": 2 }
+    ],
+    "negative": [
+      { "prompt": "have gemini look at this migration and tell me what breaks", "owner": "agy" },
+      { "prompt": "ask antigravity whether my auth refactor is sound", "owner": "agy" },
+      { "prompt": "have codex read this stack trace and find the bug", "owner": "codex" },
+      { "prompt": "ask gpt whether this regex handles unicode", "owner": "codex" }
+    ]
+  }
+}

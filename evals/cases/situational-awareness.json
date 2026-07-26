@@ -1,0 +1,16 @@
+{
+  "skill_name": "situational-awareness",
+  "trigger": {
+    "positive": [
+      { "prompt": "I came back to this branch after two weeks, what was I in the middle of", "top_k": 1 },
+      { "prompt": "bring me up to speed on this repo before I change anything", "top_k": 3 },
+      { "prompt": "what is this PR waiting on and what did the reviewers ask for", "top_k": 1 },
+      { "prompt": "figure out where this work left off", "top_k": 1 }
+    ],
+    "negative": [
+      { "prompt": "go over your earlier analysis of this branch again and rebuild it from the files", "owner": "double-check" },
+      { "prompt": "recheck the findings you reported on that pull request", "owner": "double-check" },
+      { "prompt": "which of my repos are still running out-of-date workflow actions", "owner": "bumping-github-actions" }
+    ]
+  }
+}

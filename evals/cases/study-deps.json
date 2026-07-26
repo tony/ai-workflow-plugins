@@ -1,0 +1,16 @@
+{
+  "skill_name": "study-deps",
+  "trigger": {
+    "positive": [
+      { "prompt": "I want to read the source of the library at the version we actually install", "top_k": 1 },
+      { "prompt": "pull down the upstream repo for this package so I can see how it works", "top_k": 3 },
+      { "prompt": "set up worktrees for our dependencies pinned to the versions in the lockfile", "top_k": 1 },
+      { "prompt": "where can I browse the actual code of this dependency", "top_k": 5 }
+    ],
+    "negative": [
+      { "prompt": "dependabot opened a stack of PRs to bump the actions in my workflows", "owner": "bumping-github-actions" },
+      { "prompt": "which of my repos are still running out-of-date workflow actions", "owner": "bumping-github-actions" },
+      { "prompt": "bring me up to speed on this repo before I change anything", "owner": "situational-awareness" }
+    ]
+  }
+}
