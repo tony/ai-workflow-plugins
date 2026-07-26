@@ -34,6 +34,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [github-actions](plugins/github-actions/) | Development | Update GitHub Actions pins across one repo or a whole fleet — verify every target tag exists before writing it, research each upgrade against real release notes, land one commit per action on trunk, then close dependabot's PRs by citing the commit that superseded them |
 | [situate](plugins/situate/) | Development | Gain situational awareness before touching a repository — read the branch against trunk, its diff, its pull request and review threads, its linked tickets, and the project's own conventions, then report where the work stands; optionally search prior AI conversations for decisions the repository never recorded |
 | [terraform](plugins/terraform/) | Development | Move Terraform and OpenTofu versions across any repository layout — discover every root module instead of assuming one, move every declaration of a provider together because constraints combine across modules, and refresh each lock file without narrowing its platform coverage |
+| [ruff](plugins/ruff/) | Development | Move one repo or a whole fleet onto a new ruff release — work out which rules the release can actually fire against each repo's own select list, gate on the resolver being able to see the version at all, then land one reviewed commit per rule with the upstream rule doc cited |
 
 ## Installation
 
