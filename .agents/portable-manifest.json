@@ -566,7 +566,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 27006
+      "bytes": 27106
     },
     {
       "name": "terraform-refresh-lock",
