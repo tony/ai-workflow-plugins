@@ -5,6 +5,7 @@ description: >-
   catch up, get oriented, or figure out where things left off, what a branch
   is doing, what a pull request or its review threads are asking for, or
   what the state of this repository is before touching it.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
 metadata:
   source: "plugins/situate/skills/situational-awareness/SKILL.md"
 ---
