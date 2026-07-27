@@ -383,7 +383,7 @@
         "references/scoring-rubric.md": "plugins/pytest-optimizer/references/scoring-rubric.md",
         "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
       },
-      "bytes": 11703
+      "bytes": 11760
     },
     {
       "name": "pytest-optimizer-03-execute",
@@ -394,7 +394,7 @@
         "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
         "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
       },
-      "bytes": 7751
+      "bytes": 7808
     },
     {
       "name": "rebase",
