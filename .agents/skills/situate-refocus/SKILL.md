@@ -44,11 +44,10 @@ Working tree — run this command and read the output:
 git status --short 2>/dev/null | head -20 || echo "(unavailable)"
 ```
 
-Commits on this branch — run this command and read the output:
-
-```bash
-BASE=$(git merge-base HEAD "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null); if [ -n "$BASE" ]; then git log --no-merges --format='%h %s' "$BASE..HEAD"; else echo "(no base commit resolved)"; fi
-```
+The commit range is not precomputed here. Resolve the base through the
+sweep reference in step 2 — a branch stacked on another branch takes its
+parent as the base, and a trunk-measured range would hand this command
+the parent's commits to classify as this branch's drift.
 
 ## Procedure
 
@@ -76,9 +75,14 @@ because every commit matches it by construction.
 
 ### 2. Read what was actually done
 
-Commits since the base, the diff behind them, and the uncommitted
-changes. Uncommitted work counts — drift often lives there first,
-because it has not yet had to justify itself in a commit message.
+Resolve the base first, by the sweep reference's rules rather than by
+assuming trunk: a stacked branch takes its parent, and only then does
+the range hold this branch's own work. Report the layer unavailable, and
+which lookup failed, when neither resolves.
+
+Then the commits since that base, the diff behind them, and the
+uncommitted changes. Uncommitted work counts — drift often lives there
+first, because it has not yet had to justify itself in a commit message.
 
 ### 3. Classify
 

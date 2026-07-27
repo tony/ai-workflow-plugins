@@ -40,7 +40,7 @@ Working tree — run this command and read the output:
 git status --short 2>/dev/null | head -20 || echo "(unavailable)"
 ```
 
-Commits on this branch — run this command and read the output:
+Commits since trunk — run this command and read the output:
 
 ```bash
 BASE=$(git merge-base HEAD "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null); if [ -n "$BASE" ]; then git log --no-merges --format='%h %s' "$BASE..HEAD" | head -15; else echo "(no base commit resolved)"; fi
@@ -64,10 +64,15 @@ the confusion is about what just happened — a command that ran, a
 decision taken, why the work moved — the answer is already in context
 and needs no tools at all.
 
-The context block above is local git, already gathered. Go beyond it
-only for the paid tier in the brief reference: a pull request when the
-branch has one, a ticket when an ID appears in the branch name, a
-commit, or the pull request body.
+The context block above is local git, already gathered. It measures from
+trunk, which is the cheap approximation this command is built on — on a
+branch stacked over another branch that range carries the parent's
+commits too, so treat the count as approximate and say so rather than
+re-resolving the base for a five-line answer.
+
+Go beyond the block only for the paid tier in the brief reference: a
+pull request when the branch has one, a ticket when an ID appears in the
+branch name, a commit, or the pull request body.
 
 ### 3. Write the brief
 
