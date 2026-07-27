@@ -146,6 +146,14 @@ middle one is why this cannot be a keyword match: work that serves the
 goal, load-bearing detours the goal could not land without, and genuine
 excursions. A fixture repair that unblocked the feature is correct work.
 
+Which commits count is decided before any of that, and not by assuming
+trunk. A branch stacked over another branch takes its parent as the
+base; measured from trunk instead, the range carries the parent's
+commits and the assessment reports work someone else already landed as
+this branch's drift. So the base is resolved through the sweep's rules
+rather than precomputed cheaply — a wrong base does not produce a
+slightly worse answer here, it produces a confidently wrong one.
+
 The goal does not automatically win. Sometimes the excursion was the
 better instinct and the ticket was scoped too narrowly — then the
 correction is to update the ticket, not to revert good work for
