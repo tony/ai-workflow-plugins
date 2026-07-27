@@ -1,7 +1,7 @@
 {
   "name": "situate",
   "description": "Gain situational awareness before touching a repository — sweep the branch against trunk, its diff, its pull request and review threads, its linked tickets, and the project's own conventions, optionally searching prior AI conversations for decisions the repository never recorded; answer a mid-session 'huh' in five lines or less; and re-derive what the work is for to catch both the work nobody asked for and the work nobody did",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"
