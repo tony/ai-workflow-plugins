@@ -474,6 +474,16 @@
       "bytes": 16356
     },
     {
+      "name": "situate-brief",
+      "sources": [
+        "plugins/situate/skills/brief/SKILL.md"
+      ],
+      "bundled": {
+        "references/brief.md": "plugins/situate/references/brief.md"
+      },
+      "bytes": 9444
+    },
+    {
       "name": "situate-refocus",
       "sources": [
         "plugins/situate/commands/refocus.md"
@@ -493,7 +503,17 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 15693
+      "bytes": 15965
+    },
+    {
+      "name": "situate-what",
+      "sources": [
+        "plugins/situate/commands/what.md"
+      ],
+      "bundled": {
+        "references/brief.md": "plugins/situate/references/brief.md"
+      },
+      "bytes": 9652
     },
     {
       "name": "slop-scan",
@@ -807,6 +827,7 @@
     "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py": 2,
     "plugins/pytest-optimizer/templates/state.schema.json": 2,
     "plugins/release/references/release-conventions.md": 2,
+    "plugins/situate/references/brief.md": 2,
     "plugins/situate/references/prior-conversations.md": 2,
     "plugins/spike/references/verification-gates.md": 2,
     "plugins/action/references/ticket-detection.md": 1,

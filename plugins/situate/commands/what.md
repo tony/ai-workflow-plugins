@@ -1,0 +1,92 @@
+---
+description: Say what is going on in five lines or less — the session, the branch, the pull request and ticket if they exist — with numbered options when there is a real choice to make
+argument-hint: "[what you are confused about]"
+allowed-tools: ["Bash", "Read", "Grep", "Glob"]
+---
+
+# What
+
+The reader is disoriented. End that in five lines.
+
+Read `${CLAUDE_PLUGIN_ROOT}/references/brief.md` first — it defines the
+five-line budget, what earns a line, the option lines, and the evidence
+tiers that keep this cheap enough to ask casually.
+
+User arguments: $ARGUMENTS
+
+## Context
+
+Current branch:
+`!git branch --show-current 2>/dev/null || echo "(detached HEAD)"`
+
+Ahead / behind trunk:
+`!git rev-list --left-right --count "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)"...HEAD 2>/dev/null || echo "(no comparison available)"`
+
+Working tree:
+`!git status --short 2>/dev/null | head -20 || echo "(unavailable)"`
+
+Commits on this branch:
+`!git log --no-merges --format='%h %s' "$(git merge-base HEAD "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null)..HEAD" 2>/dev/null | head -15 || echo "(no range available)"`
+
+## Procedure
+
+### 1. Read what was actually asked
+
+Empty `$ARGUMENTS` means the whole situation: what this session has been
+doing, and where the repository stands.
+
+An argument narrows it to that subject, and narrowing is the point —
+`/situate:what the test failure` answers about the test failure and
+spends no lines on branch position.
+
+### 2. Answer from the session first
+
+The conversation is the highest-value evidence and the cheapest. When
+the confusion is about what just happened — a command that ran, a
+decision taken, why the work moved — the answer is already in context
+and needs no tools at all.
+
+The context block above is local git, already gathered. Go beyond it
+only for the paid tier in the brief reference: a pull request when the
+branch has one, a ticket when an ID appears in the branch name, a
+commit, or the pull request body.
+
+### 3. Write the brief
+
+Five lines maximum, ranked as the brief reference sets out: the blocker
+first, then position, then what just happened, then what it is for, then
+what is outstanding. Stop early when the situation runs out.
+
+Then numbered single-line options — only when there is a real fork.
+
+## Rules
+
+- Read-only, and the same contract as `/situate`: no commits, no edits,
+  no branch switches, no `git fetch`.
+- Five lines is a ceiling on the body, not a target. Three good lines is
+  a better answer.
+- No headings, no preamble, no bullets in the body, no closing summary.
+- Never spend a line reporting that a layer was checked and was quiet.
+- One hedged inference at most. Two means say what is unknown instead.
+- No `AskUserQuestion` panel — the options are plain numbered lines. A
+  modal is heavier than the answer it would follow, and this command is
+  often reached ambiently, mid-thought.
+- If the branch has wandered from what it was for, do not diagnose it
+  here. Say so in a line and offer `/situate:refocus` as an option.
+- No local absolute paths, no third-party personal details.
+
+## Output
+
+The body, then the options. Nothing else — no title, no framing
+sentence, no offer to go deeper.
+
+```
+⚠ CI is red on PR #12: the type-check job fails on three files this branch added.
+feat-brief-mode, 4 commits ahead of main, 2 files uncommitted.
+This session rewrote the output contract and has not re-run the gates since.
+The ticket asks for a terse mode; the terse mode works, the failing types do not.
+
+1. Fix the three type errors and push
+2. Show the failing job output
+3. Stash the uncommitted work and check whether the branch alone is green
+```

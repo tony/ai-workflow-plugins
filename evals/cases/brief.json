@@ -1,0 +1,16 @@
+{
+  "skill_name": "brief",
+  "trigger": {
+    "positive": [
+      { "prompt": "huh?", "top_k": 1 },
+      { "prompt": "wait, what?", "top_k": 1 },
+      { "prompt": "sorry, you lost me", "top_k": 1 },
+      { "prompt": "slow down and explain simply, keep it short", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "bring me up to speed on this repo before I change anything", "owner": "situational-awareness" },
+      { "prompt": "figure out where this work left off", "owner": "situational-awareness" },
+      { "prompt": "are you certain about that? go look at the code again", "owner": "double-check" }
+    ]
+  }
+}

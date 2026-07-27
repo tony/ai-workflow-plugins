@@ -25,6 +25,11 @@ skill and `/situate`:
   searching local AI transcripts is warranted, how to scope it, and
   what may not appear in the report.
 
+A bare "huh" or "what?" is not this skill. That is disorientation
+looking for five lines, and the `brief` skill answers it; the `situate-what` skill
+is its explicit form. This one runs when someone can already say what
+they want caught up on and wants the whole picture.
+
 ## Core principle
 
 Read everything before reporting anything.
