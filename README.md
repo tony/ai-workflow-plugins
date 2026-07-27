@@ -46,46 +46,10 @@ Add the marketplace:
 
 You can also browse available plugins with `/plugin > Discover`.
 
-Then install any plugin:
+Then install any plugin by the name in the table above:
 
 ```console
 /plugin install commit@ai-workflow-plugins
-```
-
-```console
-/plugin install weave@ai-workflow-plugins
-```
-
-```console
-/plugin install rebase@ai-workflow-plugins
-```
-
-```console
-/plugin install changelog@ai-workflow-plugins
-```
-
-```console
-/plugin install tdd@ai-workflow-plugins
-```
-
-```console
-/plugin install model-cli@ai-workflow-plugins
-```
-
-```console
-/plugin install pr@ai-workflow-plugins
-```
-
-```console
-/plugin install research@ai-workflow-plugins
-```
-
-```console
-/plugin install slop@ai-workflow-plugins
-```
-
-```console
-/plugin install tailwind@ai-workflow-plugins
 ```
 
 ## Design Philosophy
