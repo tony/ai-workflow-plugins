@@ -91,6 +91,20 @@ _PLUGIN_RELATED_WORDS = frozenset(
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_PATH = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 PLUGINS_DIR = REPO_ROOT / "plugins"
+README_PATH = REPO_ROOT / "README.md"
+
+README_ROW_RE = re.compile(
+    r"^\| \[(?P<name>[^\]]+)\]\(plugins/[^)]*\) \| (?P<cat>[^|]+) \| (?P<desc>.+?) \|[ \t]*\r?$",
+    re.MULTILINE,
+)
+"""A plugin row in the README table. The table is hand-maintained, so it
+drifts from the manifest unless something compares the two.
+
+Trailing whitespace and a carriage return are tolerated because neither
+changes what the row says. ``$`` matches before ``\\n``, so a CRLF checkout
+puts ``\\r`` where the pattern would otherwise demand ``|`` — without the
+``\\r?`` every row fails to match at once, and each plugin is reported
+missing rather than the line endings being reported."""
 
 
 app = typer.Typer(
@@ -859,6 +873,102 @@ def _lint_claude_validate() -> tuple[list[str], list[str]]:
     return all_errors, all_warnings
 
 
+def check_readme_table(manifest: MarketplaceManifest, readme: str) -> list[str]:
+    r"""Compare the README plugin table against the manifest.
+
+    The manifest is the source of truth and the table is written by hand, so
+    the table silently under-reports what the marketplace ships. Nothing else
+    in CI reads it.
+
+    Rows are matched on name, then on the two fields a reader acts on:
+    category and description. A row that disagrees is worse than a missing
+    one, because it looks authoritative.
+
+    Examples
+    --------
+    >>> def _manifest(*entries: PluginEntry) -> MarketplaceManifest:
+    ...     return MarketplaceManifest(
+    ...         name="m",
+    ...         metadata=MarketplaceMetadata(description="d"),
+    ...         owner=Author(name="T"),
+    ...         plugins=list(entries),
+    ...     )
+    >>> entry = PluginEntry(
+    ...     name="commit",
+    ...     description="Create git commits",
+    ...     version="1.0.0",
+    ...     author=Author(name="T"),
+    ...     source="./plugins/commit",
+    ...     category="development",
+    ... )
+    >>> row = "| [commit](plugins/commit/) | Development | Create git commits |"
+    >>> check_readme_table(_manifest(entry), row)
+    []
+
+    A plugin with no row is reported:
+
+    >>> check_readme_table(_manifest(entry), "no table here")
+    ["README plugin table is missing a row for 'commit'"]
+
+    So is a row whose description drifted from the manifest:
+
+    >>> stale = "| [commit](plugins/commit/) | Development | Old blurb |"
+    >>> check_readme_table(_manifest(entry), stale)
+    ["README row 'commit': description does not match marketplace.json"]
+
+    And a row naming a plugin the marketplace does not list:
+
+    >>> ghost = "| [gone](plugins/gone/) | Development | Removed |"
+    >>> check_readme_table(_manifest(entry), ghost + "\n" + row)
+    ["README row 'gone' names a plugin that is not in marketplace.json"]
+
+    A plugin listed twice is reported rather than deduplicated. Keying rows
+    by name alone would let the second row mask the first, so a table
+    carrying two contradictory rows could report nothing at all:
+
+    >>> check_readme_table(_manifest(entry), row + "\n" + row)
+    ["README plugin table lists 'commit' more than once"]
+
+    Trailing whitespace and CRLF endings do not change what a row says, so
+    neither may fail the match. A CRLF checkout would otherwise report every
+    plugin missing at once, naming the wrong cause for all of them:
+
+    >>> check_readme_table(_manifest(entry), row + "  ")
+    []
+    >>> check_readme_table(_manifest(entry), row + "\r\n")
+    []
+    """
+    rows: dict[str, re.Match[str]] = {}
+    duplicates: list[str] = []
+    for match in README_ROW_RE.finditer(readme):
+        if match["name"] in rows:
+            duplicates.append(match["name"])
+        else:
+            rows[match["name"]] = match
+
+    errors = [
+        f"README plugin table lists '{name}' more than once" for name in sorted(set(duplicates))
+    ]
+    errors.extend(
+        f"README plugin table is missing a row for '{entry.name}'"
+        for entry in manifest.plugins
+        if entry.name not in rows
+    )
+    errors.extend(
+        f"README row '{name}' names a plugin that is not in marketplace.json"
+        for name in sorted(rows.keys() - {entry.name for entry in manifest.plugins})
+    )
+    for entry in manifest.plugins:
+        row = rows.get(entry.name)
+        if row is None:
+            continue
+        if row["cat"].strip().casefold() != entry.category.casefold():
+            errors.append(f"README row '{entry.name}': category does not match marketplace.json")
+        if row["desc"].strip() != entry.description.strip():
+            errors.append(f"README row '{entry.name}': description does not match marketplace.json")
+    return errors
+
+
 @app.command()
 def lint() -> None:
     """Validate the marketplace manifest and all plugin directories."""
@@ -915,6 +1025,13 @@ def lint() -> None:
             f"Plugin '{name}' exists in plugins/ but is not listed in marketplace.json"
             for name in sorted(undiscovered)
         )
+
+        # Check the README table, which nothing else in CI reads
+        console.print("\n[bold]Validating README plugin table...[/bold]")
+        readme_errors = check_readme_table(manifest, README_PATH.read_text(encoding="utf-8"))
+        errors.extend(readme_errors)
+        if not readme_errors:
+            console.print(f"  Table: [green]OK[/green] ({len(manifest.plugins)} rows)")
 
     # Run claude plugin validate if CLI is available
     cli_errors, cli_warnings = _lint_claude_validate()
@@ -1017,6 +1134,174 @@ def _load_plugin_json(plugin_dir: Path) -> PluginJson:
     return PluginJson.model_validate(raw)
 
 
+def _homepage_prefix(manifest: MarketplaceManifest) -> str | None:
+    """Learn the homepage prefix the manifest's existing entries agree on.
+
+    Returns the text preceding ``/plugins/<name>``, so a new entry can be
+    given the same shape. Disagreement returns None rather than a guess: a
+    wrong homepage is worse than an absent one, and the entry stays valid
+    either way.
+
+    Examples
+    --------
+    >>> def _entry(name: str, homepage: str | None) -> PluginEntry:
+    ...     return PluginEntry(
+    ...         name=name,
+    ...         description="d",
+    ...         version="1.0.0",
+    ...         author=Author(name="T"),
+    ...         source=f"./plugins/{name}",
+    ...         category="development",
+    ...         homepage=homepage,
+    ...     )
+    >>> def _manifest(*entries: PluginEntry) -> MarketplaceManifest:
+    ...     return MarketplaceManifest(
+    ...         name="m",
+    ...         metadata=MarketplaceMetadata(description="d"),
+    ...         owner=Author(name="T"),
+    ...         plugins=list(entries),
+    ...     )
+    >>> _homepage_prefix(_manifest(_entry("a", "https://x/tree/main/plugins/a")))
+    'https://x/tree/main'
+
+    Entries that disagree yield nothing:
+
+    >>> _homepage_prefix(
+    ...     _manifest(
+    ...         _entry("a", "https://x/tree/main/plugins/a"),
+    ...         _entry("b", "https://y/tree/main/plugins/b"),
+    ...     )
+    ... ) is None
+    True
+
+    So does a manifest whose entries set no homepage:
+
+    >>> _homepage_prefix(_manifest(_entry("a", None))) is None
+    True
+    """
+    prefixes = {
+        entry.homepage[: -len(suffix)]
+        for entry in manifest.plugins
+        if entry.homepage and entry.homepage.endswith(suffix := f"/plugins/{entry.name}")
+    }
+    return prefixes.pop() if len(prefixes) == 1 else None
+
+
+def _common_license(manifest: MarketplaceManifest) -> str | None:
+    """Return the license every entry that declares one agrees on.
+
+    Examples
+    --------
+    >>> def _entry(name: str, lic: str | None) -> PluginEntry:
+    ...     return PluginEntry(
+    ...         name=name,
+    ...         description="d",
+    ...         version="1.0.0",
+    ...         author=Author(name="T"),
+    ...         source=f"./plugins/{name}",
+    ...         category="development",
+    ...         license=lic,
+    ...     )
+    >>> def _manifest(*entries: PluginEntry) -> MarketplaceManifest:
+    ...     return MarketplaceManifest(
+    ...         name="m",
+    ...         metadata=MarketplaceMetadata(description="d"),
+    ...         owner=Author(name="T"),
+    ...         plugins=list(entries),
+    ...     )
+    >>> _common_license(_manifest(_entry("a", "MIT"), _entry("b", "MIT")))
+    'MIT'
+    >>> _common_license(_manifest(_entry("a", "MIT"), _entry("b", "Apache-2.0"))) is None
+    True
+    """
+    licenses = {entry.license for entry in manifest.plugins if entry.license}
+    return licenses.pop() if len(licenses) == 1 else None
+
+
+def _new_entry(name: str, plugin_meta: PluginJson, manifest: MarketplaceManifest) -> PluginEntry:
+    """Build the entry ``sync --write`` adds for a newly discovered plugin.
+
+    Split out of the write loop so what the writer emits can be asserted.
+    CI runs ``sync --check`` and never ``sync --write``, so the writer and
+    the linter have twice disagreed unnoticed — once emitting ``null`` for
+    every unset optional, once re-adding a ``$schema`` key that had been
+    deliberately removed. Both reached trunk.
+
+    Examples
+    --------
+    >>> manifest = MarketplaceManifest(
+    ...     name="m",
+    ...     metadata=MarketplaceMetadata(description="d"),
+    ...     owner=Author(name="Owner"),
+    ...     plugins=[
+    ...         PluginEntry(
+    ...             name="existing",
+    ...             description="d",
+    ...             version="1.0.0",
+    ...             author=Author(name="Owner"),
+    ...             source="./plugins/existing",
+    ...             category="development",
+    ...             homepage="https://example.test/tree/main/plugins/existing",
+    ...             license="MIT",
+    ...         )
+    ...     ],
+    ... )
+    >>> meta = PluginJson(name="fresh", description="A fresh plugin")
+    >>> entry = _new_entry("fresh", meta, manifest)
+
+    The fields no gate checks are the ones that go missing, so assert them:
+
+    >>> entry.homepage
+    'https://example.test/tree/main/plugins/fresh'
+    >>> entry.license
+    'MIT'
+
+    The author falls back to the marketplace owner when the plugin sets none:
+
+    >>> entry.author.name
+    'Owner'
+
+    What the writer emits must survive serialization without nulls, which is
+    what ``claude plugin validate`` rejects:
+
+    >>> manifest.plugins.append(entry)
+    >>> text = _serialize_manifest(manifest)
+    >>> "null" in text
+    False
+    >>> '"license": "MIT"' in text
+    True
+    >>> '"homepage": "https://example.test/tree/main/plugins/fresh"' in text
+    True
+
+    A marketplace with no convention yet gets neither field rather than a
+    guess, and still serializes cleanly:
+
+    >>> bare = MarketplaceManifest(
+    ...     name="m",
+    ...     metadata=MarketplaceMetadata(description="d"),
+    ...     owner=Author(name="Owner"),
+    ...     plugins=[],
+    ... )
+    >>> first = _new_entry("first", meta, bare)
+    >>> (first.homepage, first.license)
+    (None, None)
+    >>> bare.plugins.append(first)
+    >>> "null" in _serialize_manifest(bare)
+    False
+    """
+    prefix = _homepage_prefix(manifest)
+    return PluginEntry(
+        name=plugin_meta.name,
+        description=plugin_meta.description,
+        version=plugin_meta.version or "1.0.0",
+        author=plugin_meta.author or manifest.owner,
+        source=f"./plugins/{name}",
+        category="development",
+        homepage=f"{prefix}/plugins/{name}" if prefix is not None else None,
+        license=_common_license(manifest),
+    )
+
+
 @app.command()
 def sync(*, write: bool = False, check: bool = False) -> None:
     """Compare discovered plugins with marketplace manifest.
@@ -1092,15 +1377,7 @@ def sync(*, write: bool = False, check: bool = False) -> None:
 
     # Add new plugins
     for name in additions:
-        plugin_meta = _load_plugin_json(PLUGINS_DIR / name)
-        new_entry = PluginEntry(
-            name=plugin_meta.name,
-            description=plugin_meta.description,
-            version=plugin_meta.version or "1.0.0",
-            author=plugin_meta.author or manifest.owner,
-            source=f"./plugins/{name}",
-            category="development",
-        )
+        new_entry = _new_entry(name, _load_plugin_json(PLUGINS_DIR / name), manifest)
         manifest.plugins.append(new_entry)
         msg = (
             f"[yellow]Warning:[/yellow] Plugin '{name}' defaulting to"
