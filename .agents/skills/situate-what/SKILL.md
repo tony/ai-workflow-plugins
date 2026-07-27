@@ -43,7 +43,7 @@ git status --short 2>/dev/null | head -20 || echo "(unavailable)"
 Commits since trunk — run this command and read the output:
 
 ```bash
-BASE=$(git merge-base HEAD "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null); if [ -n "$BASE" ]; then git log --no-merges --format='%h %s' "$BASE..HEAD" | head -15; else echo "(no base commit resolved)"; fi
+TRUNK=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main); BASE=$(git merge-base HEAD "$TRUNK" 2>/dev/null); if [ -n "$BASE" ]; then git log --no-merges --format='%h %s' "$BASE..HEAD" | head -15; elif git rev-parse --verify --quiet "$TRUNK" >/dev/null; then echo "(no merge-base with $TRUNK)"; else echo "(trunk $TRUNK not found)"; fi
 ```
 
 ## Procedure

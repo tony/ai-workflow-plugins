@@ -513,7 +513,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 9968
+      "bytes": 10079
     },
     {
       "name": "slop-scan",
