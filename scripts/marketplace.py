@@ -1218,6 +1218,90 @@ def _common_license(manifest: MarketplaceManifest) -> str | None:
     return licenses.pop() if len(licenses) == 1 else None
 
 
+def _new_entry(name: str, plugin_meta: PluginJson, manifest: MarketplaceManifest) -> PluginEntry:
+    """Build the entry ``sync --write`` adds for a newly discovered plugin.
+
+    Split out of the write loop so what the writer emits can be asserted.
+    CI runs ``sync --check`` and never ``sync --write``, so the writer and
+    the linter have twice disagreed unnoticed — once emitting ``null`` for
+    every unset optional, once re-adding a ``$schema`` key that had been
+    deliberately removed. Both reached trunk.
+
+    Examples
+    --------
+    >>> manifest = MarketplaceManifest(
+    ...     name="m",
+    ...     metadata=MarketplaceMetadata(description="d"),
+    ...     owner=Author(name="Owner"),
+    ...     plugins=[
+    ...         PluginEntry(
+    ...             name="existing",
+    ...             description="d",
+    ...             version="1.0.0",
+    ...             author=Author(name="Owner"),
+    ...             source="./plugins/existing",
+    ...             category="development",
+    ...             homepage="https://example.test/tree/main/plugins/existing",
+    ...             license="MIT",
+    ...         )
+    ...     ],
+    ... )
+    >>> meta = PluginJson(name="fresh", description="A fresh plugin")
+    >>> entry = _new_entry("fresh", meta, manifest)
+
+    The fields no gate checks are the ones that go missing, so assert them:
+
+    >>> entry.homepage
+    'https://example.test/tree/main/plugins/fresh'
+    >>> entry.license
+    'MIT'
+
+    The author falls back to the marketplace owner when the plugin sets none:
+
+    >>> entry.author.name
+    'Owner'
+
+    What the writer emits must survive serialization without nulls, which is
+    what ``claude plugin validate`` rejects:
+
+    >>> manifest.plugins.append(entry)
+    >>> text = _serialize_manifest(manifest)
+    >>> "null" in text
+    False
+    >>> '"license": "MIT"' in text
+    True
+    >>> '"homepage": "https://example.test/tree/main/plugins/fresh"' in text
+    True
+
+    A marketplace with no convention yet gets neither field rather than a
+    guess, and still serializes cleanly:
+
+    >>> bare = MarketplaceManifest(
+    ...     name="m",
+    ...     metadata=MarketplaceMetadata(description="d"),
+    ...     owner=Author(name="Owner"),
+    ...     plugins=[],
+    ... )
+    >>> first = _new_entry("first", meta, bare)
+    >>> (first.homepage, first.license)
+    (None, None)
+    >>> bare.plugins.append(first)
+    >>> "null" in _serialize_manifest(bare)
+    False
+    """
+    prefix = _homepage_prefix(manifest)
+    return PluginEntry(
+        name=plugin_meta.name,
+        description=plugin_meta.description,
+        version=plugin_meta.version or "1.0.0",
+        author=plugin_meta.author or manifest.owner,
+        source=f"./plugins/{name}",
+        category="development",
+        homepage=f"{prefix}/plugins/{name}" if prefix is not None else None,
+        license=_common_license(manifest),
+    )
+
+
 @app.command()
 def sync(*, write: bool = False, check: bool = False) -> None:
     """Compare discovered plugins with marketplace manifest.
@@ -1292,20 +1376,8 @@ def sync(*, write: bool = False, check: bool = False) -> None:
         return
 
     # Add new plugins
-    prefix = _homepage_prefix(manifest)
-    license_name = _common_license(manifest)
     for name in additions:
-        plugin_meta = _load_plugin_json(PLUGINS_DIR / name)
-        new_entry = PluginEntry(
-            name=plugin_meta.name,
-            description=plugin_meta.description,
-            version=plugin_meta.version or "1.0.0",
-            author=plugin_meta.author or manifest.owner,
-            source=f"./plugins/{name}",
-            category="development",
-            homepage=f"{prefix}/plugins/{name}" if prefix is not None else None,
-            license=license_name,
-        )
+        new_entry = _new_entry(name, _load_plugin_json(PLUGINS_DIR / name), manifest)
         manifest.plugins.append(new_entry)
         msg = (
             f"[yellow]Warning:[/yellow] Plugin '{name}' defaulting to"
