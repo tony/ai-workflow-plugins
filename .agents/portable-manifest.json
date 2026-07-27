@@ -481,7 +481,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 9444
+      "bytes": 9445
     },
     {
       "name": "situate-refocus",
@@ -513,7 +513,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 9688
+      "bytes": 9689
     },
     {
       "name": "slop-scan",

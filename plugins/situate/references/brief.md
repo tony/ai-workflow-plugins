@@ -1,6 +1,6 @@
 # The brief
 
-Shared by `/situate:what` and the `what` skill.
+Shared by `/situate:what` and the `brief` skill.
 
 Five lines, maximum. The reader is disoriented and wants to stop being
 disoriented — every line they have to read before that happens is a
