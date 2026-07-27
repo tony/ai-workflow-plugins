@@ -5,6 +5,10 @@ branch against trunk, its diff, its pull request and review threads,
 its linked tickets, and the project's own conventions — then report
 where the work stands and what is unresolved.
 
+`/situate` is the full sweep, for opening a session on work you do not
+know. `/situate:refocus` asks the separate question of whether the work
+still serves what it was started for.
+
 ## Installation
 
 Add the marketplace:
@@ -24,11 +28,15 @@ Install the plugin:
 | Command | Description |
 |---------|-------------|
 | `/situate` | Sweep the current branch, its pull request, its tickets, and the project's conventions, and report the situation |
+| `/situate:refocus` | Re-derive what the work is for, sort the commits against it, and name both the drift and the gap |
 
-Defaults to the current branch measured against trunk. `--pr <number|url>`
-switches the subject to another pull request without checking it out.
-`--with-agentgrep [terms]` adds a search of local AI transcripts for
-decisions the repository never recorded.
+`/situate` defaults to the current branch measured against trunk.
+`--pr <number|url>` switches the subject to another pull request without
+checking it out. `--with-agentgrep [terms]` adds a search of local AI
+transcripts for decisions the repository never recorded.
+
+`/situate:refocus` takes an optional goal, for when the repository does
+not record one anywhere.
 
 ## Layers
 
@@ -82,9 +90,39 @@ and the transcript reads identically in all three cases. Where the
 transcript and the repository disagree, the repository wins — and the
 disagreement is usually the most useful thing in the report.
 
+## Goal and drift
+
+`/situate:refocus` answers a question the sweep does not ask: not where
+the work stands, but whether it still serves what it was started for.
+
+The goal is re-derived on every run and never stored. A stored goal goes
+stale the moment scope is renegotiated in a comment, and a stale goal is
+confidently wrong in exactly the situation this exists for — resuming
+after a gap, where the user has no memory to check it against. It comes
+from the first source that yields one: what the user said this session,
+then the ticket's acceptance criteria, then the pull request body, then
+the branch name and first commit. Which source it came from is reported,
+because a goal from acceptance criteria and a goal from a branch name
+are not equally trustworthy.
+
+Drift has two sides. Work the goal never asked for is the obvious half.
+Work the goal asked for that has not happened is the half that hides —
+on a resumed ticket the branch looks busy either way, and only checking
+the criteria one at a time surfaces it.
+
+Not everything off-topic is drift. Commits sort three ways, and the
+middle one is why this cannot be a keyword match: work that serves the
+goal, load-bearing detours the goal could not land without, and genuine
+excursions. A fixture repair that unblocked the feature is correct work.
+
+The goal does not automatically win. Sometimes the excursion was the
+better instinct and the ticket was scoped too narrowly — then the
+correction is to update the ticket, not to revert good work for
+disagreeing with a stale description.
+
 ## Shared references
 
-The command and the skill read the same files at runtime, so the
+The commands and the skill read the same files at runtime, so the
 explicit and ambient paths cannot drift:
 
 - `references/situation-sweep.md` — the six layers, the commands behind
@@ -93,6 +131,8 @@ explicit and ambient paths cannot drift:
 - `references/prior-conversations.md` — when transcript search is
   warranted, how to scope and cap it, how to reconcile it against the
   repository, and what may not appear in the report
+- `references/goal-derivation.md` — goal precedence, why nothing is
+  stored, the three-way classification, and the four correctives
 
 ## Skill
 
