@@ -135,7 +135,7 @@
           "additionalProperties": false,
           "required": ["subject", "body"],
           "properties": {
-            "subject": { "type": "string", "maxLength": 50 },
+            "subject": { "type": "string", "maxLength": 72 },
             "body": { "type": "string" }
           }
         },

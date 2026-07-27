@@ -32,7 +32,7 @@ providing language-agnostic AI / agentic workflow plugins for DX efficiency.
 | [merge-pr](plugins/merge-pr/) | Development | Merge PRs via gh with merge commits matching the repo's own git history — readiness checks and CI watch before every merge, plus multi-PR runs with stack detection, rebase, and conflict resolution between merges |
 | [business](plugins/business/) | Productivity | Measure and report the business value of AI skills and agentic workflows — provenance-tagged data collection and audience-tiered reports in engineer-hours and cycle time, never currency |
 | [github-actions](plugins/github-actions/) | Development | Update GitHub Actions pins across one repo or a whole fleet — verify every target tag exists before writing it, research each upgrade against real release notes, land one commit per action on trunk, then close dependabot's PRs by citing the commit that superseded them |
-| [situate](plugins/situate/) | Development | Gain situational awareness before touching a repository — read the branch against trunk, its diff, its pull request and review threads, its linked tickets, and the project's own conventions, then report where the work stands; optionally search prior AI conversations for decisions the repository never recorded |
+| [situate](plugins/situate/) | Development | Gain situational awareness before touching a repository — sweep the branch against trunk, its diff, its pull request and review threads, its linked tickets, and the project's own conventions, optionally searching prior AI conversations for decisions the repository never recorded; answer a mid-session 'huh' in five lines or less; and re-derive what the work is for to catch both the work nobody asked for and the work nobody did |
 | [terraform](plugins/terraform/) | Development | Move Terraform and OpenTofu versions across any repository layout — discover every root module instead of assuming one, move every declaration of a provider together because constraints combine across modules, and refresh each lock file without narrowing its platform coverage |
 | [ruff](plugins/ruff/) | Development | Move one repo or a whole fleet onto a new ruff release — work out which rules the release can actually fire against each repo's own select list, gate on the resolver being able to see the version at all, then land one reviewed commit per rule with the upstream rule doc cited |
 
@@ -46,46 +46,10 @@ Add the marketplace:
 
 You can also browse available plugins with `/plugin > Discover`.
 
-Then install any plugin:
+Then install any plugin by the name in the table above:
 
 ```console
 /plugin install commit@ai-workflow-plugins
-```
-
-```console
-/plugin install weave@ai-workflow-plugins
-```
-
-```console
-/plugin install rebase@ai-workflow-plugins
-```
-
-```console
-/plugin install changelog@ai-workflow-plugins
-```
-
-```console
-/plugin install tdd@ai-workflow-plugins
-```
-
-```console
-/plugin install model-cli@ai-workflow-plugins
-```
-
-```console
-/plugin install pr@ai-workflow-plugins
-```
-
-```console
-/plugin install research@ai-workflow-plugins
-```
-
-```console
-/plugin install slop@ai-workflow-plugins
-```
-
-```console
-/plugin install tailwind@ai-workflow-plugins
 ```
 
 ## Design Philosophy

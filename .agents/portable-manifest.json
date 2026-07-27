@@ -383,7 +383,7 @@
         "references/scoring-rubric.md": "plugins/pytest-optimizer/references/scoring-rubric.md",
         "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
       },
-      "bytes": 11703
+      "bytes": 11760
     },
     {
       "name": "pytest-optimizer-03-execute",
@@ -394,7 +394,7 @@
         "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
         "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
       },
-      "bytes": 7751
+      "bytes": 7808
     },
     {
       "name": "rebase",
@@ -474,6 +474,27 @@
       "bytes": 16356
     },
     {
+      "name": "situate-brief",
+      "sources": [
+        "plugins/situate/skills/brief/SKILL.md"
+      ],
+      "bundled": {
+        "references/brief.md": "plugins/situate/references/brief.md"
+      },
+      "bytes": 9445
+    },
+    {
+      "name": "situate-refocus",
+      "sources": [
+        "plugins/situate/commands/refocus.md"
+      ],
+      "bundled": {
+        "references/goal-derivation.md": "plugins/situate/references/goal-derivation.md",
+        "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
+      },
+      "bytes": 18620
+    },
+    {
       "name": "situate-situational-awareness",
       "sources": [
         "plugins/situate/skills/situational-awareness/SKILL.md"
@@ -482,7 +503,17 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 15693
+      "bytes": 15965
+    },
+    {
+      "name": "situate-what",
+      "sources": [
+        "plugins/situate/commands/what.md"
+      ],
+      "bundled": {
+        "references/brief.md": "plugins/situate/references/brief.md"
+      },
+      "bytes": 10079
     },
     {
       "name": "slop-scan",
@@ -777,6 +808,7 @@
     "plugins/github-actions/references/action-pinning.md": 3,
     "plugins/github-actions/references/dependabot-closeout.md": 3,
     "plugins/pytest-optimizer/references/heuristic-catalog.md": 3,
+    "plugins/situate/references/situation-sweep.md": 3,
     "plugins/terraform/references/pin-sites.md": 3,
     "plugins/action/references/verification-gates.md": 2,
     "plugins/business/references/evidence.md": 2,
@@ -795,8 +827,8 @@
     "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py": 2,
     "plugins/pytest-optimizer/templates/state.schema.json": 2,
     "plugins/release/references/release-conventions.md": 2,
+    "plugins/situate/references/brief.md": 2,
     "plugins/situate/references/prior-conversations.md": 2,
-    "plugins/situate/references/situation-sweep.md": 2,
     "plugins/spike/references/verification-gates.md": 2,
     "plugins/action/references/ticket-detection.md": 1,
     "plugins/business/references/instruments.md": 1,
@@ -809,6 +841,7 @@
     "plugins/ruff/references/default-rule-set.md": 1,
     "plugins/ruff/references/pin-sites-and-gating.md": 1,
     "plugins/ruff/references/release-triage.md": 1,
+    "plugins/situate/references/goal-derivation.md": 1,
     "plugins/slop/references/commit-template.md": 1,
     "plugins/slop/references/quality-gates.md": 1,
     "plugins/slop/references/slop-taxonomy.md": 1,

@@ -37,7 +37,7 @@ what:
 - Focused on a single topic
 ```
 
-Keep the subject ≤50 chars (excluding any trailing `(#NN)` PR ref); wrap
+Keep the subject ≤64 chars (excluding any trailing `(#NN)` PR ref); wrap
 body lines at ≤72 chars. Separate the `why:` and `what:` blocks with a
 blank line.
 
