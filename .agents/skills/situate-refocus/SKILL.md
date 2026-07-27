@@ -47,7 +47,7 @@ git status --short 2>/dev/null | head -20 || echo "(unavailable)"
 Commits on this branch — run this command and read the output:
 
 ```bash
-git log --no-merges --format='%h %s' "$(git merge-base HEAD "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null)..HEAD" 2>/dev/null || echo "(no range available)"
+BASE=$(git merge-base HEAD "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)" 2>/dev/null); if [ -n "$BASE" ]; then git log --no-merges --format='%h %s' "$BASE..HEAD"; else echo "(no base commit resolved)"; fi
 ```
 
 ## Procedure

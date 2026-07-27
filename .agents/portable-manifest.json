@@ -492,7 +492,7 @@
         "references/goal-derivation.md": "plugins/situate/references/goal-derivation.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 18366
+      "bytes": 18402
     },
     {
       "name": "situate-situational-awareness",
@@ -513,7 +513,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 9652
+      "bytes": 9688
     },
     {
       "name": "slop-scan",
