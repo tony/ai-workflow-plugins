@@ -49,6 +49,16 @@ signatures:
     rationale: Trailing AI-tool footers left from copy-paste; never legitimate.
     fp-guard: 'Skip if the project lists AI tools in CONTRIBUTORS or AUTHORS.'
 
+  - id: ai-slop.tool-trailers
+    tier: A
+    confidence: high
+    action: remove
+    kind: regex
+    target: [message-body]
+    pattern: '(?im)^\s*(made|generated|created|assisted|written|authored)[- ](with|by):\s*.*\b(claude|chatgpt|gpt|codex|copilot|cursor|gemini|devin|windsurf|aider|cline|anthropic|openai)\b'
+    rationale: Trailer attributing the commit to an AI tool; the tool is not an author, and the line says nothing about the change.
+    fp-guard: 'Skip if the project lists AI tools in CONTRIBUTORS or AUTHORS.'
+
   - id: ai-slop.emoji-in-commit-subject
     tier: A
     confidence: high
@@ -163,7 +173,7 @@ signatures:
     action: remove
     kind: regex
     target: [message-body]
-    pattern: '^Co-Authored-By:\s*\S+.*<.*(claude|gpt|codex|copilot|cursor|gemini)\b.*>'
+    pattern: '(?im)^\s*co-authored-by:\s*.*<[^>]*(claude|gpt|codex|copilot|cursor|gemini|anthropic|openai|devin|windsurf|aider|cline)\b[^>]*>'
     rationale: AI co-author trailer; user-confirmed because legitimate Co-Authored-By usage exists for human pair-programming.
     fp-guard: 'Demote to advisory if any commit in the last 50 trunk commits used `Co-Authored-By:` legitimately.'
 

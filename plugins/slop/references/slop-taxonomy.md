@@ -28,6 +28,7 @@ modify without explicit user assent on each occurrence.
 | Signature | Action | Why Tier A |
 |---|---|---|
 | `ai-slop.signatures` | remove | Exact-string match on AI-tool footers (`Generated with Claude`, `🤖`, etc.); these phrases are never legitimate in commit bodies. |
+| `ai-slop.tool-trailers` | remove | Trailer lines attributing the commit to an AI tool (`Made-with: Cursor`, `Generated-by: Claude`); the tool is not an author and the line says nothing about the change. |
 | `ai-slop.emoji-in-commit-subject` | remove | Unicode range match; emoji in subjects break terminal rendering and `git log` formatting. Project-overridable for gitmoji users via `.claude/slop.local.yml`. |
 | `brittle.commit-message-markdown-leak` | rewrite | Subject opens with markdown syntax (`**bold**`, `# heading`, `- bullet`, `[link](url)`); breaks `git log --oneline` and shell pagers. |
 | `low-value.todo-noise` | remove | Net-new `TODO: revisit` / `FIXME: later` etc. with no owner. The pattern requires the literal noise phrasings; deliberately scoped TODOs with tickets pass. |
