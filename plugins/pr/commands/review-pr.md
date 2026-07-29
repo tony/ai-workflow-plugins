@@ -55,6 +55,7 @@ Check each applicable dimension. Not every dimension applies to every PR — a o
 | **Before/After** | For behavioral changes, are both states shown in labeled code blocks? |
 | **No brittle details** | Does the description avoid test counts, SHAs, line numbers, or file/line-changed counts? These duplicate what the reviewer sees in the diff. |
 | **No branch-internal narrative** | Does the description avoid rename history, "no longer X" / "previously Y" phrasing, and `### Fixes` framing for behavior that never appeared in a published release? See `AGENTS.md` § *The Published-Release Test*. |
+| **Reads to an outsider** | Would an engineer who joined this week follow it without the surrounding conversation? Linked tickets and PRs are wanted (see Cross-references); a bare invariant codename or decision-record number standing in for the explanation is not. See `AGENTS.md` § *The Newcomer Test*. |
 | **Whole-branch perspective** | Does it describe the net shipped result, or does it narrate the branch's commit-by-commit evolution? |
 
 ### 4. Report

@@ -172,9 +172,32 @@ patterns:
   constraints, or trade-offs.
 - **Coded Labels:** Write rules, options, and findings as plain
   imperatives. Don't tag them with codes like `[R1]`, `A1`, or
-  `Option B` in artifacts a human reads — the reader shouldn't have to
-  decode an index. Internal agent bookkeeping may use ids; shipped text
-  may not.
+  `Option B`, and don't cite a ticket key, decision-record number, or
+  invariant codename (`PROJ-482`, `ADR 0011`, `NB-1`) in code, a
+  comment, or an ordinary commit message — the reader shouldn't have to
+  decode an index. State the constraint instead. Internal agent
+  bookkeeping may use ids; shipped text may not.
+- **Over-Explained Code:** A comment earns its line by saying what the
+  code cannot — an invariant, a hazard, a constraint the reader would
+  otherwise violate. Before writing a paragraph, ask whether a commit
+  message carries it better and whether someone skimming the API would
+  want it. Ordinary code gets a sentence or nothing.
+
+### The Newcomer Test
+
+The code, its comments, and ordinary commit messages must land for an
+engineer who joined this week and read none of the conversation behind
+the change. Names they cannot look up fail it: ticket keys,
+decision-record numbers, invariant codenames, phase and sprint labels.
+State the constraint, not its index.
+
+The surface decides, not the token. A PR description and a merge commit
+are where ticket and PR references belong — there the key is a link the
+reader follows. A PR description still has to explain itself: link the
+ticket, but never let its number stand in for the reason. When code
+strictly implements a written decision record, one line citing it by
+title is the ceiling; the reasoning lives in the record, not in every
+module that obeys it.
 
 ### Durable Source Links
 

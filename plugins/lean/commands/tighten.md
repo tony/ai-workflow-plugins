@@ -55,9 +55,9 @@ If `$ARGUMENTS` is empty, ask which files via `AskUserQuestion`.
    `--gates`, take the format/lint/typecheck commands from a checks
    section in those files; if none is defined, skip gates.
 3. **Detect.** Flag slop per the rubric — AI signatures, brittle
-   references, diff narration, prose inflation, coded labels, and
-   tables where prose reads cleaner. Preserve every load-bearing
-   reference and "why" comment.
+   references, diff narration, prose inflation, coded labels,
+   over-explained comments, and tables where prose reads cleaner.
+   Preserve every load-bearing reference and "why" comment.
 4. **Preview and confirm.** Show the proposed edits and confirm via
    `AskUserQuestion` before writing; the preview and the printed diff
    (Step 6) are the review surface. Skip when `--diff-only`.

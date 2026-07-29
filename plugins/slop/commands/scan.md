@@ -62,6 +62,15 @@ Published-Release Test diagnostic are in
 `AGENTS.md` § *AI Slop Prevention*; the scan flags
 candidates in `diff` and `file` targets.
 
+Slop also includes **insider shorthand** — ticket keys, decision-record
+numbers, and invariant codenames sitting where the reader cannot open
+them — and comments that argue for ordinary code where a commit message
+would carry it better. The surface decides: a PR description and a
+merge commit are where those references belong. The Newcomer Test in
+`AGENTS.md` § *AI Slop Prevention* is the discriminator;
+`jargon.internal-codes` and `verbose.over-explained-comment` are the
+detection layer.
+
 ## `$ARGUMENTS` contract
 
 If `$ARGUMENTS` is empty, scan all tracked files at HEAD with the

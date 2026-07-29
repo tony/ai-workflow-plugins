@@ -187,6 +187,46 @@ signatures:
     rationale: Absolute user-home paths in committed code break for every other user.
     fp-guard: 'Skip in test fixtures and example documentation.'
 
+  - id: jargon.internal-codes
+    tier: B
+    confidence: medium
+    action: rewrite
+    kind: regex
+    target: [diff, file, message-subject, message-body]
+    pattern: '\b[Aa][Dd][Rr][ -]?[0-9]{2,4}\b|\b(?!(?:ISO|IEC|IEEE|ANSI|NIST|FIPS|RFC|BCP|STD|PEP|CVE|CWE|CVSS|WCAG|ARIA|SHA|MD|AES|RSA|UTF|UCS|HTTP|IPV|TLS|SSL|USB|PCI|SQL|EN|JIS|GB)-)[A-Z]{2,6}-[0-9]{1,5}\b|\[[A-Z][0-9]{1,2}\]|\bOption [A-Z]\b'
+    rationale: |
+      A code only the author can resolve — decision-record number,
+      ticket key, invariant codename, bracketed rule id — sitting in
+      code, a comment, or an ordinary commit message, where the reader
+      cannot open it. Name the constraint instead. The surface decides:
+      the same key is wanted in a PR description and in a merge commit,
+      where it links to something the reader can follow.
+    fp-guard: |
+      Merge commits are exempt — PR and ticket references are their
+      purpose. Skip issue trailers (`Fixes:`, `Closes:`, `Refs:`), the
+      decision records themselves, and one single-line citation naming
+      a record by title per file.
+
+  - id: verbose.over-explained-comment
+    tier: B
+    confidence: medium
+    action: ask
+    kind: semantic
+    target: [diff, file]
+    rationale: |
+      A comment or docstring argues for ordinary code across several
+      sentences, preserving the design conversation in the artifact.
+      Three questions decide it: would a commit message carry this
+      better, would someone skimming the API want it, and is this code
+      load-bearing enough to justify a paragraph? Three noes mean one
+      sentence or nothing.
+    fp-guard: |
+      Keep comments documenting an invariant, protocol constraint,
+      platform quirk, security boundary, or upstream workaround, and
+      keep reference prose on a public API where the text is the
+      contract. Length alone is never the finding — the finding is
+      prose the reader can derive from the code or the commit message.
+
   # ─── Tier C — advisory only (high FPR, never auto-applied) ──────
 
   - id: ai-slop.flagship-phrases
