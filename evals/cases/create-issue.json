@@ -1,0 +1,15 @@
+{
+  "skill_name": "create-issue",
+  "trigger": {
+    "positive": [
+      { "prompt": "file a github issue for this crash", "top_k": 1 },
+      { "prompt": "open an issue upstream reporting that the flag is ignored", "top_k": 1 },
+      { "prompt": "turn this audit into a tracked issue on the repo", "top_k": 3 },
+      { "prompt": "report this bug to the maintainers with a reproduction", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "catch me up on what this branch and its pull request are asking for", "owner": "situational-awareness" },
+      { "prompt": "reproduce this bug as a failing test before fixing it", "owner": "xfail" }
+    ]
+  }
+}

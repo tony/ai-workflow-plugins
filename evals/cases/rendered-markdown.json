@@ -1,0 +1,14 @@
+{
+  "skill_name": "rendered-markdown",
+  "trigger": {
+    "positive": [
+      { "prompt": "should I hard-wrap this issue body or leave the paragraphs on one line", "top_k": 3 },
+      { "prompt": "fold this log into a details block and pin the source link to a tag", "top_k": 1 },
+      { "prompt": "rewrite this comment body so the code fences actually render on github", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "keep this commit message tight, no filler", "owner": "lean-writing" },
+      { "prompt": "polish this README until it reads well", "owner": "refine" }
+    ]
+  }
+}
