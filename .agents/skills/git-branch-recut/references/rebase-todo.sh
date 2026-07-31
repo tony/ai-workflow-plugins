@@ -92,8 +92,12 @@ apply)
     [ $# -eq 3 ] || die "usage: rebase-todo.sh apply <base> <plan-file>"
     [ -f "$3" ] || die "no such plan file: $3"
     preflight
-    plan=$(cd "$(dirname -- "$3")" && pwd)/$(basename -- "$3")
-    GIT_SEQUENCE_EDITOR="cp -- '$plan'" rebase rebase -i $(update_refs_flag) "$2" || {
+    # Passed through the environment, not interpolated into the editor string:
+    # git runs the sequence editor as `sh -c '<editor> "$@"' <editor> <todo>`,
+    # so a path containing a quote would break the string it was spliced into.
+    RECUT_PLAN=$(cd "$(dirname -- "$3")" && pwd)/$(basename -- "$3")
+    export RECUT_PLAN
+    GIT_SEQUENCE_EDITOR='cp -- "$RECUT_PLAN"' rebase rebase -i $(update_refs_flag) "$2" || {
         report_state; exit 1;
     }
     ;;
