@@ -19,7 +19,7 @@ Install the plugin:
 
 ## Components
 
-### `/git-branch:recut` (skill)
+### `/git-branch:soft-reset-and-recommit` (skill)
 
 Takes a branch of `wip` commits, or one commit doing five things, and
 turns it into a series a reviewer can read.
@@ -52,8 +52,7 @@ Pushing is always a separate decision the user makes.
 ### The interactive-rebase toolkit
 
 `references/rebase-todo.sh` drives `git rebase -i` from a shell with
-no editor and no TTY. It is used by `/git-branch:recut` and works
-standalone.
+no editor and no TTY. Both skills use it, and it works standalone.
 
 Run it from anywhere — the examples below spell the path in full so
 they can be pasted as-is. Inside a session `${CLAUDE_PLUGIN_ROOT}`
@@ -97,7 +96,7 @@ rebase it left stopped.
 
 ## Relationship to the other git plugins
 
-### Reach for `/git-branch:recut` when
+### Reach for `/git-branch:soft-reset-and-recommit` when
 
 The branch's *content* is right and its *history* is wrong — commits
 that mix concerns, say nothing, or do not survive review.
@@ -106,19 +105,17 @@ that mix concerns, say nothing, or do not survive review.
 
 The commit messages need cleaning but the commit boundaries are fine.
 It fixes messages through fixup commits and autosquash, and explicitly
-does not split multi-topic commits — that gap is what `recut` fills.
+does not split multi-topic commits — that gap is what this plugin
+fills.
 
 ### Reach for `/rebase` when
 
 The branch needs to move onto current trunk. That is a different
-operation: `recut` never changes the base it sits on.
+operation: neither skill here changes the base a branch sits on.
 
 ### Reach for `/commit` when
 
 You are creating a new commit rather than rebuilding existing ones.
-
-`/pr:recut` is unrelated despite the name — it rewrites a pull
-request's *description*, not its commits.
 
 ## Prerequisites
 

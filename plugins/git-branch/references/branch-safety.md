@@ -1,6 +1,6 @@
 # Not losing the user's work
 
-A recut rewrites history that may already be published and may be the
+A recommit rewrites history that may already be published and may be the
 only copy of a day's work. Every gate here exists because skipping it
 loses something silently. Verified against git 2.43.
 
@@ -120,7 +120,7 @@ cleanup. It destroys the user's entire stash list.
 
 ## Pushing the result
 
-Pushing is always an explicit, separate decision. The recut itself
+Pushing is always an explicit, separate decision. The recommit itself
 stops at the local branch.
 
 ```

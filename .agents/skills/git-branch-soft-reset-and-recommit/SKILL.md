@@ -1,21 +1,21 @@
 ---
-name: recut
+name: git-branch-soft-reset-and-recommit
 description: >-
   Use when a commit history needs rebuilding rather than the code it
   contains — `wip` commits to squash, one commit doing five unrelated
-  things, or a history no reviewer can follow. Collapses everything
-  with a soft reset and rebuilds it as atomic commits in the project's
-  own message format, preserving authorship, proving the resulting
-  tree is byte-identical to what it replaced, and gating each commit
-  through the project's checks. Ships an editor-free interactive
-  rebase toolkit for reordering, squashing, and verifying from an
-  agent shell with no TTY.
-user-invocable: true
-argument-hint: "[PR number, base ref, or a hint like 'split the auth work out']"
+  things, or a history no reviewer can follow. Collapses everything with a
+  soft reset and rebuilds it as atomic commits in the project's own message
+  format, preserving authorship, proving the resulting tree is
+  byte-identical to what it replaced, and gating each commit through the
+  project's checks. Ships an editor-free interactive rebase toolkit for
+  reordering, squashing, and verifying from an agent shell with no TTY.
 allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "AskUserQuestion", "WebFetch"]
+metadata:
+  argument-hint: "[PR number, base ref, or a hint like 'split the auth work out']"
+  source: "plugins/git-branch/skills/soft-reset-and-recommit/SKILL.md"
 ---
 
-# Recut
+# Soft reset and recommit
 
 Rebuild a branch's history so the commits explain the change, without
 changing a byte of the result.
@@ -25,20 +25,20 @@ split, or nothing.
 
 Four references carry the parts that must not drift:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/recut-safety.md` — the gates, the
+- `references/branch-safety.md` — the gates, the
   backup, recovery, and the push.
-- `${CLAUDE_PLUGIN_ROOT}/references/split-mechanics.md` — base
+- `references/split-mechanics.md` — base
   resolution, the collapse, staging, splitting, verification.
-- `${CLAUDE_PLUGIN_ROOT}/references/commit-messages.md` — style
+- `references/commit-messages.md` — style
   discovery, intent recovery, and the privacy gate.
-- `${CLAUDE_PLUGIN_ROOT}/references/rebase-toolkit.md` — interactive
+- `references/rebase-toolkit.md` — interactive
   rebase with no editor, plus `references/rebase-todo.sh`.
 
 ## Core principle
 
 The tree is the invariant. The history is the deliverable.
 
-A recut that changes what the branch produces is a bug, no matter how
+A recommit that changes what the branch produces is a bug, no matter how
 good the commits look. Every decision below is subordinate to proving
 the final tree is identical to the one it replaced.
 
@@ -63,7 +63,7 @@ first, plain merge-base as fallback, and refuse unless exactly one
 merge base exists. On a stacked branch the base is the parent branch
 tip, never trunk.
 
-Then run every refusal in `recut-safety.md`: dirty tree, operation in
+Then run every refusal in `branch-safety.md`: dirty tree, operation in
 progress, merge commits in the range, branch held by another worktree,
 shallow clone. Detect a pushed branch and whether anyone else has
 pushed to it — without `git fetch`.
@@ -137,7 +137,7 @@ date. Carry `Co-authored-by` and ticket trailers forward.
 Then gate the whole series in place:
 
 ```
-sh ${CLAUDE_PLUGIN_ROOT}/references/rebase-todo.sh verify <base-sha> '<test command>'
+sh references/rebase-todo.sh verify <base-sha> '<test command>'
 ```
 
 A failure stops the rebase and leaves it in progress; the script says
@@ -152,7 +152,7 @@ The gate, not a formality:
 git diff --quiet backup/<branch>-<ts> HEAD
 ```
 
-A non-zero exit means the recut changed the result. Restore from the
+A non-zero exit means the recommit changed the result. Restore from the
 backup and report — do not try to patch the difference.
 
 Then show the user how the history was regrouped:
@@ -166,8 +166,8 @@ what was deferred.
 
 ## Phase 8 — Pushing is a separate decision
 
-Never push as part of the recut. Offer it, with the flags from
-`recut-safety.md`, and let the user decide:
+Never push as part of the recommit. Offer it, with the flags from
+`branch-safety.md`, and let the user decide:
 
 ```
 git push --force-with-lease --force-if-includes origin <branch>
@@ -205,7 +205,7 @@ commits that became empty, exiting 0.
 after `--` is a pathspec, so git looks for a file named `-m`.
 
 **Gating on `git range-diff` being clean.** Heavy regrouping shows as
-drop-and-add pairs. It explains the recut; tree equality gates it.
+drop-and-add pairs. It explains the recommit; tree equality gates it.
 
 **Leaving a stopped rebase in place.** A failed `--exec` leaves a
 detached HEAD that poisons every later git command.
@@ -215,3 +215,9 @@ unredacted. Re-state the claim in your own words.
 
 **Adding a `(#N)` suffix because the merge commits have one.** Merge
 style and branch style legitimately differ in the same repository.
+
+
+## Portability notes
+
+- `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
+- Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.

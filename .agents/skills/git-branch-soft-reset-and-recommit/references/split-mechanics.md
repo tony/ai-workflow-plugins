@@ -1,6 +1,6 @@
 # Splitting a collapsed branch into atomic commits
 
-The mechanics of the recut motion: resolve the base, collapse the
+The mechanics of the recommit motion: resolve the base, collapse the
 branch into the index, then carve the index up one logical change at a
 time. Verified against git 2.43.
 
@@ -40,8 +40,8 @@ string that flows into `git reset --soft`.
 
 **On a stacked branch the base is the parent branch tip, never
 trunk.** Recutting a child against trunk absorbs the entire parent
-pull request into it. Once the parent has itself been recut, plain
-`merge-base` for the child collapses back to trunk — recut stacks
+pull request into it. Once the parent has itself been recommit, plain
+`merge-base` for the child collapses back to trunk — recommit stacks
 bottom-up and re-derive each child's base afterward.
 
 ## Refuse before collapsing
@@ -150,7 +150,7 @@ Notes on the patch step:
   the header counts is a hard failure, and `--3way` does not rescue it
   because parsing happens first. `--recount` does.
 - `--cached` is required. `git apply --index` refuses whenever the
-  index and working tree differ, which is the recut's steady state.
+  index and working tree differ, which is the recommit's steady state.
 - Never pass `--whitespace=fix`; it rewrites content and breaks the
   content-identity guarantee.
 - Binary paths need `git diff --binary`, or applying fails with
@@ -168,7 +168,7 @@ git diff --cached --name-only
 
 ## Preserve authorship
 
-The committer is always whoever runs the recut, stamped now; that
+The committer is always whoever runs the recommit, stamped now; that
 cannot be preserved and should not be faked. The author can be:
 
 ```
@@ -187,24 +187,24 @@ are gone from the branch:
 git log --no-merges --format='%H %an <%ae> %aI' <base>..HEAD
 ```
 
-## Prove the recut changed nothing
+## Prove the recommit changed nothing
 
-Tree equality against the pre-recut backup is the definitive check.
+Tree equality against the pre-recommit backup is the definitive check.
 Exit 0 means the two trees are identical:
 
 ```
-git diff --quiet refs/recut/backup HEAD
+git diff --quiet <backup-branch> HEAD
 ```
 
 `git range-diff` explains *how* the commits were regrouped, which an
 endpoint diff cannot:
 
 ```
-git range-diff <base-sha> refs/recut/backup HEAD
+git range-diff <base-sha> <backup-branch> HEAD
 ```
 
 Read it as an explanation, not a gate. It ignores merge commits, and
-its `<` and `>` lines are expected noise on a real recut — heavy
+its `<` and `>` lines are expected noise on a real recommit — heavy
 regrouping is reported as unrelated drop-and-add pairs rather than as
 matched edits.
 
@@ -212,5 +212,5 @@ Then check that each commit stands on its own, in a worktree that is
 not pinned to the final content:
 
 ```
-git worktree add --detach /tmp/recut-check <sha>
+git worktree add --detach /tmp/recommit-check <sha>
 ```

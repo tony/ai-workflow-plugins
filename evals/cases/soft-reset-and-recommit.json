@@ -1,5 +1,5 @@
 {
-  "skill_name": "recut",
+  "skill_name": "soft-reset-and-recommit",
   "trigger": {
     "positive": [
       { "prompt": "squash these wip commits into atomic commits with real messages", "top_k": 1 },
