@@ -1,0 +1,14 @@
+{
+  "skill_name": "redo-from-scratch",
+  "trigger": {
+    "positive": [
+      { "prompt": "this branch works but I want the implementation written again from scratch", "top_k": 1 },
+      { "prompt": "the proof of concept grew into the real thing, redo it properly", "top_k": 3 },
+      { "prompt": "throw away this approach and start the implementation over, tests are the spec", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "squash these wip commits into atomic commits with real messages", "owner": "soft-reset-and-recommit" },
+      { "prompt": "reproduce this bug as a failing test before fixing it", "owner": "xfail" }
+    ]
+  }
+}

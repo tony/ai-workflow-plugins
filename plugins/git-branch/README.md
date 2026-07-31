@@ -1,7 +1,7 @@
 # git-branch
 
-Rebuild a branch's commit history so the commits explain the change,
-without changing a byte of what the branch produces.
+Redo a branch two ways: keep the code and rebuild only the history, or
+keep the requirements and replace the implementation.
 
 ## Installation
 
@@ -48,6 +48,42 @@ turns it into a series a reviewer can read.
    checks.
 
 Pushing is always a separate decision the user makes.
+
+### `/git-branch:redo-from-scratch` (skill)
+
+For the other case: the branch's code is what is wrong. A proof of
+concept that became the real thing, or an approach found halfway
+through that the earlier code does not reflect.
+
+1. **Establishes a contract before anything else** — trunk's tests,
+   the tests this branch added, and their result right now. What
+   passes is the specification. A branch with no tests stops here, and
+   the skill offers to write characterization tests against the
+   existing implementation first, so a spec exists before anything is
+   discarded.
+2. **Studies the branch into a coverage ledger** — behavior changes,
+   tests, edge cases, workarounds, review requests, acceptance
+   criteria, public surface, dependencies. The undocumented guards get
+   the most attention, because a clean rewrite is what drops them.
+3. **Rebuilds in a worktree, from the ledger** — not by reading the
+   old implementation line by line, which reproduces the shape the
+   rewrite was called in to replace. Offers a bakeoff when more than
+   one approach is genuinely in contention.
+4. **Verifies against the contract** — a test the rebuild cannot pass
+   without editing is a decision surfaced to you, never a silent edit.
+5. **Reconciles** — every ledger entry addressed or explicitly
+   dropped, then the old-versus-new diff walked as review material
+   rather than as a gate, since the code is supposed to differ.
+
+The original branch is kept as the reference and the fallback.
+
+### Which one
+
+The net change is the difference. `soft-reset-and-recommit` guarantees
+it is byte-identical and gates on that. `redo-from-scratch` expects it
+to change, so it earns its safety from the test contract and the
+ledger instead. That makes the second strictly riskier, and it is why
+it refuses to start on a branch with no tests.
 
 ### The interactive-rebase toolkit
 
