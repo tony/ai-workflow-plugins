@@ -1,0 +1,9 @@
+{
+  "name": "gh",
+  "description": "File GitHub issues a maintainer can still act on in three years — evidence and reproduction before prose, duplicates and the repo's own templates checked first, every symbol backticked and every source link pinned to a tag or a commit, long output folded into details blocks, local paths and PII stripped before anything is opened — plus the rendered-markdown writing discipline those bodies follow, reusable for any pull request, comment, or ticket a renderer will show a human",
+  "version": "0.0.1",
+  "author": {
+    "name": "Tony Narlock",
+    "email": "tony@git-pull.com"
+  }
+}

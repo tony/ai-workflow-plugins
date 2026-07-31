@@ -152,6 +152,28 @@
       "bytes": 7580
     },
     {
+      "name": "gh-create-issue",
+      "sources": [
+        "plugins/gh/skills/create-issue/SKILL.md"
+      ],
+      "bundled": {
+        "references/rendered-markdown.md": "plugins/gh/references/rendered-markdown.md",
+        "references/source-links.md": "plugins/gh/references/source-links.md"
+      },
+      "bytes": 26241
+    },
+    {
+      "name": "gh-rendered-markdown",
+      "sources": [
+        "plugins/gh/skills/rendered-markdown/SKILL.md"
+      ],
+      "bundled": {
+        "references/rendered-markdown.md": "plugins/gh/references/rendered-markdown.md",
+        "references/source-links.md": "plugins/gh/references/source-links.md"
+      },
+      "bytes": 20932
+    },
+    {
       "name": "github-actions-bumping-github-actions",
       "sources": [
         "plugins/github-actions/skills/bumping-github-actions/SKILL.md"
@@ -813,6 +835,8 @@
     "plugins/action/references/verification-gates.md": 2,
     "plugins/business/references/evidence.md": 2,
     "plugins/double-check/references/verification-contract.md": 2,
+    "plugins/gh/references/rendered-markdown.md": 2,
+    "plugins/gh/references/source-links.md": 2,
     "plugins/lean/references/lean-rubric.md": 2,
     "plugins/merge-pr/references/merge-readiness.md": 2,
     "plugins/pr/references/template-resolution.md": 2,
