@@ -1,7 +1,7 @@
 {
   "name": "git-branch",
-  "description": "Recut a branch's history into atomic commits — collapse it with a soft reset, rebuild it one logical change at a time with messages drawn from the original commits, the pull request, its tickets, and the session that wrote the code, prove the resulting tree is byte-identical to what it replaced, and gate every commit through the project's own checks — plus an editor-free interactive-rebase toolkit for reordering, squashing, and verifying history from an agent shell with no TTY",
-  "version": "0.0.1",
+  "description": "Redo a branch two ways — keep the code and rebuild only the history into atomic commits, proving the resulting tree is byte-identical to what it replaced; or keep the requirements and replace the implementation from scratch, holding the branch's own tests as the specification and reconciling the result against a ledger of everything the original handled. Both draw their commit messages from the original commits, the pull request, its tickets, and the session that wrote the code, gate every commit through the project's own checks, and never push on their own — plus an editor-free interactive-rebase toolkit for reordering, squashing, and verifying history from an agent shell with no TTY",
+  "version": "0.1.0",
   "author": {
     "name": "Tony Narlock",
     "email": "tony@git-pull.com"

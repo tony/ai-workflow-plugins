@@ -174,18 +174,32 @@
       "bytes": 20932
     },
     {
-      "name": "git-branch-recut",
+      "name": "git-branch-redo-from-scratch",
       "sources": [
-        "plugins/git-branch/skills/recut/SKILL.md"
+        "plugins/git-branch/skills/redo-from-scratch/SKILL.md"
       ],
       "bundled": {
+        "references/branch-safety.md": "plugins/git-branch/references/branch-safety.md",
         "references/commit-messages.md": "plugins/git-branch/references/commit-messages.md",
         "references/rebase-todo.sh": "plugins/git-branch/references/rebase-todo.sh",
         "references/rebase-toolkit.md": "plugins/git-branch/references/rebase-toolkit.md",
-        "references/recut-safety.md": "plugins/git-branch/references/recut-safety.md",
+        "references/rebuild-contract.md": "plugins/git-branch/references/rebuild-contract.md"
+      },
+      "bytes": 38221
+    },
+    {
+      "name": "git-branch-soft-reset-and-recommit",
+      "sources": [
+        "plugins/git-branch/skills/soft-reset-and-recommit/SKILL.md"
+      ],
+      "bundled": {
+        "references/branch-safety.md": "plugins/git-branch/references/branch-safety.md",
+        "references/commit-messages.md": "plugins/git-branch/references/commit-messages.md",
+        "references/rebase-todo.sh": "plugins/git-branch/references/rebase-todo.sh",
+        "references/rebase-toolkit.md": "plugins/git-branch/references/rebase-toolkit.md",
         "references/split-mechanics.md": "plugins/git-branch/references/split-mechanics.md"
       },
-      "bytes": 39808
+      "bytes": 39927
     },
     {
       "name": "github-actions-bumping-github-actions",
@@ -851,6 +865,10 @@
     "plugins/double-check/references/verification-contract.md": 2,
     "plugins/gh/references/rendered-markdown.md": 2,
     "plugins/gh/references/source-links.md": 2,
+    "plugins/git-branch/references/branch-safety.md": 2,
+    "plugins/git-branch/references/commit-messages.md": 2,
+    "plugins/git-branch/references/rebase-todo.sh": 2,
+    "plugins/git-branch/references/rebase-toolkit.md": 2,
     "plugins/lean/references/lean-rubric.md": 2,
     "plugins/merge-pr/references/merge-readiness.md": 2,
     "plugins/pr/references/template-resolution.md": 2,
@@ -870,10 +888,7 @@
     "plugins/spike/references/verification-gates.md": 2,
     "plugins/action/references/ticket-detection.md": 1,
     "plugins/business/references/instruments.md": 1,
-    "plugins/git-branch/references/commit-messages.md": 1,
-    "plugins/git-branch/references/rebase-todo.sh": 1,
-    "plugins/git-branch/references/rebase-toolkit.md": 1,
-    "plugins/git-branch/references/recut-safety.md": 1,
+    "plugins/git-branch/references/rebuild-contract.md": 1,
     "plugins/git-branch/references/split-mechanics.md": 1,
     "plugins/pr/references/apply-template.sh": 1,
     "plugins/pr/references/conflict-loop.md": 1,

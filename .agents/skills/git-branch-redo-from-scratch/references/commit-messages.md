@@ -1,6 +1,6 @@
 # Writing the replacement messages
 
-A recut is only worth doing if the new messages are better than the
+A recommit is only worth doing if the new messages are better than the
 ones they replace. That takes two things the original commits do not
 carry on their own: the project's own conventions, and the reasoning
 behind the code.
@@ -39,7 +39,7 @@ sets `core.hooksPath` locally.
 ### Otherwise mine the history
 
 Anchor the sample at the fork point. Mining `git log HEAD` on the
-branch under recut samples the mess you were asked to fix.
+branch under recommit samples the mess you were asked to fix.
 
 ```
 git log --no-merges -n 200 --format='%B' "$(git merge-base HEAD <base-ref>)"
@@ -59,7 +59,7 @@ What to measure, and the trap in each:
 - **A `(#N)` suffix.** Measure it separately on merges and on ordinary
   commits. Merge style and branch style legitimately differ: a repo
   can carry `(#N)` on every merge subject and none of its branch
-  commits, in which case the recut must not add one.
+  commits, in which case the recommit must not add one.
 - **Body rate and wrap width.** Whether commits carry bodies at all,
   and the real wrap column rather than an assumed 72.
 - **Trailers.** Filter keys against a `^[A-Za-z][A-Za-z0-9-]*$` shape,
@@ -88,7 +88,7 @@ wrote. Re-read what actually landed:
 git log -1 --format=%B
 ```
 
-Rebase replay never fires the `commit-msg` hook, so a recut can land
+Rebase replay never fires the `commit-msg` hook, so a recommit can land
 messages the project's own linter would reject. Run the linter
 yourself as a per-commit gate.
 
@@ -116,7 +116,7 @@ git log --format='%(trailers:only=true,unfold=true)' <base>..HEAD
 Two more git-native sources are usually ignored. `git notes` may carry
 rationale, and `git stash list` may hold abandoned approaches that
 explain why the landed approach looks the way it does. Notes do not
-survive the recut on their own: `reset --soft` plus `commit` is not a
+survive the recommit on their own: `reset --soft` plus `commit` is not a
 rewrite as far as git is concerned, so no note is copied. Carry
 anything worth keeping into the message itself, which is the only
 place that is durable and visible to everyone — notes are neither
@@ -147,7 +147,7 @@ than skipping the context.
 Preserve linkage through the rewrite, and prefer a trailer for it. A
 `Refs: PROJ-12` trailer survives reflow; a Jira Smart Commit directive
 does not, because those are line-scoped and re-wrapping a message
-during a recut can break a transition that used to fire. Linear often
+during a recommit can break a transition that used to fire. Linear often
 carries the linkage in the branch name alone, so promote the
 identifier into a trailer before a later squash loses it.
 
@@ -201,7 +201,7 @@ intermediate branch states shape the message but do not belong in it
 unless users of a published release actually experienced the old
 behavior.
 
-## What a recut message owes the reader
+## What a recommit message owes the reader
 
 The subject says what changed. The body says why it had to, in the
 project's own format, at a length proportional to the change.
