@@ -33,31 +33,31 @@ Report any operation in progress, so a later command does not fail
 mysteriously:
 
 ```
-sh rebase-todo.sh status
+sh references/rebase-todo.sh status
 ```
 
 Print the todo list for a range:
 
 ```
-sh rebase-todo.sh show <base>
+sh references/rebase-todo.sh show <base>
 ```
 
 Replay the range using an edited plan as the todo list:
 
 ```
-sh rebase-todo.sh apply <base> plan.txt
+sh references/rebase-todo.sh apply <base> plan.txt
 ```
 
 Run a command after every commit, in place:
 
 ```
-sh rebase-todo.sh verify <base> 'make test'
+sh references/rebase-todo.sh verify <base> 'make test'
 ```
 
 Fold every pending `fixup!` and `amend!` commit:
 
 ```
-sh rebase-todo.sh squash <base>
+sh references/rebase-todo.sh squash <base>
 ```
 
 Exit 0 is success, 1 means git failed and may have left a rebase

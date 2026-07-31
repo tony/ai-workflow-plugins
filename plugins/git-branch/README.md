@@ -55,34 +55,39 @@ Pushing is always a separate decision the user makes.
 no editor and no TTY. It is used by `/git-branch:recut` and works
 standalone.
 
+Run it from anywhere — the examples below spell the path in full so
+they can be pasted as-is. Inside a session `${CLAUDE_PLUGIN_ROOT}`
+resolves to this plugin's directory; from a plain shell, substitute
+wherever the plugin is installed.
+
 Report any git operation in progress:
 
 ```console
-sh rebase-todo.sh status
+sh ${CLAUDE_PLUGIN_ROOT}/references/rebase-todo.sh status
 ```
 
 Print the todo list for a range:
 
 ```console
-sh rebase-todo.sh show <base>
+sh ${CLAUDE_PLUGIN_ROOT}/references/rebase-todo.sh show <base>
 ```
 
 Replay the range from an edited plan:
 
 ```console
-sh rebase-todo.sh apply <base> plan.txt
+sh ${CLAUDE_PLUGIN_ROOT}/references/rebase-todo.sh apply <base> plan.txt
 ```
 
 Run a command after every commit, in place:
 
 ```console
-sh rebase-todo.sh verify <base> 'make test'
+sh ${CLAUDE_PLUGIN_ROOT}/references/rebase-todo.sh verify <base> 'make test'
 ```
 
 Fold pending `fixup!` and `amend!` commits:
 
 ```console
-sh rebase-todo.sh squash <base>
+sh ${CLAUDE_PLUGIN_ROOT}/references/rebase-todo.sh squash <base>
 ```
 
 It refuses to run on a dirty tree or over an operation already in

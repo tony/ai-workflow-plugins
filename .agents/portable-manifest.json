@@ -185,7 +185,7 @@
         "references/recut-safety.md": "plugins/git-branch/references/recut-safety.md",
         "references/split-mechanics.md": "plugins/git-branch/references/split-mechanics.md"
       },
-      "bytes": 39753
+      "bytes": 39808
     },
     {
       "name": "github-actions-bumping-github-actions",
