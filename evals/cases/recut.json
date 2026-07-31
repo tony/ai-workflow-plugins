@@ -1,0 +1,15 @@
+{
+  "skill_name": "recut",
+  "trigger": {
+    "positive": [
+      { "prompt": "squash these wip commits into atomic commits with real messages", "top_k": 1 },
+      { "prompt": "this branch has one commit doing five things, split it up", "top_k": 3 },
+      { "prompt": "rebuild my branch history so the commits are reviewable", "top_k": 3 },
+      { "prompt": "soft reset to the base and recommit this branch properly", "top_k": 1 }
+    ],
+    "negative": [
+      { "prompt": "catch me up on what this branch and its pull request are asking for", "owner": "situational-awareness" },
+      { "prompt": "file a github issue for this crash", "owner": "create-issue" }
+    ]
+  }
+}

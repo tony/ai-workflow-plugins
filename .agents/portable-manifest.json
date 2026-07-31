@@ -174,6 +174,20 @@
       "bytes": 20932
     },
     {
+      "name": "git-branch-recut",
+      "sources": [
+        "plugins/git-branch/skills/recut/SKILL.md"
+      ],
+      "bundled": {
+        "references/commit-messages.md": "plugins/git-branch/references/commit-messages.md",
+        "references/rebase-todo.sh": "plugins/git-branch/references/rebase-todo.sh",
+        "references/rebase-toolkit.md": "plugins/git-branch/references/rebase-toolkit.md",
+        "references/recut-safety.md": "plugins/git-branch/references/recut-safety.md",
+        "references/split-mechanics.md": "plugins/git-branch/references/split-mechanics.md"
+      },
+      "bytes": 39482
+    },
+    {
       "name": "github-actions-bumping-github-actions",
       "sources": [
         "plugins/github-actions/skills/bumping-github-actions/SKILL.md"
@@ -856,6 +870,11 @@
     "plugins/spike/references/verification-gates.md": 2,
     "plugins/action/references/ticket-detection.md": 1,
     "plugins/business/references/instruments.md": 1,
+    "plugins/git-branch/references/commit-messages.md": 1,
+    "plugins/git-branch/references/rebase-todo.sh": 1,
+    "plugins/git-branch/references/rebase-toolkit.md": 1,
+    "plugins/git-branch/references/recut-safety.md": 1,
+    "plugins/git-branch/references/split-mechanics.md": 1,
     "plugins/pr/references/apply-template.sh": 1,
     "plugins/pr/references/conflict-loop.md": 1,
     "plugins/pr/references/quality-gates.md": 1,
