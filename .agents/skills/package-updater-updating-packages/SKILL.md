@@ -1,6 +1,13 @@
 ---
-name: updating-packages
-description: Use when dependencies or toolchain pins are out of date across one repo or a whole fleet — bump dev packages, refresh a lockfile (uv.lock, pnpm-lock.yaml, package-lock.json, Cargo.lock, go.sum), find outdated packages with ncu, uv, pnpm or cargo, hold a package back in .ncurc, or move a .tool-versions, .nvmrc, packageManager or engines pin.
+name: package-updater-updating-packages
+description: >-
+  Use when dependencies or toolchain pins are out of date across one repo or
+  a whole fleet — bump dev packages, refresh a lockfile (uv.lock,
+  pnpm-lock.yaml, package-lock.json, Cargo.lock, go.sum), find outdated
+  packages with ncu, uv, pnpm or cargo, hold a package back in .ncurc, or
+  move a .tool-versions, .nvmrc, packageManager or engines pin.
+metadata:
+  source: "plugins/package-updater/skills/updating-packages/SKILL.md"
 ---
 
 # Updating packages
@@ -12,18 +19,18 @@ toolchain from the dependencies from their fallout.
 Six references carry the parts that must not drift between this skill
 and the plugin's commands:
 
-- `${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md` — deciding which
+- `references/repo-scope.md` — deciding which
   repositories are yours to commit to, and when to stop and ask.
-- `${CLAUDE_PLUGIN_ROOT}/references/ecosystems.md` — how to detect each
+- `references/ecosystems.md` — how to detect each
   ecosystem, its discovery and apply commands, and the supply-chain
   cooldown that can hide a release from the resolver.
-- `${CLAUDE_PLUGIN_ROOT}/references/commit-conventions.md` — the four
+- `references/commit-conventions.md` — the four
   commit tracks, subject grammar, body anatomy, and the empty-body rule.
-- `${CLAUDE_PLUGIN_ROOT}/references/upstream-links.md` — which URLs each
+- `references/upstream-links.md` — which URLs each
   tool's bump cites, and how to verify them.
-- `${CLAUDE_PLUGIN_ROOT}/references/follow-ups.md` — which bumps need a
+- `references/follow-ups.md` — which bumps need a
   second commit, and how to declare a knowingly-red intermediate.
-- `${CLAUDE_PLUGIN_ROOT}/references/holds.md` — deliberately staying
+- `references/holds.md` — deliberately staying
   behind on a package, and releasing the hold when its condition is met.
 
 ## Never run cargo-outdated
@@ -47,7 +54,7 @@ years later when someone needs exactly that.
 ## Scope
 
 Repositories you maintain. Follow
-`${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md` before any sweep that
+`references/repo-scope.md` before any sweep that
 walks a directory: skip worktrees and duplicate clones, ask the forge
 for `isFork` and `viewerPermission`, and fall back to the remote owner
 plus trunk authorship only when it cannot answer.
@@ -60,11 +67,11 @@ name is not recoverable.
 Three dependency classes belong to sibling plugins. Report them as
 findings with the command that handles them, and do not do the work:
 
-- GitHub Actions `uses:` pins → `/github-actions:update-actions`
-- ruff's floor and the rule fallout it produces → `/ruff:bump`
+- GitHub Actions `uses:` pins → the `github-actions-update-actions` skill
+- ruff's floor and the rule fallout it produces → the `ruff-bump` skill
 - Terraform versions, providers and lock files →
-  `/terraform:bump-provider`, `/terraform:bump-terraform`,
-  `/terraform:refresh-lock`
+  the `terraform-bump-provider` skill, the `terraform-bump-terraform` skill,
+  the `terraform-refresh-lock` skill
 
 ## Phase 1 — Inventory
 
@@ -272,3 +279,8 @@ permanent history before and need a rewrite to remove.
 
 **A cooldown exemption that outlives its reason.** Narrow it, annotate
 it, commit it alone, and revert it when the block lapses.
+
+
+## Portability notes
+
+- Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.
