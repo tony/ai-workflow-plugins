@@ -315,6 +315,62 @@
       "bytes": 1052
     },
     {
+      "name": "package-updater-update",
+      "sources": [
+        "plugins/package-updater/commands/update.md"
+      ],
+      "bundled": {
+        "references/commit-conventions.md": "plugins/package-updater/references/commit-conventions.md",
+        "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
+        "references/follow-ups.md": "plugins/package-updater/references/follow-ups.md",
+        "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
+        "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
+      },
+      "bytes": 36926
+    },
+    {
+      "name": "package-updater-update-package",
+      "sources": [
+        "plugins/package-updater/commands/update-package.md"
+      ],
+      "bundled": {
+        "references/commit-conventions.md": "plugins/package-updater/references/commit-conventions.md",
+        "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
+        "references/follow-ups.md": "plugins/package-updater/references/follow-ups.md",
+        "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
+        "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
+      },
+      "bytes": 35253
+    },
+    {
+      "name": "package-updater-update-toolchain",
+      "sources": [
+        "plugins/package-updater/commands/update-toolchain.md"
+      ],
+      "bundled": {
+        "references/commit-conventions.md": "plugins/package-updater/references/commit-conventions.md",
+        "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
+        "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
+        "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
+      },
+      "bytes": 31831
+    },
+    {
+      "name": "package-updater-updating-packages",
+      "sources": [
+        "plugins/package-updater/skills/updating-packages/SKILL.md"
+      ],
+      "bundled": {
+        "references/commit-conventions.md": "plugins/package-updater/references/commit-conventions.md",
+        "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
+        "references/follow-ups.md": "plugins/package-updater/references/follow-ups.md",
+        "references/holds.md": "plugins/package-updater/references/holds.md",
+        "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
+        "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
+      },
+      "bytes": 45257
+    },
+    {
       "name": "pr",
       "sources": [
         "plugins/pr/commands/pr.md"
@@ -852,11 +908,16 @@
     "plugins/weave/references/deslop-pass.md": 6,
     "plugins/business/references/audiences.md": 5,
     "plugins/pytest-optimizer/references/output-contract.md": 5,
+    "plugins/package-updater/references/commit-conventions.md": 4,
+    "plugins/package-updater/references/ecosystems.md": 4,
+    "plugins/package-updater/references/repo-scope.md": 4,
+    "plugins/package-updater/references/upstream-links.md": 4,
     "plugins/terraform/references/layout-discovery.md": 4,
     "plugins/terraform/references/lock-and-init.md": 4,
     "plugins/business/references/measurement.md": 3,
     "plugins/github-actions/references/action-pinning.md": 3,
     "plugins/github-actions/references/dependabot-closeout.md": 3,
+    "plugins/package-updater/references/follow-ups.md": 3,
     "plugins/pytest-optimizer/references/heuristic-catalog.md": 3,
     "plugins/situate/references/situation-sweep.md": 3,
     "plugins/terraform/references/pin-sites.md": 3,
@@ -890,6 +951,7 @@
     "plugins/business/references/instruments.md": 1,
     "plugins/git-branch/references/rebuild-contract.md": 1,
     "plugins/git-branch/references/split-mechanics.md": 1,
+    "plugins/package-updater/references/holds.md": 1,
     "plugins/pr/references/apply-template.sh": 1,
     "plugins/pr/references/conflict-loop.md": 1,
     "plugins/pr/references/quality-gates.md": 1,

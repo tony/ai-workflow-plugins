@@ -1,0 +1,18 @@
+{
+  "skill_name": "updating-packages",
+  "trigger": {
+    "positive": [
+      { "prompt": "what packages are out of date across my repos", "top_k": 1 },
+      { "prompt": "run a dependency refresh and land each bump as its own commit", "top_k": 3 },
+      { "prompt": "move uv and just up to their latest releases in .tool-versions", "top_k": 1 },
+      { "prompt": "bump the pnpm version in packageManager and relock", "top_k": 3 },
+      { "prompt": "refresh uv.lock and commit the dev package bumps", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "dependabot opened a stack of PRs to bump the actions in my workflows", "owner": "bumping-github-actions" },
+      { "prompt": "the aws provider constraint in our terraform config is way behind, move it up", "owner": "bumping-terraform" },
+      { "prompt": "clone the exact version of the library we depend on so I can read its source", "owner": "study-deps" },
+      { "prompt": "catch me up on this branch and what its pull request still needs", "owner": "situational-awareness" }
+    ]
+  }
+}
