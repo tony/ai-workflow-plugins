@@ -79,6 +79,21 @@ duration, pnpm reads `minimumReleaseAge` in **minutes** from
 Waiting out the window is the default. An exemption is narrow,
 annotated, committed alone, and reverted when the block lapses.
 
+## Whose repositories get committed to
+
+A `--root` sweep walks into worktrees, forks, vendored clones and
+upstream projects kept around for reference — all of which look like git
+repositories. The plugin asks the forge for `isFork` and
+`viewerPermission` before touching any of them, skips forks regardless
+of who owns them, and **stops to ask when the signals disagree** rather
+than inferring ownership from an account name.
+
+That last case is not hypothetical: one repo here is owned outright by
+the user, yet its last ten commits on trunk are all from a coding agent,
+so authorship alone would have excluded it. Another sits under an
+organisation the user only contributes to, where the account name alone
+would have included it.
+
 ## What one discovery tool misses
 
 `ncu` reads `package.json`, so a `pnpm-workspace.yaml` catalog entry, an
@@ -105,7 +120,8 @@ names the command:
 inventory, discovery, research, plan gate, land in order, verify,
 report.
 
-**References** — `ecosystems.md` (detection, discovery and apply
+**References** — `repo-scope.md` (which repositories are yours to commit
+to, and when to stop and ask), `ecosystems.md` (detection, discovery and apply
 commands, cooldown configuration), `commit-conventions.md` (subject
 grammar, body anatomy, the empty-body rule), `upstream-links.md` (which
 URLs each tool's bump cites), `follow-ups.md` (which bumps need a second

@@ -9,9 +9,11 @@ Find what is actually out of date, research each move against the
 vendor's own release notes, and land it as commits that separate the
 toolchain from the dependencies from their fallout.
 
-Four references carry the parts that must not drift between this skill
+Five references carry the parts that must not drift between this skill
 and the plugin's commands:
 
+- `${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md` — deciding which
+  repositories are yours to commit to, and when to stop and ask.
 - `${CLAUDE_PLUGIN_ROOT}/references/ecosystems.md` — how to detect each
   ecosystem, its discovery and apply commands, and the supply-chain
   cooldown that can hide a release from the resolver.
@@ -42,9 +44,16 @@ years later when someone needs exactly that.
 
 ## Scope
 
-Repositories you own and can push to. A fork you own is still someone
-else's project — check the fork flag, not the owner name, and skip it
-unless told otherwise.
+Repositories you maintain. Follow
+`${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md` before any sweep that
+walks a directory: skip worktrees and duplicate clones, ask the forge
+for `isFork` and `viewerPermission`, and fall back to the remote owner
+plus trunk authorship only when it cannot answer.
+
+**When ownership is unclear, stop and ask the user.** Do not infer it
+from the account name and proceed. A fork you own is still someone
+else's project, and a commit landing in a colleague's history under your
+name is not recoverable.
 
 Three dependency classes belong to sibling plugins. Report them as
 findings with the command that handles them, and do not do the work:

@@ -11,8 +11,9 @@ toolchain pin and per named package, a bulk refresh for the rest, and
 each follow-up as its own commit.
 
 Use `${CLAUDE_PLUGIN_ROOT}/skills/updating-packages/SKILL.md` for the
-phase structure. It reads the same four references this command does, so
+phase structure. It reads the same references this command does, so
 the sweep and the single-package path cannot drift:
+`${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md`,
 `${CLAUDE_PLUGIN_ROOT}/references/ecosystems.md`,
 `${CLAUDE_PLUGIN_ROOT}/references/commit-conventions.md`,
 `${CLAUDE_PLUGIN_ROOT}/references/upstream-links.md`, and
@@ -57,8 +58,14 @@ fan-out.
 Default scope is the current repository. `--root` walks a directory for
 git repositories; `--repo` names individual ones; `--owner` keeps only
 those whose remote belongs to the given accounts or organisations.
-Exclude forks — check the fork flag, not the owner name — and exclude
-repositories you cannot push to. Say plainly what was excluded and why.
+
+Follow the repo-scope reference for every repository a `--root` sweep
+turns up. Skip worktrees and duplicate clones, ask the forge for
+`isFork` and `viewerPermission`, and treat a fork as out of scope no
+matter who owns it. Where the signals disagree — or trunk's recent
+commits are all from bots and coding agents — **stop and ask the user
+rather than guessing**. Say plainly what was excluded and under which
+rule, and list what you asked about separately.
 
 ### 2. Inventory and discover
 

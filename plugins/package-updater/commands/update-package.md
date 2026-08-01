@@ -10,7 +10,7 @@ Move one named package to a target version wherever it is pinned, with a
 body that says what the release means for each repository it lands in.
 
 Use `${CLAUDE_PLUGIN_ROOT}/skills/updating-packages/SKILL.md` for the
-phase structure, and its four references:
+phase structure, and its references:
 `${CLAUDE_PLUGIN_ROOT}/references/ecosystems.md`,
 `${CLAUDE_PLUGIN_ROOT}/references/commit-conventions.md`,
 `${CLAUDE_PLUGIN_ROOT}/references/upstream-links.md`, and
@@ -66,6 +66,10 @@ to the same version.
 Default scope is the current repository. `--root`, `--repo` and
 `--owner` widen it as in `/package-updater:update`. Drop repositories
 that do not pin the package and those already at the target.
+
+A widened scope goes through the repo-scope reference first: worktrees
+and forks are out, and a repository whose ownership is unclear is a
+question for the user, not a guess.
 
 ### 4. Research the span once
 

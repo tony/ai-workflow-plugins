@@ -59,6 +59,10 @@ Default scope is the current repository. `--root`, `--repo` and
 `--owner` widen it as in `/package-updater:update`. Drop repositories
 that do not pin the tool and those already at the target.
 
+A widened scope goes through the repo-scope reference first: worktrees
+and forks are out, and a repository whose ownership is unclear is a
+question for the user, not a guess.
+
 A toolchain sweep is where pins most often disagree across a fleet.
 Record the current version per repository before changing anything; the
 spread is a finding.
