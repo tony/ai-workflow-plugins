@@ -98,9 +98,30 @@ would have included it.
 
 `ncu` reads `package.json`, so a `pnpm-workspace.yaml` catalog entry, an
 `overrides` block, or a package held in `.ncurc` never appears in its
-report. A clean run is not a current tree. The plugin checks those by
-hand and reports holds that carry no recorded reason, which is how a
-deliberate pin becomes indistinguishable from neglect.
+report. A clean run is not a current tree.
+
+## Holds
+
+A `reject` entry in `.ncurc` is a decision to stay behind on purpose,
+and every one has a condition that ends it. The plugin audits them on
+every sweep: it releases the holds whose condition has been met, and
+surfaces the ones whose reason is no longer recoverable rather than
+quietly dropping them.
+
+Two things make this easy to get wrong. `.ncurc` resolves next to the
+*package file*, so a workspace member can hold a package its siblings
+track and a root-only scan will miss it. And `ncu` rejects unknown keys,
+so a `$comment` explaining the hold breaks the tool rather than
+documenting it — the commit message is the only durable record, which is
+why the grammar names the condition in the subject:
+
+```
+.ncurc: Ignore `@biomejs/biome` 2.3.5 -> 2.3.6 until they fix class methods
+```
+
+```
+.ncurc: Unignore `@biomejs/biome` (2.3.7 fixed issue)
+```
 
 ## What this plugin does not do
 
@@ -125,7 +146,9 @@ to, and when to stop and ask), `ecosystems.md` (detection, discovery and apply
 commands, cooldown configuration), `commit-conventions.md` (subject
 grammar, body anatomy, the empty-body rule), `upstream-links.md` (which
 URLs each tool's bump cites), `follow-ups.md` (which bumps need a second
-commit, and how to declare a knowingly-red intermediate).
+commit, and how to declare a knowingly-red intermediate), `holds.md`
+(staying behind on purpose, and releasing the hold when its condition is
+met).
 
 ## Prerequisites
 

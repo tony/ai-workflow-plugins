@@ -116,21 +116,13 @@ stops tracking its own pinned tools.
 
 ### Holding a package back
 
-`.ncurc` carries a `reject` array of packages `ncu` must not offer.
-Holding one is a decision with a reason and a release condition, so it
-lands as its own commit that states both — and is reversed by a paired
-commit naming what fixed it:
+`.ncurc` carries a `reject` array of packages `ncu` must not offer. It
+resolves next to the package file, so a workspace member can hold a
+package its siblings track — a root-only scan under-reports holds.
 
-```
-.ncurc: Ignore `@biomejs/biome` 2.3.5 -> 2.3.6 until they fix class methods
-```
-
-```
-.ncurc: Unignore `@biomejs/biome` (2.3.7 fixed issue)
-```
-
-A hold with no recorded reason is indistinguishable from neglect. When
-the audit finds one, report it.
+Adding and releasing a hold are both commits, and both name the
+condition. See `holds.md` for the lifecycle, the commit grammar, and why
+the reason cannot be written into the file itself.
 
 For a one-off exclusion that is not worth checking in, `ncu -u -x <name>`.
 

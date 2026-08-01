@@ -9,7 +9,7 @@ Find what is actually out of date, research each move against the
 vendor's own release notes, and land it as commits that separate the
 toolchain from the dependencies from their fallout.
 
-Five references carry the parts that must not drift between this skill
+Six references carry the parts that must not drift between this skill
 and the plugin's commands:
 
 - `${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md` — deciding which
@@ -23,6 +23,8 @@ and the plugin's commands:
   tool's bump cites, and how to verify them.
 - `${CLAUDE_PLUGIN_ROOT}/references/follow-ups.md` — which bumps need a
   second commit, and how to declare a knowingly-red intermediate.
+- `${CLAUDE_PLUGIN_ROOT}/references/holds.md` — deliberately staying
+  behind on a package, and releasing the hold when its condition is met.
 
 ## Never run cargo-outdated
 
@@ -93,6 +95,13 @@ Separate what moves in-range from what needs a manifest edit. They are
 different commits with different meanings, and conflating them at
 discovery time makes the plan wrong.
 
+**Audit the existing holds in the same pass.** Every `reject` entry in
+every config in the tree, not just the root one, per the holds
+reference. A hold whose condition has been met is released in this run;
+a hold with no recoverable reason is reported for the user to decide.
+Packages held back are the ones a sweep is most likely to report as
+current when they are merely hidden.
+
 ## Phase 3 — Research each move
 
 A bulk lockfile refresh needs no research; it gets an empty body and
@@ -157,6 +166,10 @@ The order within a repository:
 4. **Bulk lockfile refresh** — empty body.
 5. **Follow-ups** — config schema, snapshots, migrations, in that order
    after the bump each belongs to.
+
+A hold added or released is its own commit too, naming the condition
+that started or ended it. Releasing a hold comes before the bump it
+unblocks.
 
 Toolchain first is not arbitrary: those pins select the resolver that
 produces everything below them.

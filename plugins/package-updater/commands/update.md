@@ -154,8 +154,11 @@ Open with a one-line hero (`✓ N commits across M repos` or
    real results, with any pre-existing failure named as pre-existing.
 7. `## Handoff` — stale GitHub Actions, ruff floors and Terraform
    versions found, each with the sibling command that handles it.
-8. `## Drift` — pins disagreeing across a workspace, and packages held
-   back with no recorded reason.
+8. `## Holds` — every `reject` entry across the tree with its recorded
+   condition, which conditions are now met, and which holds have no
+   recoverable reason. Omit when nothing is held.
+9. `## Drift` — pins disagreeing across a workspace, and holds applied
+   unevenly across workspace members.
 
 End with an `AskUserQuestion` panel offering next steps — for example:
 run the sibling command for the handoff items, drop a cooldown exemption
