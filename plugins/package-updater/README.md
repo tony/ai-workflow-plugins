@@ -34,10 +34,10 @@ report without writing. One package you already know is stale →
 
 All three default to the current repository and to committing on the
 default branch. `--branch <name>` works on a branch, `--pr` opens a pull
-request from it, `--no-push` commits locally and stops. `update` and
-`update-toolchain` additionally take `--root <dir>` to sweep every
-repository beneath a directory and `--owner <name>` to keep only those
-belonging to given accounts.
+request from it, `--no-push` commits locally and stops. All three also
+widen scope the same way: `--root <dir>` sweeps every repository beneath
+a directory, `--repo <path|slug>` names individual ones, and
+`--owner <name>` keeps only those belonging to given accounts.
 
 `update --issue github|linear` files the audit before the work starts:
 create the issue or card listing what is outstanding, derive the branch
