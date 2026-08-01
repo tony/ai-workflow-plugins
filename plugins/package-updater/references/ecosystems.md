@@ -142,8 +142,25 @@ pnpm section applies unchanged, except the cooldown key.
 
 ## Rust
 
-Marked by `Cargo.lock`. `cargo update --dry-run` reports what would
-move; `cargo update` applies it, in-range, touching only the lockfile.
+Marked by `Cargo.lock`.
+
+**Never run `cargo-outdated`.** It allocates without bound — around
+18 GB resident — and on a memory-constrained host such as WSL the OOM
+killer takes the machine down, losing whatever else was running. The
+cost is paid by starting the process, so there is no safe way to try it
+and see. Do not offer it as an option, and do not run it to check
+whether the problem still reproduces.
+
+Discover with the resolver instead:
+
+```console
+cargo update --dry-run
+```
+
+Or read the `Cargo.lock` diff directly, which is what the dry run
+prints anyway.
+
+`cargo update` applies an in-range refresh, touching only the lockfile.
 Raising a version in `Cargo.toml` is a manifest edit and a separate
 commit; `cargo upgrade` does it but ships in `cargo-edit`, so confirm
 the subcommand exists before putting it in a plan.

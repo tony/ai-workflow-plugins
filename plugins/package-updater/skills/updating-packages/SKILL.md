@@ -22,6 +22,17 @@ and the plugin's commands:
 - `${CLAUDE_PLUGIN_ROOT}/references/follow-ups.md` — which bumps need a
   second commit, and how to declare a knowingly-red intermediate.
 
+## Never run cargo-outdated
+
+It allocates around 18 GB resident and the OOM killer takes the whole
+host down with it on a memory-constrained machine. The cost is paid by
+starting the process, so there is no safe probe: do not run it to check
+whether the problem still reproduces, and do not offer it as an option.
+
+`cargo update --dry-run` reports the same thing safely. This holds until
+someone explicitly lifts the restriction — see the Rust section of the
+ecosystems reference.
+
 ## Core principle
 
 A dependency commit's value is its reasoning, and reasoning does not
