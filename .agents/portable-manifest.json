@@ -366,7 +366,7 @@
         "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 44654
+      "bytes": 45257
     },
     {
       "name": "pr",

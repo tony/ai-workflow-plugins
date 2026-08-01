@@ -14,8 +14,14 @@ problem it was added for.
 
 npm-check-updates reads `.ncurc`, or `.ncurc.json`, `.ncurc.yaml`,
 `.ncurc.yml`, `.ncurc.js`, `.ncurc.mjs`, `.ncurc.cjs`. The `reject`
-array names packages `ncu` must not offer. Entries may be globs
-(`*gatsby*`).
+array names packages `ncu` must not offer. Entries may be exact names,
+globs (`*gatsby*`), or regex literals (`/.*react.*/`) — the regex form
+is how a family of packages gets held together.
+
+**A `"ncu"` key in `package.json` is not config.** Unlike most tools in
+this ecosystem, `ncu` does not look there, so a `reject` array written
+into `package.json` is silently ignored and the package keeps being
+offered. Confirm a hold works rather than assuming the file was read.
 
 **Config resolves next to the package file, not at the repository
 root.** A workspace can therefore hold a package in one member and not
@@ -30,9 +36,12 @@ tree:
 fd -H -t f '^\.ncurc' .
 ```
 
-An empty `{"reject": []}` is a normal end state, not dead config. It
-means every hold that file once carried has been released, and it stays
-so the next hold has somewhere to go.
+Releasing the last hold ends one of two ways, and both are in use:
+`{"reject": []}` left in place so the next hold has somewhere to go, or
+the file deleted outright. Neither is dead config to clean up. Follow
+whichever the repository already does, and do not "tidy" an empty
+`reject` array away — its absence and its emptiness mean the same thing
+to `ncu` but not to the next reader.
 
 ## The reason cannot live in the file
 
