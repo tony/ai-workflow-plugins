@@ -98,8 +98,8 @@ three commits. Stage the file, commit one tool's change, then the next.
 Each reverts on its own, and a reader bisecting a runtime regression
 needs them separated.
 
-Subject names the file and the tool; the body is a link block and
-nothing else:
+Subject names the file and the tool. A routine bump's body is a link
+block and nothing else:
 
 ```console
 git commit -F - <<'EOF'
@@ -111,6 +111,15 @@ git commit -F - <<'EOF'
   - https://github.com/casey/just/releases/tag/1.57.0
 EOF
 ```
+
+A bump that crosses a major, is labeled breaking by its vendor, changes
+behavior this repository exercises, carries a security fix, or skips a
+newer release the cooldown gates takes a `why:` above the link block.
+Say what the span changes upstream — describing the intermediate
+releases, not only linking them — and what it reaches here, naming what
+the repository gains alongside what it dodges. See
+`${CLAUDE_PLUGIN_ROOT}/references/commit-conventions.md` for the
+threshold and the shape.
 
 `packageManager` and `engines` live in `package.json` but are toolchain
 pins, so they land here and never with a dependency bump. An `engines`
@@ -147,12 +156,18 @@ Open with a one-line hero (`✓ N tools across M repos` or
 1. `## Pins` — per repository, each tool's current version and target,
    and what was excluded as not pinning it or already current.
 2. `## Spans` — per tool, every release between pin and target with
-   verified links, and anything in the span worth knowing.
-3. `## Commits` — the commits made, one per tool per repository, and
+   verified links, and the headline changes each release carries.
+   Describe the intermediate releases; do not just link them.
+3. `## Impact` — per repository and per tool, what the span actually
+   reaches there: the behavior that changes underneath it, and what it
+   leaves untouched. Name gains, not only exclusions, and say how each
+   claim was checked. A span that reaches nothing gets one line saying
+   so, never an omitted section.
+4. `## Commits` — the commits made, one per tool per repository, and
    whether they were pushed.
-4. `## Verification` — the quality checks run per repository and their
+5. `## Verification` — the quality checks run per repository and their
    real results, including whether the lockfile still resolves.
-5. `## Drift` — tools pinned to different versions across the fleet, and
+6. `## Drift` — tools pinned to different versions across the fleet, and
    pins that disagree with what the repository declares it supports.
 
 End with an `AskUserQuestion` panel offering next steps — for example:

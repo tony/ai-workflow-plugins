@@ -124,6 +124,15 @@ release note describes the package; only the repository can say whether
 the change reaches it. A general claim written into a body it does not
 fit is false in that repository's history permanently.
 
+Research owes two products, and both belong in the commit rather than
+only in the session report: the headline changes across the span, named
+release by release; and what those changes reach here. Prove the
+intersection instead of asserting it — a resolver or lockfile check, a
+search for the input format a release now rejects, the test lane that
+exercises the changed code path. The proof is the difference between
+"reviewed and inert" and "assumed inert", and it is cheap enough to run
+before the plan rather than after the commit.
+
 ## Orchestration Plan
 
 Before any file is written, enter plan mode — `EnterPlanMode` in Claude
@@ -243,6 +252,15 @@ also moved forty packages.
 **Writing an inventory of package names into a bulk refresh body.** The
 lockfile diff already says it, and the noise buries the commits that
 carry real reasoning.
+
+**Leaving the intersection in the session report.** The chat scrolls
+away; `git log` does not. A body that links three releases and describes
+none of them sends the next reader back to the release notes to redo
+work that was already done once.
+
+**An impact paragraph built only from negatives.** A list of everything
+that does not apply proves the bump was safe and never says what it was
+for. Name the behavior that changed underneath the repository too.
 
 **Reporting a tree as current when it is only gated.** The cooldown
 hides fresh releases from the resolver; a discovery pass that does not

@@ -46,8 +46,32 @@ A single commit may span several releases of that one tool. When it
 does, link every release in the span, not just the endpoint — the
 intermediate ones are where the regression usually is.
 
-The body is a link block and nothing else. See `upstream-links.md` for
+A routine bump takes a link block and nothing else: a patch or minor
+inside the same series, with nothing in the span the repository
+exercises, is fully described by its links. See `upstream-links.md` for
 which URLs each tool takes.
+
+A bump takes a `why:` above that link block when any of these hold:
+
+- It crosses a major, or the vendor labels the release breaking.
+- The span changes behavior the repository exercises — a resolver
+  default, a discovery rule, a newly rejected input format.
+- It carries a security fix.
+- A newer release exists and is deliberately skipped, gated by a
+  cooldown or held back.
+
+That `why:` answers two questions and stops: what the span changes
+upstream, describing the intermediate releases rather than only linking
+them; and what those changes reach in *this* repository.
+
+Write the intersection where it survives. Analysis that lands only in
+the session report dies with the session — the commit is what a reader
+finds in `git log` two years later.
+
+Negatives alone are half a body. "Does not apply, no such files, inert"
+proves the bump is safe and says nothing about why it was worth taking.
+Name what the repository gains as concretely as what it dodges. When a
+span genuinely touches nothing here, one line saying so is the finding.
 
 ### Package manager and engines
 
@@ -208,7 +232,7 @@ what:
 - astro 7.1.1 exists but stays excluded by the 3-day release cooldown
 ```
 
-A toolchain bump, link block only:
+A routine toolchain bump, link block only:
 
 ```
 .tool-versions(just) just 1.55.1 -> 1.57.0
