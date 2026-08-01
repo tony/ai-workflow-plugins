@@ -29,6 +29,7 @@ ignore = [
     "SIM108",   # allow ternary when readable
     "C901",     # allow complex main() in CLI scripts
     "PLR0912",  # allow many branches in main()
+    "CPY001",   # licence lives in LICENSE, not a per-file header
 ]
 
 [tool.ruff.lint.pydocstyle]
