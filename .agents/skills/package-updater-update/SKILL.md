@@ -48,31 +48,31 @@ git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo "(unknown)
 Manifests, lockfiles and toolchain pins here — run this command and read the output:
 
 ```bash
-git ls-files -- 'pyproject.toml' '**/pyproject.toml' 'uv.lock' '**/uv.lock' 'poetry.lock' 'requirements*.txt' 'package.json' '**/package.json' 'pnpm-lock.yaml' 'package-lock.json' 'yarn.lock' 'Cargo.toml' 'Cargo.lock' 'go.mod' '.tool-versions' '.nvmrc' '.python-version' 'mise.toml' '.mise.toml' 2>/dev/null | grep -v node_modules | head -40 || echo "(none found)"
+out=$(git ls-files -- 'pyproject.toml' '**/pyproject.toml' 'uv.lock' '**/uv.lock' 'poetry.lock' 'requirements*.txt' 'package.json' '**/package.json' 'pnpm-lock.yaml' 'package-lock.json' 'yarn.lock' 'Cargo.toml' 'Cargo.lock' 'go.mod' '.tool-versions' '.nvmrc' '.python-version' 'mise.toml' '.mise.toml' 2>/dev/null | grep -v node_modules | head -40); if [ -n "$out" ]; then echo "$out"; else echo "(none found)"; fi
 ```
 
 Toolchain pins on this branch — run this command and read the output:
 
 ```bash
-for f in .tool-versions .nvmrc .python-version; do [ -f "$f" ] && { echo "--- $f"; cat "$f"; }; done 2>/dev/null || echo "(no toolchain pin files)"
+out=$(for f in .tool-versions .nvmrc .python-version; do [ -f "$f" ] && { echo "--- $f"; cat "$f"; }; done 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(no toolchain pin files)"; fi
 ```
 
 Package manager and engines — run this command and read the output:
 
 ```bash
-grep -hE '"(packageManager|node|npm|pnpm)"[[:space:]]*:' package.json 2>/dev/null || echo "(none declared)"
+out=$(grep -hE '"(packageManager|node|npm|pnpm)"[[:space:]]*:' package.json 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(none declared)"; fi
 ```
 
 Cooldown configuration that can hide a fresh release — run this command and read the output:
 
 ```bash
-{ grep -hi 'minimumReleaseAge\|min-release-age' pnpm-workspace.yaml .npmrc 2>/dev/null; grep -hi 'exclude-newer' uv.toml pyproject.toml "${UV_CONFIG_FILE:-$HOME/.config/uv/uv.toml}" 2>/dev/null; } || echo "(no cooldown configured)"
+out=$({ grep -hi 'minimumReleaseAge\|min-release-age' pnpm-workspace.yaml .npmrc; grep -hi 'exclude-newer' uv.toml pyproject.toml "${UV_CONFIG_FILE:-$HOME/.config/uv/uv.toml}"; } 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(no cooldown configured)"; fi
 ```
 
 Project quality checks — run this command and read the output:
 
 ```bash
-grep -hiE '^(test|lint|format|check|type-?check)[[:space:]]*:' justfile Justfile Makefile 2>/dev/null | head -12; grep -A12 '"scripts"' package.json 2>/dev/null | head -14 || echo "(read AGENTS.md/CLAUDE.md or CI for the real commands)"
+out=$({ grep -hiE '^(test|lint|format|check|type-?check)[[:space:]]*:' justfile Justfile Makefile; grep -A12 '"scripts"' package.json; } 2>/dev/null | head -26); if [ -n "$out" ]; then echo "$out"; else echo "(read AGENTS.md/CLAUDE.md or CI for the real commands)"; fi
 ```
 
 ## Procedure

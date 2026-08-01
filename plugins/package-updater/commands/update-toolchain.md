@@ -30,16 +30,16 @@ Default branch:
 `!git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo "(unknown)"`
 
 Pin files on this branch:
-`!for f in .tool-versions .nvmrc .python-version mise.toml .mise.toml; do [ -f "$f" ] && { echo "--- $f"; cat "$f"; }; done 2>/dev/null || echo "(no toolchain pin files)"`
+`!out=$(for f in .tool-versions .nvmrc .python-version mise.toml .mise.toml; do [ -f "$f" ] && { echo "--- $f"; cat "$f"; }; done 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(no toolchain pin files)"; fi`
 
 Package manager and engines:
-`!grep -hE '"(packageManager|engines|node|npm|pnpm)"[[:space:]]*:' package.json 2>/dev/null || echo "(none declared)"`
+`!out=$(grep -hE '"(packageManager|engines|node|npm|pnpm)"[[:space:]]*:' package.json 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(none declared)"; fi`
 
 What the version manager reports as outdated:
-`!command -v mise >/dev/null 2>&1 && mise outdated 2>/dev/null || echo "(mise not on PATH — resolve each tool against its own release feed)"`
+`!if ! command -v mise >/dev/null 2>&1; then echo "(mise not on PATH — resolve each tool against its own release feed)"; else out=$(mise outdated 2>&1); if [ -n "$out" ]; then echo "$out"; else echo "(mise reports nothing outdated)"; fi; fi`
 
 Installed versions, for comparison:
-`!for c in uv just node python go pnpm; do command -v "$c" >/dev/null 2>&1 && printf '%s: %s\n' "$c" "$($c --version 2>&1 | head -1)"; done 2>/dev/null || echo "(none on PATH)"`
+`!out=$(for c in uv just node python go pnpm; do command -v "$c" >/dev/null 2>&1 && printf '%s: %s\n' "$c" "$($c --version 2>&1 | head -1)"; done 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(none on PATH)"; fi`
 
 ## Procedure
 

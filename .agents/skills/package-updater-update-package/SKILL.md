@@ -44,13 +44,13 @@ git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo "(unknown)
 Manifests that could pin it — run this command and read the output:
 
 ```bash
-git ls-files -- 'pyproject.toml' '**/pyproject.toml' 'requirements*.txt' 'package.json' '**/package.json' 'Cargo.toml' 'go.mod' 2>/dev/null | grep -v node_modules | head -30 || echo "(none found)"
+out=$(git ls-files -- 'pyproject.toml' '**/pyproject.toml' 'requirements*.txt' 'package.json' '**/package.json' 'Cargo.toml' 'go.mod' 2>/dev/null | grep -v node_modules | head -30); if [ -n "$out" ]; then echo "$out"; else echo "(none found)"; fi
 ```
 
 Cooldown configuration — run this command and read the output:
 
 ```bash
-{ grep -hi 'minimumReleaseAge\|min-release-age' pnpm-workspace.yaml .npmrc 2>/dev/null; grep -hi 'exclude-newer' uv.toml pyproject.toml "${UV_CONFIG_FILE:-$HOME/.config/uv/uv.toml}" 2>/dev/null; } || echo "(no cooldown configured)"
+out=$({ grep -hi 'minimumReleaseAge\|min-release-age' pnpm-workspace.yaml .npmrc; grep -hi 'exclude-newer' uv.toml pyproject.toml "${UV_CONFIG_FILE:-$HOME/.config/uv/uv.toml}"; } 2>/dev/null); if [ -n "$out" ]; then echo "$out"; else echo "(no cooldown configured)"; fi
 ```
 
 ## Procedure

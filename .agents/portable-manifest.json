@@ -326,7 +326,7 @@
         "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 36706
+      "bytes": 36926
     },
     {
       "name": "package-updater-update-package",
@@ -339,7 +339,7 @@
         "references/follow-ups.md": "plugins/package-updater/references/follow-ups.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 31516
+      "bytes": 31604
     },
     {
       "name": "package-updater-update-toolchain",
@@ -351,7 +351,7 @@
         "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 27931
+      "bytes": 28181
     },
     {
       "name": "package-updater-updating-packages",
