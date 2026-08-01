@@ -337,9 +337,10 @@
         "references/commit-conventions.md": "plugins/package-updater/references/commit-conventions.md",
         "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
         "references/follow-ups.md": "plugins/package-updater/references/follow-ups.md",
+        "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 31604
+      "bytes": 35253
     },
     {
       "name": "package-updater-update-toolchain",
@@ -349,9 +350,10 @@
       "bundled": {
         "references/commit-conventions.md": "plugins/package-updater/references/commit-conventions.md",
         "references/ecosystems.md": "plugins/package-updater/references/ecosystems.md",
+        "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 28181
+      "bytes": 31831
     },
     {
       "name": "package-updater-updating-packages",
@@ -908,6 +910,7 @@
     "plugins/pytest-optimizer/references/output-contract.md": 5,
     "plugins/package-updater/references/commit-conventions.md": 4,
     "plugins/package-updater/references/ecosystems.md": 4,
+    "plugins/package-updater/references/repo-scope.md": 4,
     "plugins/package-updater/references/upstream-links.md": 4,
     "plugins/terraform/references/layout-discovery.md": 4,
     "plugins/terraform/references/lock-and-init.md": 4,
@@ -929,7 +932,6 @@
     "plugins/git-branch/references/rebase-toolkit.md": 2,
     "plugins/lean/references/lean-rubric.md": 2,
     "plugins/merge-pr/references/merge-readiness.md": 2,
-    "plugins/package-updater/references/repo-scope.md": 2,
     "plugins/pr/references/template-resolution.md": 2,
     "plugins/pytest-optimizer/references/durations-parsing.md": 2,
     "plugins/pytest-optimizer/references/fixture-analysis.md": 2,

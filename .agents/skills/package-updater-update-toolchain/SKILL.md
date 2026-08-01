@@ -19,8 +19,9 @@ Use the `package-updater-updating-packages` skill for the
 phase structure, and in particular
 `references/upstream-links.md`, which carries the
 per-tool link taxonomy this command depends on. Also read
-`references/commit-conventions.md` and
-`references/ecosystems.md`.
+`references/commit-conventions.md`,
+`references/ecosystems.md`, and
+`references/repo-scope.md`.
 
 For dependencies rather than tools, use the `package-updater-update` skill or
 the `package-updater-update-package` skill.
@@ -83,9 +84,10 @@ Default scope is the current repository. `--root`, `--repo` and
 `--owner` widen it as in the `package-updater-update` skill. Drop repositories
 that do not pin the tool and those already at the target.
 
-A widened scope goes through the repo-scope reference first: worktrees
-and forks are out, and a repository whose ownership is unclear is a
-question for the user, not a guess.
+A widened scope goes through
+`references/repo-scope.md` first: worktrees and
+forks are out, and a repository whose ownership is unclear is a question
+for the user, not a guess.
 
 A toolchain sweep is where pins most often disagree across a fleet.
 Record the current version per repository before changing anything; the

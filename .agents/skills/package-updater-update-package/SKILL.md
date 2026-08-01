@@ -17,6 +17,7 @@ body that says what the release means for each repository it lands in.
 
 Use the `package-updater-updating-packages` skill for the
 phase structure, and its references:
+`references/repo-scope.md`,
 `references/ecosystems.md`,
 `references/commit-conventions.md`,
 `references/upstream-links.md`, and
@@ -85,9 +86,10 @@ Default scope is the current repository. `--root`, `--repo` and
 `--owner` widen it as in the `package-updater-update` skill. Drop repositories
 that do not pin the package and those already at the target.
 
-A widened scope goes through the repo-scope reference first: worktrees
-and forks are out, and a repository whose ownership is unclear is a
-question for the user, not a guess.
+A widened scope goes through
+`references/repo-scope.md` first: worktrees and
+forks are out, and a repository whose ownership is unclear is a question
+for the user, not a guess.
 
 ### 4. Research the span once
 

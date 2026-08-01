@@ -13,8 +13,9 @@ Use `${CLAUDE_PLUGIN_ROOT}/skills/updating-packages/SKILL.md` for the
 phase structure, and in particular
 `${CLAUDE_PLUGIN_ROOT}/references/upstream-links.md`, which carries the
 per-tool link taxonomy this command depends on. Also read
-`${CLAUDE_PLUGIN_ROOT}/references/commit-conventions.md` and
-`${CLAUDE_PLUGIN_ROOT}/references/ecosystems.md`.
+`${CLAUDE_PLUGIN_ROOT}/references/commit-conventions.md`,
+`${CLAUDE_PLUGIN_ROOT}/references/ecosystems.md`, and
+`${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md`.
 
 For dependencies rather than tools, use `/package-updater:update` or
 `/package-updater:update-package`.
@@ -59,9 +60,10 @@ Default scope is the current repository. `--root`, `--repo` and
 `--owner` widen it as in `/package-updater:update`. Drop repositories
 that do not pin the tool and those already at the target.
 
-A widened scope goes through the repo-scope reference first: worktrees
-and forks are out, and a repository whose ownership is unclear is a
-question for the user, not a guess.
+A widened scope goes through
+`${CLAUDE_PLUGIN_ROOT}/references/repo-scope.md` first: worktrees and
+forks are out, and a repository whose ownership is unclear is a question
+for the user, not a guess.
 
 A toolchain sweep is where pins most often disagree across a fleet.
 Record the current version per repository before changing anything; the
