@@ -108,8 +108,10 @@ what:
 
 #### Release commits
 
-Never create tags. Never push tags. The user handles tagging and tag
-pushes (tags trigger the CI publish workflow).
+Never create or push a tag on your own initiative — tags trigger the
+CI publish workflow, so cutting one is the user's call. An explicit
+instruction in the conversation is that call, including a `--tag` or
+`--push-tag` flag; act on it without asking again.
 
 Release commit subjects are plain and short: `Tag v<version>`. Put
 the detailed why/what in the commit body. Don't use the
