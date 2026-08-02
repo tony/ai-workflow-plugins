@@ -262,7 +262,7 @@
       "bundled": {
         "references/merge-readiness.md": "plugins/merge-pr/references/merge-readiness.md"
       },
-      "bytes": 10339
+      "bytes": 10644
     },
     {
       "name": "merge-pr-this",
@@ -272,7 +272,7 @@
       "bundled": {
         "references/merge-readiness.md": "plugins/merge-pr/references/merge-readiness.md"
       },
-      "bytes": 9803
+      "bytes": 10108
     },
     {
       "name": "model-cli-agy",
@@ -518,7 +518,7 @@
       "bundled": {
         "references/release-conventions.md": "plugins/release/references/release-conventions.md"
       },
-      "bytes": 11732
+      "bytes": 12227
     },
     {
       "name": "release-cut",
@@ -528,7 +528,7 @@
       "bundled": {
         "references/release-conventions.md": "plugins/release/references/release-conventions.md"
       },
-      "bytes": 13298
+      "bytes": 14227
     },
     {
       "name": "release-update-downstream-packages",

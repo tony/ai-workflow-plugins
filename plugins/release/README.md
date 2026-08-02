@@ -47,6 +47,17 @@ Safety model — each escalation needs its own flag:
 Whatever the flags did not authorize is printed as ready-to-run
 commands, and offered interactively at the end.
 
+If your repo's AGENTS.md / CLAUDE.md reserves tagging for a human,
+scope the rule to unprompted action:
+
+> Never create or push a tag on your own initiative. An explicit
+> instruction is the user's call, including a `--tag` or `--push-tag`
+> flag; act on it without asking again.
+
+An unscoped "never create tags" reads as outranking a flag the user
+just passed, and the agent stops mid-release — commit pushed, tag
+missing, publish never triggered.
+
 ### `/release:bump [patch|minor|major|prerelease|final|<version>]` (command)
 
 Same procedure as `cut`, but discovers what "next" means first: reads

@@ -182,6 +182,15 @@ exceptions:
 - If `v<version>` already exists as a tag, stop — the version is
   taken.
 
+These rules gate what the commands do on their own initiative. A flag
+is the user authorizing that step *in this run*, not a default the
+target repo can restyle: an AGENTS.md/CLAUDE.md rule reserving tags
+for a human governs unprompted tagging and does not withdraw
+authorization the user has just given. When the two conflict the flag
+wins. If you still believe an authorized step must not run, stop
+before the release commit and say why — never cut the release and
+drop the step afterward.
+
 After the release commit, report the exact commands the user can run
 themselves for whichever steps were not authorized:
 

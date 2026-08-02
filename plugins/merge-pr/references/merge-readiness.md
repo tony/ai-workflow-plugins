@@ -103,6 +103,12 @@ found during discovery, or over anything that violates the repo's
 AGENTS.md/CLAUDE.md. If the user did not pass `--admin` and it turns
 out to be needed, ask before using it.
 
+`--admin` yields to AGENTS.md because it overrides a control the
+repository set for everyone, not because repo rules outrank flags in
+general. A flag that authorizes a step the user would otherwise run by
+hand — `/release:cut`'s `--tag` and `--push-tag` — is the user's
+decision and stands.
+
 ## After each merge
 
 1. `git checkout <trunk>` and `git pull` so the local trunk matches
