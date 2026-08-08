@@ -17,7 +17,15 @@ signature-driven detection with commits, use `/slop:scan`.
   approaches, or "no longer" behavior a released user never saw.
 - **Prose inflation** — comprehensive, robust, seamless,
   production-ready, leverage, delve, tapestry, best practices.
-- **Coded labels** — `[R1]`, `A1`, `Option B` in human-facing text.
+- **Coded labels** — `[R1]`, `A1`, `Option B`, plus ticket keys,
+  decision-record numbers, and invariant codenames (`PROJ-482`,
+  `ADR 0011`, `NB-1`) in code, comments, or an ordinary commit message.
+  Name the constraint, not its index; one line citing a record by title
+  is the ceiling. In a PR description or a merge commit they are links
+  — keep them.
+- **Over-explained code** — a comment arguing for ordinary code. Keep
+  it when it carries an invariant, a hazard, or a constraint the code
+  cannot show; otherwise a commit message carries it better.
 
 ## Preserve — do not strip
 

@@ -28,6 +28,7 @@ modify without explicit user assent on each occurrence.
 | Signature | Action | Why Tier A |
 |---|---|---|
 | `ai-slop.signatures` | remove | Exact-string match on AI-tool footers (`Generated with Claude`, `🤖`, etc.); these phrases are never legitimate in commit bodies. |
+| `ai-slop.tool-trailers` | remove | Trailer lines attributing the commit to an AI tool (`Made-with: Cursor`, `Generated-by: Claude`); the tool is not an author and the line says nothing about the change. |
 | `ai-slop.emoji-in-commit-subject` | remove | Unicode range match; emoji in subjects break terminal rendering and `git log` formatting. Project-overridable for gitmoji users via `.claude/slop.local.yml`. |
 | `brittle.commit-message-markdown-leak` | rewrite | Subject opens with markdown syntax (`**bold**`, `# heading`, `- bullet`, `[link](url)`); breaks `git log --oneline` and shell pagers. |
 | `low-value.todo-noise` | remove | Net-new `TODO: revisit` / `FIXME: later` etc. with no owner. The pattern requires the literal noise phrasings; deliberately scoped TODOs with tickets pass. |
@@ -55,6 +56,8 @@ explain when the rule is suppressed automatically.
 | `hardcoded.os-paths` | rewrite | Skip in test fixtures and example documentation. |
 | `branch-internal.rename-narrative` | rewrite | Skip when old symbol appears in trunk before branch point. Skip in `CHANGES` / `CHANGELOG` / `MIGRATION` / `UPGRADING` / `*deprecation*` files and inside `Deprecated:` / `Deprecation:` blocks. |
 | `branch-internal.diff-paraphrase` | ask | Skip when comment explains a hidden constraint rather than narrating the edit. Skip in `CHANGES` / `CHANGELOG` files where describing the change is the purpose. |
+| `jargon.internal-codes` | rewrite | Merge commits are exempt — PR and ticket references are their purpose. Skip issue trailers, the decision records themselves, and one single-line citation naming a record by title per file. |
+| `verbose.over-explained-comment` | ask | Skip invariants, protocol constraints, platform quirks, security boundaries, upstream workarounds, and public-API reference prose. Length alone never fires it. |
 | `branch-internal.phantom-fix` | ask | Skip when subject names a symptom that appears in trunk before branch point. Heuristic: only fires on `### Fix*` headings or "no longer raises/fails" phrasing in `CHANGES*` / `CHANGELOG*` / `releases/*.md` files. |
 
 ---
@@ -89,6 +92,34 @@ When applying any rule, also apply these whole-document suppressions:
 | Tone words | Tier C signals at ≥ 3 occurrences in the last 50 trunk commits — demoted to summary-only. |
 | Hardcoded test runner | When the matching manifest exists (`pyproject.toml` → `pytest` may be the actual command). |
 | Rename narrative | Symbol existed in a published release (found in `git log` before branch point), OR file is `CHANGES` / `CHANGELOG` / migration / deprecation context. |
+| Internal codes | The surface wants the reference: a merge commit, a PR description, a `Fixes:` / `Closes:` / `Refs:` trailer, or the decision record itself. |
+| Comment length | The comment carries an invariant, protocol constraint, platform quirk, security boundary, or upstream workaround, or is public-API reference prose. |
+
+---
+
+## The newcomer test
+
+Two signatures — `jargon.internal-codes` and
+`verbose.over-explained-comment` — share one question: does this land
+for an engineer who joined this week and read none of the conversation
+behind the change? Apply it to the code, its comments, and ordinary
+commit messages.
+
+`(ADR 0011 NB-1/NB-2)` in a module docstring fails: the reader cannot
+open either name. "This spawns a subprocess, so keep it off the UI
+thread" passes, and is shorter.
+
+The surface decides, not the token. A ticket key in a PR description or
+a merge commit is a link the reader follows; the same key in a
+docstring is a dead end. A PR description still has to explain itself —
+link the ticket, but never let its number stand in for the reason. When code strictly implements a written
+decision record, one line citing it by title is the ceiling — the
+reasoning lives in the record, not in every module that obeys it.
+
+The comment rule is YAGNI, not a word budget. A comment earns its line
+by carrying an invariant, a hazard, or a constraint the code cannot
+show. Justification of ordinary code belongs in the commit message,
+where a reader who wants the history goes looking.
 
 ---
 

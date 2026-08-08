@@ -32,7 +32,14 @@ to be cleaned up later.
 - Prefer prose and nested sections over tables. Reach for a table only
   when the data is genuinely matrix-shaped and stable.
 - One command per code block; keep comments outside the fence.
-- No coded rule labels (`[R1]`, `Option B`) in text a human reads.
+- Write for an engineer who joined this week. No coded labels (`[R1]`,
+  `Option B`) and no ticket keys, decision-record numbers, or invariant
+  codenames (`PROJ-482`, `ADR 0011`, `NB-1`) in code, comments, or an
+  ordinary commit message — name the constraint instead. A PR
+  description and a merge commit are where those references belong.
+- Comment only what the code cannot say: an invariant, a hazard, a
+  constraint. Justification of ordinary code belongs in the commit
+  message.
 
 ## Calibrate to the project
 
