@@ -5,7 +5,7 @@ requires-python = ">=3.12"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14",
+    "ruff>=0.16.1",
     "basedpyright>=1.37",
     "pytest>=9.0",
     "pydantic>=2.0",
