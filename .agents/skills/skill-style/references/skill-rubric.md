@@ -188,11 +188,22 @@ description competes in.
 - One `#` title. Everything under it is `##`, with `###` only where a
   section genuinely branches.
 - A heading names the step or the decision — `Resolve targets`, `When
-  the tree is dirty` — not the topic.
-- Ordered steps are a numbered list. Unordered rules are bullets.
-  Prose that is neither runs at most three lines before the next
-  heading, list, or fence.
-- One command per fence, comments outside it.
+  the tree is dirty` — not the topic. `Context`, `Details`, `Notes`,
+  `Misc`, and `Thoughts` name a container and promise nothing; an
+  agent skimming headings learns the shape of the file from them, and
+  those four teach it nothing.
+- Ordered steps are a numbered list. For anything else, apply the
+  reorder test: if the items can be resequenced without changing what
+  they mean, they are siblings and belong in bullets. If reordering
+  breaks them, they are an argument — write prose. Bulleting a causal
+  chain hides the causality that was the point.
+- State the rule before its exceptions. An agent that meets the edge
+  case first has no model to hang it on, and generalizes the exception
+  into the rule.
+- One command per fence, comments outside it. Say what the fence is
+  for before it, and what its result means after. Cutting prose that
+  restates a command is not the same as shipping a fence with nothing
+  telling the agent when to run it.
 - Prefer nested sections over tables. Repeated semantic headings diff
   and wrap cleanly; a table earns its place only when the data is
   genuinely matrix-shaped and stable.
@@ -221,6 +232,11 @@ never from inside another reference.
 
 Give a reference file longer than 100 lines a contents list at the
 top, so a partial read still shows the full scope of what is there.
+
+Each layer answers a question the one above it did not. A reference
+that restates the body in longer words is paid for twice and read
+once; it should carry the cases, the worked examples, and the
+exceptions the body only names.
 
 Name files for their content: `form-validation-rules.md`, not
 `doc2.md`. Organize by domain, so a question about sales loads the

@@ -92,12 +92,18 @@ Where a fence and its prose say the same thing, the prose goes.
 Bodies are sections, never a wall.
 
 - One `#` title, then `##` sections. A heading names the step or the
-  decision, not the topic.
-- Steps that must run in order are a numbered list; everything else is
-  prose or bullets.
+  decision, not the topic — never `Context`, `Details`, `Notes`, or
+  `Misc`.
+- Steps that must run in order are a numbered list. Otherwise ask
+  whether the items reorder without changing meaning: siblings are
+  bullets, an argument is prose.
+- State the rule before its exceptions. Exceptions first leave the
+  agent without the model they qualify.
 - Prose runs at most three lines before a heading, a list, or a fence.
 - One command per fence, `console` tag, `$ ` prefix, comments outside
   it.
+- A fence says when to run it and what its result means. Cutting prose
+  that repeats a command is not the same as shipping the fence bare.
 - Prefer nested sections over tables. A table earns its place only
   when the data is genuinely matrix-shaped.
 
