@@ -398,6 +398,19 @@
       "category": "development",
       "homepage": "https://github.com/tony/skills/tree/main/plugins/agent-messaging",
       "license": "MIT"
+    },
+    {
+      "name": "skill-style",
+      "description": "Hold SKILL.md files to a deletion test — a line stays only when its removal would change what the agent does — while frontmatter, code blocks, and sections survive verbatim.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Tony Narlock",
+        "email": "tony@git-pull.com"
+      },
+      "source": "./plugins/skill-style",
+      "category": "development",
+      "homepage": "https://github.com/tony/skills/tree/main/plugins/skill-style",
+      "license": "MIT"
     }
   ]
 }
