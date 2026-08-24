@@ -1,10 +1,10 @@
 # Verification-Gate & CI Discovery
 
-> **Lockstep note**: this file is identical to
-> the spike plugin's verification-gates reference and
-> the action plugin's verification-gates reference. When you change
-> discovery behavior in one copy, mirror the change in the others in
-> the same PR. It extends the four-bucket algorithm shared by
+> **Canonical source**: `shared-references/verification-gates.md`,
+> fanned out byte-for-byte to the `action`, `respond`, and `spike`
+> plugins by `scripts/marketplace.py shared-refs`. Edit content only
+> at the canonical path; the command regenerates every plugin copy
+> from it. This file extends the four-bucket algorithm shared by
 > the `pr-deslop` skill and the `slop-scan` skill
 > (the pr plugin's quality-gates reference) with a `build` bucket and
 > a CI-coverage pass.

@@ -10,7 +10,7 @@
         "references/ticket-detection.md": "plugins/action/references/ticket-detection.md",
         "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 27526
+      "bytes": 27560
     },
     {
       "name": "action-worktrees",
@@ -20,7 +20,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 15975
+      "bytes": 16009
     },
     {
       "name": "agent-messaging-session-relay",
@@ -462,7 +462,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/pr/references/slop-taxonomy.md"
       },
-      "bytes": 72823
+      "bytes": 74214
     },
     {
       "name": "pr-merge-commit",
@@ -626,7 +626,7 @@
         "references/screening-rubric.md": "plugins/respond/references/screening-rubric.md",
         "references/verification-gates.md": "plugins/respond/references/verification-gates.md"
       },
-      "bytes": 28165
+      "bytes": 28200
     },
     {
       "name": "respond-check",
@@ -649,7 +649,7 @@
         "references/review-agents.md": "plugins/respond/references/review-agents.md",
         "references/verification-gates.md": "plugins/respond/references/verification-gates.md"
       },
-      "bytes": 20455
+      "bytes": 20490
     },
     {
       "name": "ruff-bump",
@@ -761,7 +761,7 @@
         "references/signatures.yml": "plugins/slop/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/slop/references/slop-taxonomy.md"
       },
-      "bytes": 63701
+      "bytes": 63198
     },
     {
       "name": "spike-bakeoff",
@@ -771,7 +771,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 18811
+      "bytes": 18844
     },
     {
       "name": "spike-probe",
@@ -781,7 +781,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 17420
+      "bytes": 17453
     },
     {
       "name": "spike-ratchet",
@@ -791,7 +791,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 15322
+      "bytes": 15355
     },
     {
       "name": "tailwind-spacing-audit",
@@ -889,7 +889,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/trello.md": "plugins/ticket/references/providers/trello.md"
       },
-      "bytes": 144364
+      "bytes": 144437
     },
     {
       "name": "ticket-rebuild",
@@ -913,7 +913,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/trello.md": "plugins/ticket/references/providers/trello.md"
       },
-      "bytes": 144055
+      "bytes": 144128
     },
     {
       "name": "weave-architecture",
@@ -942,7 +942,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 115148
+      "bytes": 115221
     },
     {
       "name": "weave-brainstorm",
@@ -971,7 +971,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 127811
+      "bytes": 127884
     },
     {
       "name": "weave-execute",
@@ -1011,7 +1011,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 120731
+      "bytes": 120804
     },
     {
       "name": "weave-prompt",
@@ -1040,7 +1040,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 126563
+      "bytes": 126636
     },
     {
       "name": "weave-review",
@@ -1056,7 +1056,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 120274
+      "bytes": 120347
     },
     {
       "name": "weave-serene-bliss",
@@ -1072,7 +1072,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 111900
+      "bytes": 111973
     }
   ],
   "duplication": {

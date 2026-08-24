@@ -1,6 +1,12 @@
-# this skill slop registry — versioned, project-overridable.
+# this skill and the `slop-scan` skill slop registry — versioned, project-overridable.
 #
-# Project overrides live in `.claude/deslop.local.yml` at repo root.
+# Canonical source: shared-references/signatures.yml, fanned out
+# byte-for-byte to the pr and slop plugins by
+# `scripts/marketplace.py shared-refs`. Edit content only at the
+# canonical path; the command regenerates every plugin copy from it.
+#
+# this skill project overrides live in `.claude/deslop.local.yml`.
+# the `slop-scan` skill project overrides live in `.claude/slop.local.yml`.
 # The override file may declare top-level `replace:` / `append:` /
 # `delete:` keys (each a list of signature ids). The keys are mutually
 # disjoint per id; declaring the same id under more than one key
@@ -43,7 +49,7 @@ signatures:
     target: [message-subject]
     pattern: '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]'
     rationale: Emoji in commit subjects break terminal rendering and `git log` formatting.
-    fp-guard: 'Project-overridable for gitmoji users via `.claude/deslop.local.yml`.'
+    fp-guard: 'Project-overridable for gitmoji users via `.claude/deslop.local.yml` (this skill) or `.claude/slop.local.yml` (the `slop-scan` skill).'
 
   - id: brittle.commit-message-markdown-leak
     tier: A

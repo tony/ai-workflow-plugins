@@ -1,13 +1,9 @@
 # Quality-Gate Discovery
 
-> **Lockstep note**: the algorithm in this file is identical to
-> `plugins/pr/references/quality-gates.md`; only the
-> ownership/usage notes (which steps in which skill consume the
-> result) differ between the two copies. Both `/pr:deslop` and
-> `/slop:scan` run the same discovery algorithm and fallback rules.
-> When you change algorithm behavior in one file, mirror the change
-> in the other in the same PR. v1.1 will extract this document to a
-> shared location.
+> **Canonical source**: `shared-references/quality-gates.md`, fanned
+> out byte-for-byte to the `pr` and `slop` plugins by
+> `scripts/marketplace.py shared-refs`. Edit content only at the
+> canonical path; the command regenerates every plugin copy from it.
 
 How `/pr:deslop` and `/slop:scan` find the project's formatter,
 linter, type-checker, and test command at runtime — language-agnostic,

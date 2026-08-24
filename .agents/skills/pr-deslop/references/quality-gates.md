@@ -1,12 +1,23 @@
 # Quality-Gate Discovery
 
-How this skill finds the project's formatter, linter, type-checker,
-and test command at runtime — language-agnostic, never hardcoded.
+> **Canonical source**: `shared-references/quality-gates.md`, fanned
+> out byte-for-byte to the `pr` and `slop` plugins by
+> `scripts/marketplace.py shared-refs`. Edit content only at the
+> canonical path; the command regenerates every plugin copy from it.
 
-The skill needs four buckets resolved before Step 7 (so `apply.sh` can
-record them) and Step 11 (so the conflict loop can run them). Any
-bucket may legitimately remain `unset`; the conflict loop and final
-verification skip empty buckets.
+How this skill and the `slop-scan` skill find the project's formatter,
+linter, type-checker, and test command at runtime — language-agnostic,
+never hardcoded.
+
+The skill needs four buckets resolved before any apply step (so the
+patch driver or per-finding apply loop can record and run them). Any
+bucket may legitimately remain `unset`; downstream steps skip empty
+buckets.
+
+- this skill resolves them at Step 3 and runs them in the conflict
+  loop (Step 11) and final verification (Step 12).
+- the `slop-scan` skill resolves them at Step 3 and runs them before each
+  per-finding commit (Step 10) and at final verification (Step 11).
 
 ---
 
@@ -113,11 +124,11 @@ conflict loop and final verification become no-ops.
 After discovery, any bucket may be `unset`. This is a legitimate
 state — not all projects have all four gates. The skill must:
 
-- Skip empty buckets in the conflict loop (Step 11).
-- Skip empty buckets in final verification (Step 12).
-- Warn at Step 3 if every bucket is `unset` *and* `--apply-rebase`
-  was requested — the conflict loop will not validate any code
-  changes; the user should know before history is rewritten.
+- Skip empty buckets wherever gates run (deslop's conflict loop,
+  slop's per-commit apply loop, both skills' final verification).
+- Warn at Step 3 if every bucket is `unset` *and* the user requested
+  any mode that rewrites or commits — the gates will not validate
+  the changes; the user should know before any modification.
 
 ---
 

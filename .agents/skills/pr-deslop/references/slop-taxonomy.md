@@ -1,5 +1,10 @@
 # Slop Taxonomy
 
+> **Canonical source**: `shared-references/slop-taxonomy.md`, fanned
+> out byte-for-byte to the `pr` and `slop` plugins by
+> `scripts/marketplace.py shared-refs`. Edit content only at the
+> canonical path; the command regenerates every plugin copy from it.
+
 This catalog mirrors `signatures.yml` for human reading. Each row maps
 to one signature `id` in the registry. The registry is the source of
 truth for detection (`pattern`, `kind`, `target`) — this document
@@ -21,7 +26,7 @@ modify without explicit user assent on each occurrence.
 | Signature | Action | Why Tier A |
 |---|---|---|
 | `ai-slop.signatures` | remove | Exact-string match on AI-tool footers (`Generated with Claude`, `🤖`, etc.); these phrases are never legitimate in commit bodies. |
-| `ai-slop.emoji-in-commit-subject` | remove | Unicode range match; emoji in subjects break terminal rendering and `git log` formatting. Project-overridable for gitmoji users via `.claude/deslop.local.yml`. |
+| `ai-slop.emoji-in-commit-subject` | remove | Unicode range match; emoji in subjects break terminal rendering and `git log` formatting. Project-overridable for gitmoji users via `.claude/deslop.local.yml` (this skill) or `.claude/slop.local.yml` (the `slop-scan` skill). |
 | `brittle.commit-message-markdown-leak` | rewrite | Subject opens with markdown syntax (`**bold**`, `# heading`, `- bullet`, `[link](url)`); breaks `git log --oneline` and shell pagers. |
 | `low-value.todo-noise` | remove | Net-new `TODO: revisit` / `FIXME: later` etc. with no owner. The pattern requires the literal noise phrasings; deliberately scoped TODOs with tickets pass. |
 
@@ -117,7 +122,9 @@ Findings beyond the budget remain visible in the report's
 
 ## Project overrides
 
-Projects override the registry via `.claude/deslop.local.yml`:
+Projects override the registry per skill: this skill reads
+`.claude/deslop.local.yml`; the `slop-scan` skill reads `.claude/slop.local.yml`.
+Both accept the same schema:
 
 ```yaml
 version: 1

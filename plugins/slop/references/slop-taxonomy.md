@@ -1,11 +1,9 @@
 # Slop Taxonomy
 
-> **Lockstep note**: this catalog is a v1 byte-for-byte duplicate of
-> `plugins/pr/references/slop-taxonomy.md`. Both
-> `/pr:deslop` and `/slop:scan` read the matching signature registry,
-> and both must describe the tiers identically. When you change one
-> file, change the other in the same PR. v1.1 will extract this
-> document to a shared location.
+> **Canonical source**: `shared-references/slop-taxonomy.md`, fanned
+> out byte-for-byte to the `pr` and `slop` plugins by
+> `scripts/marketplace.py shared-refs`. Edit content only at the
+> canonical path; the command regenerates every plugin copy from it.
 
 This catalog mirrors `signatures.yml` for human reading. Each row maps
 to one signature `id` in the registry. The registry is the source of
@@ -28,7 +26,7 @@ modify without explicit user assent on each occurrence.
 | Signature | Action | Why Tier A |
 |---|---|---|
 | `ai-slop.signatures` | remove | Exact-string match on AI-tool footers (`Generated with Claude`, `🤖`, etc.); these phrases are never legitimate in commit bodies. |
-| `ai-slop.emoji-in-commit-subject` | remove | Unicode range match; emoji in subjects break terminal rendering and `git log` formatting. Project-overridable for gitmoji users via `.claude/slop.local.yml`. |
+| `ai-slop.emoji-in-commit-subject` | remove | Unicode range match; emoji in subjects break terminal rendering and `git log` formatting. Project-overridable for gitmoji users via `.claude/deslop.local.yml` (`/pr:deslop`) or `.claude/slop.local.yml` (`/slop:scan`). |
 | `brittle.commit-message-markdown-leak` | rewrite | Subject opens with markdown syntax (`**bold**`, `# heading`, `- bullet`, `[link](url)`); breaks `git log --oneline` and shell pagers. |
 | `low-value.todo-noise` | remove | Net-new `TODO: revisit` / `FIXME: later` etc. with no owner. The pattern requires the literal noise phrasings; deliberately scoped TODOs with tickets pass. |
 
@@ -124,7 +122,9 @@ Findings beyond the budget remain visible in the report's
 
 ## Project overrides
 
-Projects override the registry via `.claude/slop.local.yml`:
+Projects override the registry per skill: `/pr:deslop` reads
+`.claude/deslop.local.yml`; `/slop:scan` reads `.claude/slop.local.yml`.
+Both accept the same schema:
 
 ```yaml
 version: 1

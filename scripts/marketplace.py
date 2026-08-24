@@ -94,6 +94,30 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE_PATH = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 PLUGINS_DIR = REPO_ROOT / "plugins"
 README_PATH = REPO_ROOT / "README.md"
+SHARED_REFERENCES_DIR = REPO_ROOT / "shared-references"
+
+SHARED_REFERENCES: dict[str, tuple[str, ...]] = {
+    "verification-gates.md": ("action", "respond", "spike"),
+    "quality-gates.md": ("pr", "slop"),
+    "signatures.yml": ("pr", "slop"),
+    "slop-taxonomy.md": ("pr", "slop"),
+}
+"""Canonical reference docs fanned out to more than one plugin.
+
+Each key is a file in ``shared-references/``; each value names the plugins
+whose ``plugins/<plugin>/references/<key>`` receives a byte-identical copy.
+``shared-refs`` writes the copies; ``shared-refs --check`` fails when a copy
+has drifted from its source, so no plugin needs a hand-written note telling
+editors to update the sibling copies by hand.
+
+Only whole-file, byte-identical duplicates belong here. A basename that
+recurs across ``plugins/*/references/`` but carries plugin-specific content
+(diverged wording, a different config filename per consumer) is not a
+candidate for this table -- forcing it to match would erase the legitimate
+difference. ``fd -e md . plugins/*/references/ | xargs -n1 basename | sort |
+uniq -c | awk '$1>1'`` lists every recurring basename; only the ones that are
+still byte-identical after a manual diff should be added here.
+"""
 
 README_ROW_RE = re.compile(
     r"^\| \[(?P<name>[^\]]+)\]\(plugins/[^)]*\) \| (?P<cat>[^|]+) \| (?P<desc>.+?) \|[ \t]*\r?$",
@@ -1504,6 +1528,135 @@ def check_outdated() -> None:
         console.print("\n[yellow]Version mismatches found.[/yellow]")
     else:
         console.print("\n[green]All versions match.[/green]")
+
+
+class SharedReferenceTarget(pydantic.BaseModel):
+    """One fan-out copy: a canonical source and the plugin that receives it."""
+
+    basename: str
+    plugin: str
+    source: Path
+    dest: Path
+
+
+def _shared_reference_targets() -> list[SharedReferenceTarget]:
+    """List every (source, destination) pair ``shared-refs`` manages.
+
+    Returns
+    -------
+    list[SharedReferenceTarget]
+        One entry per plugin listed in ``SHARED_REFERENCES``, in table order.
+
+    Examples
+    --------
+    One target per (basename, plugin) pair, so the count is the total fan-out:
+
+    >>> targets = _shared_reference_targets()
+    >>> len(targets) == sum(len(p) for p in SHARED_REFERENCES.values())
+    True
+
+    Every target reads from ``shared-references/`` and writes into the
+    receiving plugin, which is what makes a copy regenerable rather than
+    hand-maintained:
+
+    >>> all(t.source == SHARED_REFERENCES_DIR / t.basename for t in targets)
+    True
+    >>> all(t.dest.parts[-3:] == (t.plugin, "references", t.basename) for t in targets)
+    True
+
+    A basename is never fanned into the same plugin twice:
+
+    >>> pairs = [(t.basename, t.plugin) for t in targets]
+    >>> len(pairs) == len(set(pairs))
+    True
+    """
+    return [
+        SharedReferenceTarget(
+            basename=basename,
+            plugin=plugin,
+            source=SHARED_REFERENCES_DIR / basename,
+            dest=PLUGINS_DIR / plugin / "references" / basename,
+        )
+        for basename, plugins in SHARED_REFERENCES.items()
+        for plugin in plugins
+    ]
+
+
+@app.command(name="shared-refs")
+def shared_refs(*, check: bool = False) -> None:
+    """Fan out canonical reference docs to the plugins that consume them.
+
+    Each entry in ``SHARED_REFERENCES`` names a file under
+    ``shared-references/`` and the plugins whose ``references/`` directory
+    gets a byte-identical copy, so every plugin stays installable alone
+    while only one place needs an edit.
+
+    Parameters
+    ----------
+    check : bool
+        If True, verify every fanned-out copy still matches its source and
+        exit 1 on the first drift instead of writing anything (for CI).
+
+    Examples
+    --------
+    >>> import subprocess
+    >>> result = subprocess.run(
+    ...     ["python", "scripts/marketplace.py", "shared-refs", "--check"],
+    ...     capture_output=True,
+    ...     text=True,
+    ...     cwd=REPO_ROOT,
+    ... )
+    >>> result.returncode == 0  # 0 means every copy matches its source
+    True
+    """
+    targets = _shared_reference_targets()
+    errors: list[str] = []
+
+    for target in targets:
+        if not target.source.is_file():
+            missing = (
+                f"shared-refs: canonical source '{PrivatePath(target.source)}' is missing"
+                f" (needed for {PrivatePath(target.dest)})"
+            )
+            errors.append(missing)
+            continue
+        content = target.source.read_bytes()
+        if not check:
+            target.dest.parent.mkdir(parents=True, exist_ok=True)
+            _ = target.dest.write_bytes(content)
+            continue
+        if not target.dest.is_file():
+            absent = (
+                f"shared-refs: '{PrivatePath(target.dest)}' is missing"
+                " (run 'shared-refs' to generate it)"
+            )
+            errors.append(absent)
+        elif target.dest.read_bytes() != content:
+            drifted = (
+                f"shared-refs: '{PrivatePath(target.dest)}' has drifted from"
+                f" '{PrivatePath(target.source)}' (run 'shared-refs' to refresh it)"
+            )
+            errors.append(drifted)
+
+    if not check:
+        basenames = len(SHARED_REFERENCES)
+        wrote = (
+            f"[green]Wrote {len(targets)} fanned-out cop{'y' if len(targets) == 1 else 'ies'}"
+            f" from {basenames} canonical source{'s' if basenames != 1 else ''}.[/green]"
+        )
+        console.print(wrote)
+        return
+
+    if errors:
+        for error in errors:
+            console.print(f"[red]Error:[/red] {rich.markup.escape(error)}")
+        console.print(f"\n[red bold]{len(errors)} error(s) found.[/red bold]")
+        raise SystemExit(1)
+    clean = (
+        f"[green bold]0 errors found.[/green bold] {len(targets)} fanned-out"
+        " copies match their source."
+    )
+    console.print(clean)
 
 
 AGENTS_DIR = REPO_ROOT / ".agents"
