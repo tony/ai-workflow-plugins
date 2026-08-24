@@ -739,6 +739,18 @@
       "bytes": 10114
     },
     {
+      "name": "skill-style",
+      "sources": [
+        "plugins/skill-style/skills/skill-style/SKILL.md"
+      ],
+      "bundled": {
+        "references/example-bloated.md": "plugins/skill-style/references/example-bloated.md",
+        "references/example-ideal.md": "plugins/skill-style/references/example-ideal.md",
+        "references/skill-rubric.md": "plugins/skill-style/references/skill-rubric.md"
+      },
+      "bytes": 29479
+    },
+    {
       "name": "slop-scan",
       "sources": [
         "plugins/slop/skills/scan/SKILL.md"
@@ -1161,6 +1173,9 @@
     "plugins/self-improvement/references/detecting-invocations.md": 1,
     "plugins/self-improvement/references/worked-example-spike.md": 1,
     "plugins/situate/references/goal-derivation.md": 1,
+    "plugins/skill-style/references/example-bloated.md": 1,
+    "plugins/skill-style/references/example-ideal.md": 1,
+    "plugins/skill-style/references/skill-rubric.md": 1,
     "plugins/slop/references/commit-template.md": 1,
     "plugins/slop/references/quality-gates.md": 1,
     "plugins/slop/references/slop-taxonomy.md": 1,

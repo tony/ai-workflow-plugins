@@ -1,0 +1,18 @@
+{
+  "skill_name": "skill-style",
+  "trigger": {
+    "positive": [
+      { "prompt": "this SKILL.md is bloated, cut the lines that don't change what the agent does", "top_k": 3 },
+      { "prompt": "review my skill and tell me if the frontmatter description will ever trigger", "top_k": 3 },
+      { "prompt": "why does my skill never fire when I ask for it", "top_k": 3 },
+      { "prompt": "audit every SKILL.md in this plugin against skill authoring best practices", "top_k": 3 },
+      { "prompt": "help me write a SKILL.md with a good name and description", "top_k": 3 }
+    ],
+    "negative": [
+      { "prompt": "keep this commit message tight, no filler and no story of what I tried", "owner": "lean-writing" },
+      { "prompt": "these docstrings are way too long, trim them down", "owner": "trim-comments" },
+      { "prompt": "make sure this issue body renders right on GitHub with the links pinned", "owner": "rendered-markdown" },
+      { "prompt": "he has a real skill for making pasta" }
+    ]
+  }
+}
