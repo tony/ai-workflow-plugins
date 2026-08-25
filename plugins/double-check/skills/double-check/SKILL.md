@@ -1,6 +1,7 @@
 ---
 name: double-check
 description: "Use when asked “are you sure/certain” or “I don't trust that”; recheck code/files from source and repeat prior analysis in full, not just changes."
+user-invocable: true
 ---
 
 # Double-check

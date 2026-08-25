@@ -1,6 +1,7 @@
 ---
 name: rendered-markdown
 description: "Use when Markdown must render: never hard-wrap issue-body paragraphs; fix GitHub code fences, fold logs into details, and pin source links to tags."
+allowed-tools: ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"]
 ---
 
 # Rendered markdown

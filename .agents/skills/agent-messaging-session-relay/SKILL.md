@@ -4,6 +4,7 @@ description: >-
   Use when sending a message to another Codex/Claude session or telling an
   agent in another tmux pane a status, finding, instruction, or schema
   change.
+allowed-tools: ["Bash", "Read", "Grep", "ListAgents", "SendMessage"]
 metadata:
   source: "plugins/agent-messaging/skills/session-relay/SKILL.md"
 ---

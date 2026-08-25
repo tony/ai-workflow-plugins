@@ -1,6 +1,7 @@
 ---
 name: situational-awareness
 description: "Use when you came back to branch/PR: bring me up to speed on repo state before work, where work left off, and what reviewers ask or PR waits on."
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
 ---
 
 # Situational awareness

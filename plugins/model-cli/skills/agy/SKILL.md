@@ -1,6 +1,9 @@
 ---
 name: agy
 description: "Use when delegating to Google Gemini or Antigravity for a second opinion from Google's model; falls back through Gemini and agent CLIs."
+user-invocable: true
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
+argument-hint: <prompt> [timeout:<seconds>]
 ---
 
 # Antigravity (agy) CLI Skill

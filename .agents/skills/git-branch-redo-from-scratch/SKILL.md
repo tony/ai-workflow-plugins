@@ -3,7 +3,9 @@ name: git-branch-redo-from-scratch
 description: >-
   Use when a branch or proof of concept should be redone from scratch: throw
   away the approach, start implementation over, and treat tests as the spec.
+allowed-tools: ["Bash", "Read", "Write", "Edit", "Grep", "Glob", "AskUserQuestion", "WebFetch"]
 metadata:
+  argument-hint: "[PR number, branch, or what should change about the approach]"
   source: "plugins/git-branch/skills/redo-from-scratch/SKILL.md"
 ---
 

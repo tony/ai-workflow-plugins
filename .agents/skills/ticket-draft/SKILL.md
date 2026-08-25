@@ -3,7 +3,9 @@ name: ticket-draft
 description: >-
   Use when asked to file a Linear issue or regression, draft a Jira epic,
   open a GitLab issue, or create a Shortcut story or tracker document.
+allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 metadata:
+  argument-hint: "[description, URL, provider, or pasted finding]"
   source: "plugins/ticket/skills/draft/SKILL.md"
 ---
 

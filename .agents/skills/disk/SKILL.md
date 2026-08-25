@@ -3,6 +3,7 @@ name: disk
 description: >-
   Use when disk space is low; find large directories, free space, decide if
   Claude sessions or npm cache are safe to remove, or shrink WSL.
+allowed-tools: "Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion, TodoWrite"
 metadata:
   source: "plugins/disk/skills/disk/SKILL.md"
 ---

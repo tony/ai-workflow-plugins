@@ -3,6 +3,7 @@ name: situate-brief
 description: >-
   Use when confusion is only “huh,” “wait, what,” “sorry, you lost me,” or
   “slow down; explain simply and keep it short.”
+allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 metadata:
   source: "plugins/situate/skills/brief/SKILL.md"
 ---

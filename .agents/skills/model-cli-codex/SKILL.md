@@ -3,7 +3,9 @@ name: model-cli-codex
 description: >-
   Use when asked to use Codex, GPT, OpenAI's model, or the Codex CLI to
   delegate a task; falls back to the GPT agent when needed.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 metadata:
+  argument-hint: "<prompt> [timeout:<seconds>]"
   source: "plugins/model-cli/skills/codex/SKILL.md"
 ---
 

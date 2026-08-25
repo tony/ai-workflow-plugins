@@ -500,6 +500,8 @@ into a project's `.claude/agents/` or a user's `~/.claude/agents/`.
 - `name` (required here) — skill display name; upstream it defaults to
   the directory name, but this repo's gates expect it written out
 - `description` (required here) — when and how to invoke the skill
+- `argument-hint` (required when the body consumes `$ARGUMENTS`) — placeholder
+  Claude shows when the user invokes the skill
 - `allowed-tools` (optional) — tools usable without a permission prompt;
   space- or comma-separated string, or a YAML list
 - `disallowed-tools` (optional) — tools removed while the skill is active

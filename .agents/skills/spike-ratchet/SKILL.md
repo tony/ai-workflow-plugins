@@ -3,7 +3,9 @@ name: spike-ratchet
 description: >-
   Use when asked to spike, bake off, then spike again; rinse and repeat,
   keep spiking, converge on a design, and stop when nothing new fights back.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 metadata:
+  argument-hint: "[<goal>] [--rounds=<n>] [--replay]"
   source: "plugins/spike/skills/ratchet/SKILL.md"
 ---
 

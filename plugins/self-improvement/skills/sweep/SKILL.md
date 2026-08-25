@@ -1,6 +1,9 @@
 ---
 name: sweep
 description: "Use when mining prompt history to rank skill usage, count invocations, find never-invoked skills, sweep the corpus, or improve repeated instructions."
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
+argument-hint: "[<plugin|plugin:skill>...]"
+user-invocable: true
 ---
 
 

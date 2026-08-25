@@ -1,6 +1,9 @@
 ---
 name: codex
 description: "Use when asked to use Codex, GPT, OpenAI's model, or the Codex CLI to delegate a task; falls back to the GPT agent when needed."
+user-invocable: true
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
+argument-hint: <prompt> [timeout:<seconds>]
 ---
 
 # Codex CLI Skill

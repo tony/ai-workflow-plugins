@@ -4,7 +4,9 @@ description: >-
   Use when screening or replying to pull-request review comments and bot
   findings; decide if each comment is real, worth fixing, deferred, or
   declined.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion", "Task"]
 metadata:
+  argument-hint: "[findings text] [--pr=<num>] [--base=<ref>] [--include-resolved]"
   source: "plugins/respond/skills/check/SKILL.md"
 ---
 

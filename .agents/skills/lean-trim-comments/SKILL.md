@@ -3,7 +3,9 @@ name: lean-trim-comments
 description: >-
   Use when existing source comments or docstrings are bloated, dense,
   repetitive, AI slop, or should be trimmed, debloated, and kept light.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 metadata:
+  argument-hint: "[paths/globs] [--staged] [--all] [--diff-only]"
   source: "plugins/lean/skills/trim-comments/SKILL.md"
 ---
 

@@ -3,7 +3,9 @@ name: model-cli-agy
 description: >-
   Use when delegating to Google Gemini or Antigravity for a second opinion
   from Google's model; falls back through Gemini and agent CLIs.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 metadata:
+  argument-hint: "<prompt> [timeout:<seconds>]"
   source: "plugins/model-cli/skills/agy/SKILL.md"
 ---
 

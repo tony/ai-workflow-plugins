@@ -1,6 +1,8 @@
 ---
 name: lean-writing
 description: "Use when commit messages or prose must stay tight: cut filler, padding, preamble, AI fluff, and stories of attempts; lead with current results."
+user-invocable: true
+allowed-tools: ["Read", "Grep", "Glob"]
 ---
 
 # Lean writing

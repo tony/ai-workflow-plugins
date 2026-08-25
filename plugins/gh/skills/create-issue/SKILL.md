@@ -2,6 +2,7 @@
 name: create-issue
 description: "Use when filing a GitHub issue for a bug, feature, audit, review finding, or investigated piece of work."
 user-invocable: true
+argument-hint: "[description, repository, or pasted finding]"
 allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 ---
 

@@ -3,7 +3,9 @@ name: research-study-deps
 description: >-
   Use when pulling upstream source or cloning a dependency at its installed
   version to study internals, read code, or create pinned worktrees.
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "WebSearch", "AskUserQuestion"]
 metadata:
+  argument-hint: "<package-name|\"all\"|category> [--lang <language>] [--no-worktree]"
   source: "plugins/research/skills/deps/SKILL.md"
 ---
 

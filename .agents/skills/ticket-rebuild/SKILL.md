@@ -4,7 +4,9 @@ description: >-
   Use when rebuilding a bloated tracker item whose epic or Jira ticket
   hard-codes implementation, restates a spec, or cites counts and line
   numbers.
+allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 metadata:
+  argument-hint: "[URL or identifier]"
   source: "plugins/ticket/skills/rebuild/SKILL.md"
 ---
 

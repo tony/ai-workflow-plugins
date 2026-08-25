@@ -3,6 +3,7 @@ name: gh-rendered-markdown
 description: >-
   Use when Markdown must render: never hard-wrap issue-body paragraphs; fix
   GitHub code fences, fold logs into details, and pin source links to tags.
+allowed-tools: ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"]
 metadata:
   source: "plugins/gh/skills/rendered-markdown/SKILL.md"
 ---

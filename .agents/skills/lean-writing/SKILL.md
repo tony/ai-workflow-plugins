@@ -3,6 +3,7 @@ name: lean-writing
 description: >-
   Use when commit messages or prose must stay tight: cut filler, padding,
   preamble, AI fluff, and stories of attempts; lead with current results.
+allowed-tools: ["Read", "Grep", "Glob"]
 metadata:
   source: "plugins/lean/skills/lean-writing/SKILL.md"
 ---

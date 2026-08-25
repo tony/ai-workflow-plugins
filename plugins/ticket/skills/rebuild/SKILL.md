@@ -1,6 +1,9 @@
 ---
 name: rebuild
 description: "Use when rebuilding a bloated tracker item whose epic or Jira ticket hard-codes implementation, restates a spec, or cites counts and line numbers."
+user-invocable: true
+argument-hint: "[URL or identifier]"
+allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 ---
 
 # Rebuild a ticket

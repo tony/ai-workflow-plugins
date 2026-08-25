@@ -1,6 +1,9 @@
 ---
 name: cursor
 description: "Use when asked to use Cursor, Cursor's CLI, or the agent binary to delegate a prompt or task; no fallback is available."
+user-invocable: true
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
+argument-hint: <prompt> [timeout:<seconds>]
 ---
 
 # Cursor Agent CLI Skill

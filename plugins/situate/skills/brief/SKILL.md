@@ -1,6 +1,7 @@
 ---
 name: brief
 description: "Use when confusion is only “huh,” “wait, what,” “sorry, you lost me,” or “slow down; explain simply and keep it short.”"
+allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 ---
 
 # Brief

@@ -5,6 +5,7 @@ description: >-
   or investigated piece of work.
 allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 metadata:
+  argument-hint: "[description, repository, or pasted finding]"
   source: "plugins/gh/skills/create-issue/SKILL.md"
 ---
 

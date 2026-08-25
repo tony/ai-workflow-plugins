@@ -32,7 +32,7 @@
         "references/claude-code.md": "plugins/agent-messaging/references/agents/claude-code.md",
         "references/codex.md": "plugins/agent-messaging/references/agents/codex.md"
       },
-      "bytes": 38357
+      "bytes": 38426
     },
     {
       "name": "business-case-study-internal",
@@ -156,7 +156,7 @@
         "references/study-repos.md": "plugins/disk/references/study-repos.md",
         "references/virtual-disks.md": "plugins/disk/references/virtual-disks.md"
       },
-      "bytes": 29373
+      "bytes": 29454
     },
     {
       "name": "disk-reclaim",
@@ -218,7 +218,7 @@
         "references/rendered-markdown.md": "plugins/gh/references/rendered-markdown.md",
         "references/source-links.md": "plugins/gh/references/source-links.md"
       },
-      "bytes": 32271
+      "bytes": 32335
     },
     {
       "name": "gh-rendered-markdown",
@@ -229,7 +229,7 @@
         "references/rendered-markdown.md": "plugins/gh/references/rendered-markdown.md",
         "references/source-links.md": "plugins/gh/references/source-links.md"
       },
-      "bytes": 20427
+      "bytes": 20500
     },
     {
       "name": "git-branch-redo-from-scratch",
@@ -243,7 +243,7 @@
         "references/rebase-toolkit.md": "plugins/git-branch/references/rebase-toolkit.md",
         "references/rebuild-contract.md": "plugins/git-branch/references/rebuild-contract.md"
       },
-      "bytes": 37939
+      "bytes": 38116
     },
     {
       "name": "git-branch-soft-reset-and-recommit",
@@ -310,7 +310,7 @@
       "bundled": {
         "references/comment-policy.md": "plugins/lean/references/comment-policy.md"
       },
-      "bytes": 10211
+      "bytes": 10352
     },
     {
       "name": "lean-writing",
@@ -321,7 +321,7 @@
         "references/comment-policy.md": "plugins/lean/references/comment-policy.md",
         "references/lean-rubric.md": "plugins/lean/references/lean-rubric.md"
       },
-      "bytes": 10720
+      "bytes": 10760
     },
     {
       "name": "merge-pr-multiple",
@@ -349,7 +349,7 @@
         "plugins/model-cli/skills/agy/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 5972
+      "bytes": 6085
     },
     {
       "name": "model-cli-codex",
@@ -357,7 +357,7 @@
         "plugins/model-cli/skills/codex/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 4760
+      "bytes": 4873
     },
     {
       "name": "model-cli-cursor",
@@ -365,7 +365,7 @@
         "plugins/model-cli/skills/cursor/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 3227
+      "bytes": 3340
     },
     {
       "name": "model-cli-gemini",
@@ -614,7 +614,7 @@
         "plugins/research/skills/deps/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 7982
+      "bytes": 8149
     },
     {
       "name": "respond-action",
@@ -637,7 +637,7 @@
         "references/feedback-sources.md": "plugins/respond/references/feedback-sources.md",
         "references/screening-rubric.md": "plugins/respond/references/screening-rubric.md"
       },
-      "bytes": 20243
+      "bytes": 20402
     },
     {
       "name": "respond-goal",
@@ -683,7 +683,7 @@
         "references/detecting-invocations.md": "plugins/self-improvement/references/detecting-invocations.md",
         "references/worked-example-spike.md": "plugins/self-improvement/references/worked-example-spike.md"
       },
-      "bytes": 48405
+      "bytes": 48518
     },
     {
       "name": "situate",
@@ -704,7 +704,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 9231
+      "bytes": 9279
     },
     {
       "name": "situate-refocus",
@@ -726,7 +726,7 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 15762
+      "bytes": 15829
     },
     {
       "name": "situate-what",
@@ -791,7 +791,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 14567
+      "bytes": 14713
     },
     {
       "name": "tailwind-spacing-audit",
@@ -889,7 +889,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/trello.md": "plugins/ticket/references/providers/trello.md"
       },
-      "bytes": 143729
+      "bytes": 143897
     },
     {
       "name": "ticket-rebuild",
@@ -913,7 +913,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/trello.md": "plugins/ticket/references/providers/trello.md"
       },
-      "bytes": 143447
+      "bytes": 143587
     },
     {
       "name": "weave-architecture",
@@ -971,7 +971,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 127315
+      "bytes": 127625
     },
     {
       "name": "weave-execute",
@@ -1040,7 +1040,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 126109
+      "bytes": 126398
     },
     {
       "name": "weave-review",

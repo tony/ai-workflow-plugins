@@ -1,6 +1,9 @@
 ---
 name: brainstorm-and-refine
 description: "Use when asked to brainstorm then refine, generate ideas then improve, or explore alternatives and synthesize the best one across passes."
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
+argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
+user-invocable: true
 ---
 
 
