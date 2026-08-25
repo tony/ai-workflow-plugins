@@ -1,20 +1,6 @@
 ---
 name: bakeoff
-description: >-
-  Use when the user wants to try 2–4 different strategies for the
-  same goal in parallel and pick a winner — a bakeoff, arena,
-  tournament, gauntlet, shootout, or head-to-head where each
-  contender is built for real in its own git worktree, adversarially
-  judged, and none of it lands as commits. Triggers on phrases like
-  "bakeoff", "bake off two approaches", "arena them", "run the
-  gauntlet", "hold a tournament", "fan out different approaches",
-  "try it three different ways", "competing implementations",
-  "head-to-head", or "which approach wins". Varies the strategy, not
-  the model — for running one prompt across different AI models
-  (Claude, Antigravity, GPT), use the weave plugin instead. Ends
-  with every contender stashed with a recovery SHA, a judged
-  verdict, and a commit-by-commit plan to land the winner through
-  the project's quality gates.
+description: "Use when building two to four competing strategies in isolated git worktrees to compare them without landing commits."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<goal>] [--strategies=\"a; b; c\"] [--prongs=<2-4>] [--keep-trees] [--replay]"
 user-invocable: true

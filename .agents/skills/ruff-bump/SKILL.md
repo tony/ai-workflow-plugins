@@ -1,9 +1,8 @@
 ---
 name: ruff-bump
 description: >-
-  Move one repo or a whole fleet onto a new ruff release — predict which
-  rules can fire against each repo's own select list, gate on the resolver
-  seeing the version, then land one reviewed commit per rule
+  Use when upgrading Ruff in one repository or a fleet and evaluating newly
+  applicable rules before committing each change.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 metadata:

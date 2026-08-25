@@ -1,9 +1,8 @@
 ---
 name: github-actions-update-actions
 description: >-
-  Audit every GitHub Action across one repo or a whole fleet and update the
-  out-of-date ones — one researched commit per action, then close
-  dependabot's PRs by citing them
+  Use when updating every outdated GitHub Action across one repository or a
+  fleet, one researched change at a time.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 metadata:

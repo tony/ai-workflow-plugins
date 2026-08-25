@@ -1,17 +1,12 @@
 ---
 name: ticket-rebuild
 description: >-
-  Use when an existing Linear, Jira, GitLab, Shortcut, Azure DevOps, Trello,
-  Asana, or GitHub item needs rebuilding rather than editing — one that grew
-  into a design document, one whose description restates a spec it links to,
-  one whose definition of done hard-codes the implementation, or one padded
-  with insertion counts, line numbers, and links that have rotted. Fetches
-  the live item, keeps provenance that cannot be re-derived, relocates depth
-  into a document instead of deleting it, converts a done-checklist into
-  invariants plus non-binding intent, shows a diff, and rewrites in place
-  only on approval. Operates on one item at a time.
+  Use when rebuilding a bloated tracker item whose epic or Jira ticket
+  hard-codes implementation, restates a spec, or cites counts and line
+  numbers.
 allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 metadata:
+  argument-hint: "[URL or identifier]"
   source: "plugins/ticket/skills/rebuild/SKILL.md"
 ---
 

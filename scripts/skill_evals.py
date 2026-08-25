@@ -64,7 +64,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 PLUGINS_DIR = REPO_ROOT / "plugins"
 CASES_DIR = REPO_ROOT / "evals" / "cases"
 
-MAX_DESCRIPTION_CHARS = 1024
+MAX_DESCRIPTION_CHARS = 150
 """Hosts inject the description into the system prompt; keep it bounded."""
 
 COLLISION_WARN = 0.5
@@ -246,7 +246,7 @@ def lint_description(skill: SkillDoc) -> list[str]:
 
     Examples
     --------
-    >>> lint_description(SkillDoc("demo", "Use when x. " + "y" * 1100))[0][:20]
+    >>> lint_description(SkillDoc("demo", "Use when x. " + "y" * 150))[0][:20]
     'demo: description is'
     """
     problems: list[str] = []

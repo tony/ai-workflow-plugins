@@ -1,13 +1,8 @@
 ---
 name: lean-tighten
 description: >-
-  Use to tighten specified files (or a pasted draft) in the working tree —
-  remove AI slop, verbose prose, brittle references, and low-value noise —
-  editing in place and printing a diff, with no commits. Triggers on
-  "tighten these files", "trim the slop from", "make this leaner", or
-  "deslop this draft in place". For repo-wide commit-per-finding cleanup use
-  the `slop-scan` skill; for branch commit cleanup use the `pr-deslop`
-  skill.
+  Use when tightening named files or pasted text in place by removing
+  verbose prose, brittle references, and low-value noise.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 metadata:

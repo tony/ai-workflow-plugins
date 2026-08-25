@@ -1,14 +1,8 @@
 ---
 name: git-branch-redo-from-scratch
 description: >-
-  Use when a branch's code works but its implementation should be replaced
-  from scratch rather than tidied — a proof of concept that became the real
-  thing, an approach found halfway through that the earlier code does not
-  reflect, or a structure that fights the problem. Studies the branch into a
-  coverage ledger, treats its tests as the specification, reimplements from
-  those requirements instead of copying the old code, then reconciles the
-  result against the ledger entry by entry. The net change may legitimately
-  differ from the original, which is kept as reference and fallback.
+  Use when a branch or proof of concept should be redone from scratch: throw
+  away the approach, start implementation over, and treat tests as the spec.
 allowed-tools: ["Bash", "Read", "Write", "Edit", "Grep", "Glob", "AskUserQuestion", "WebFetch"]
 metadata:
   argument-hint: "[PR number, branch, or what should change about the approach]"

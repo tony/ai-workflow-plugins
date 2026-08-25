@@ -1,12 +1,9 @@
 ---
 name: self-improvement-sweep
 description: >-
-  Use to measure how a skill catalog is actually invoked: mine local agent
-  prompt history with agentgrep for per-skill invocation counts across hosts
-  and projects, plus the arguments recorded alongside them. Triggers on
-  "sweep the corpus", "mine my prompt history", "rank my skills by usage",
-  or "which skills never get invoked". Reports usage evidence; edits
-  nothing.
+  Use when mining prompt history to rank skill usage, count invocations,
+  find never-invoked skills, sweep the corpus, or improve repeated
+  instructions.
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
 metadata:
   argument-hint: "[<plugin|plugin:skill>...]"

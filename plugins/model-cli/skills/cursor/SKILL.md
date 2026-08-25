@@ -1,10 +1,6 @@
 ---
 name: cursor
-description: >
-  Delegate a task to Cursor's agent CLI. Use this skill when the user explicitly
-  asks to use Cursor or the agent CLI for a task, or when you determine that
-  Cursor's agent would provide better results for a specific task. Requires the
-  agent binary — there is no fallback for this skill.
+description: "Use when asked to use Cursor, Cursor's CLI, or the agent binary to delegate a prompt or task; no fallback is available."
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 argument-hint: <prompt> [timeout:<seconds>]

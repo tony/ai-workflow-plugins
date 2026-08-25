@@ -1,17 +1,6 @@
 ---
 name: ratchet
-description: >-
-  Use when one spike will not settle a design and the work needs
-  repeated contact with real code — probe, bake off the approaches the
-  probe's stumbling blocks put in doubt, graft the runners-up, probe
-  again, and stop when nothing new fights back. Triggers on phrases
-  like "rinse and repeat", "spike then bakeoff then spike again",
-  "keep spiking until it's right", "iterate until the design settles",
-  "converge on an approach", "prove it out then rewrite it from
-  scratch", or a port or rewrite whose shape is not yet known. Keeps a
-  ledger of stumbling blocks and locked decisions outside the working
-  tree, produces zero commits across every round, and ends by handing
-  that ledger to a clean rewrite or to a commit-by-commit landing plan.
+description: "Use when asked to spike, bake off, then spike again; rinse and repeat, keep spiking, converge on a design, and stop when nothing new fights back."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<goal>] [--rounds=<n>] [--replay]"
 user-invocable: true

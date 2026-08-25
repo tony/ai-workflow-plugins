@@ -1,14 +1,6 @@
 ---
 name: apply
-description: >-
-  Use after `/self-improvement:sweep` to land the findings it accepted
-  — turning usage evidence into skill edits, one gated commit per
-  finding. Triggers on phrases like "apply the sweep", "land those
-  findings", "make those the defaults", "act on the usage evidence",
-  or "implement what the sweep found". Edits SKILL.md files, so it is
-  invoked by name only. Every description edit is gated on the
-  catalog's own routing checks, and every commit on the project's
-  quality gates.
+description: "Use when applying accepted self-improvement sweep findings to skills as individually gated edits and commits."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<finding id>...] [--dry-run]"
 user-invocable: true

@@ -1,14 +1,8 @@
 ---
 name: gh-rendered-markdown
 description: >-
-  Use when writing anything a renderer will show a human — a GitHub issue,
-  pull request, discussion or review-comment body, release notes, a tracker
-  ticket, or a repository markdown file. Governs the markup that decides
-  whether it renders and the links that decide whether it survives: never
-  hard-wrap a comment body, backtick every symbol, pin source links to a tag
-  or a 7-character commit, one shell command per fence, long output folded
-  into `<details>`, nested sections instead of tables, and no local paths or
-  PII. Guidance only; it never edits files on its own.
+  Use when Markdown must render: never hard-wrap issue-body paragraphs; fix
+  GitHub code fences, fold logs into details, and pin source links to tags.
 allowed-tools: ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"]
 metadata:
   source: "plugins/gh/skills/rendered-markdown/SKILL.md"

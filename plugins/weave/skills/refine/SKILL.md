@@ -1,10 +1,6 @@
 ---
 name: refine
-description: >-
-  Use when the user has an existing draft, text, code, or artifact and wants
-  it iteratively improved through independent adversarial critique and weaving
-  across multiple passes. Triggers on phrases like "refine this", "improve
-  this", "make this better", "iterate on this", or "polish this"
+description: "Use when asked to refine a draft, iterate on code until cleaner, or polish a README through repeated critique and improvement."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<text or file path> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
 user-invocable: true

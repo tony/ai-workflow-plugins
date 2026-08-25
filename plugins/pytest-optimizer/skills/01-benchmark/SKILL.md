@@ -1,14 +1,6 @@
 ---
 name: 01-benchmark
-description: >-
-  Phase 2 of the pytest-optimizer pipeline. Test each hypothesis from 00-scan in
-  isolation on a throwaway working copy and re-measure its wall-clock delta
-  against the project's noise band. Runs the safety gates (order independence,
-  collection determinism, green re-run) per candidate, rejects anything within
-  noise or failing a gate, and records the measured delta, confidence, and
-  observed risk to benchmarks.json. Never mutates committed history. Idempotent
-  per hypothesis id. Use after 00-scan to find out which proposed speedups are
-  real.
+description: "Use when benchmarking pytest optimization hypotheses from 00-scan in isolation to identify speedups that beat measured noise."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit", "AskUserQuestion"]
 argument-hint: "[--only=<heuristic-id>] [--runs=N] [--force] [--memory-dir=<path>]"
 user-invocable: true

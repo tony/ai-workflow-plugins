@@ -1,14 +1,8 @@
 ---
 name: pytest-optimizer-03-execute
 description: >-
-  Phase 4 of the pytest-optimizer pipeline. Apply each approved speedup from
-  plan.json as its own commit and verify green. Iterates the plan in order:
-  apply one change, run the project quality checks and test suite, and on
-  success commit it alone with the drafted why/what message; on failure,
-  revert that change and mark it skipped, then continue. Checkpoints after
-  every item to execution-log.json and resumes from the last applied index,
-  so it is crash-safe and idempotent. Refuses to run on a dirty tree. Use
-  after 02-plan to land the speedups as separate, verified commits.
+  Use when applying an approved pytest optimization plan as separate
+  verified commits with resumable progress.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit", "AskUserQuestion"]
 metadata:

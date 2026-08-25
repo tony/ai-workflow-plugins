@@ -168,6 +168,20 @@ def _parse_frontmatter(path: Path) -> dict[str, t.Any]:
     return parsed
 
 
+def _assert_arguments_have_hint(path: Path, fm: dict[str, t.Any]) -> None:
+    """Require Claude's invocation hint when a skill consumes arguments."""
+    text = path.read_text(encoding="utf-8")
+    body = text.split("\n---\n", maxsplit=1)[-1]
+    if "$ARGUMENTS" not in body:
+        return
+    hint = fm.get("argument-hint")
+    rel = path.relative_to(REPO_ROOT)
+    _assert(
+        isinstance(hint, str) and bool(hint.strip()),
+        f"{rel}: skill consumes $ARGUMENTS but has no argument-hint",
+    )
+
+
 def _test_static_frontmatter() -> list[TestCase]:
     """Verify skill frontmatter has required fields and bare tool names.
 
@@ -286,6 +300,7 @@ def _test_static_agent_skill_frontmatter() -> list[TestCase]:
                         "description" in fm,
                         f"{rel}: missing 'description' in frontmatter",
                     )
+                    _assert_arguments_have_hint(p, fm)
 
                 skill_name = skill_file.parent.name
                 tests.append(

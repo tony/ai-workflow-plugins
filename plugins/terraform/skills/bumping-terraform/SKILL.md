@@ -1,6 +1,6 @@
 ---
 name: bumping-terraform
-description: Use when Terraform or OpenTofu provider constraints are out of date, when a `.terraform.lock.hcl` needs refreshing, when a `required_version` CLI pin needs moving, or when asked which root modules in a repository are stuck on stale provider versions.
+description: "Use when Terraform or OpenTofu provider constraints, CLI pins, or lockfiles are stale across repository root modules."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "WebSearch", "WebFetch", "AskUserQuestion"]
 ---
 

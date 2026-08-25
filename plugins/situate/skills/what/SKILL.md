@@ -1,6 +1,6 @@
 ---
 name: what
-description: Say what is going on in five lines or less — the session, the branch, the pull request and ticket if they exist — with numbered options when there is a real choice to make
+description: "Use when the user asks what is going on and needs a five-line summary of the session, branch, pull request, and ticket."
 allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 argument-hint: "[what you are confused about]"
 user-invocable: true

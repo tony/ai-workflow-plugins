@@ -1,6 +1,6 @@
 ---
 name: report-leadership
-description: Render the tier-0 leadership report from a business run — SCQA with the answer first, action-titled exhibits, explicit value build, the conservative number committed
+description: "Use when rendering a tier-0 leadership report from a completed business-value run, with SCQA and a conservative value case."
 allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion"]
 argument-hint: "[run directory]"
 user-invocable: true

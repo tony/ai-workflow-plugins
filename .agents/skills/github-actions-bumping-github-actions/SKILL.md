@@ -1,10 +1,8 @@
 ---
 name: github-actions-bumping-github-actions
 description: >-
-  Use when GitHub Actions pins are out of date, when dependabot has opened
-  action-bump pull requests, when asked which workflow actions need
-  updating, or when auditing `uses:` versions across one or many
-  repositories.
+  Use when workflow actions are out of date across repos, Dependabot opens
+  action-bump PRs, or pinned actions/checkout needs its latest release.
 metadata:
   source: "plugins/github-actions/skills/bumping-github-actions/SKILL.md"
 ---

@@ -1,11 +1,8 @@
 ---
 name: model-cli-codex
 description: >-
-  Delegate a task to OpenAI's GPT via the Codex CLI. Use this skill when the
-  user explicitly asks to use Codex, GPT, or OpenAI for a task, or when you
-  determine that GPT would provide better results for a specific task (e.g.,
-  tasks requiring OpenAI-specific strengths). Detects the codex binary,
-  falls back to agent --model gpt-5.4-high if unavailable.
+  Use when asked to use Codex, GPT, OpenAI's model, or the Codex CLI to
+  delegate a task; falls back to the GPT agent when needed.
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 metadata:
   argument-hint: "<prompt> [timeout:<seconds>]"

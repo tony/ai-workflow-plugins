@@ -1,17 +1,6 @@
 ---
 name: action
-description: >-
-  Use when screened review feedback should actually be fixed on the
-  current branch. Triggers on phrases like "address the review items",
-  "action the findings", "fix the PR comments", "apply the reviewer
-  feedback", "handle what the bot flagged", "address each issue in
-  separate commits". Works from a ledger produced by /respond:check and
-  runs that screening itself when none covers the current head, so
-  nothing is fixed that was never triaged. Lands one finding per
-  commit with the simplest fix that works, behind the project's own
-  quality gates, adding no test, comment, or complexity the fix cannot
-  justify and never writing a ticket or issue number into code.
-  History rewrites and posted replies are opt-in.
+description: "Use when screened review findings should be fixed on the current branch, usually as one verified commit per finding."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[findings text] [--pr=<num>] [--base=<ref>] [--no-fixup] [--on-fail=skip|stop|ask] [--reply]"
 user-invocable: true

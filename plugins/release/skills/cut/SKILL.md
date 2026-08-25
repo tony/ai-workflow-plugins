@@ -1,6 +1,6 @@
 ---
 name: cut
-description: Cut a release at an explicit version — bump version files, refresh the lockfile, date CHANGES/MIGRATION, and commit. Never pushes or tags unless explicitly flagged.
+description: "Use when cutting a release at an explicit version, including version files, lockfiles, changelog dates, and commit."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 argument-hint: "<version> [--push] [--tag] [--push-tag]"
 user-invocable: true

@@ -163,7 +163,7 @@ attention. It decides whether the skill is ever used.
   is weaker than it looks. Write both where both get typed.
 - **Front-load the trigger.** The first clause is what survives
   truncation and skimming.
-- **1024 characters or fewer**, non-empty, no XML tags.
+- **150 characters or fewer**, non-empty, no XML tags.
 
 Working descriptions:
 

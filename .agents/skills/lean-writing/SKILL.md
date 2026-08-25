@@ -1,13 +1,8 @@
 ---
 name: lean-writing
 description: >-
-  Use while producing or editing any prose or code — commit messages, PR and
-  ticket bodies, docs, comments, or implementation — to keep the first draft
-  tight and free of AI fluff: lead with the result, state current truth over
-  the journey, reuse before creating, and preserve references when editing.
-  Guidance only; it never edits files. To clean slop out of existing files
-  in place, use the `lean-tighten` skill; for repo-wide or branch-scoped
-  commit cleanup, use the `slop-scan` skill or the `pr-deslop` skill.
+  Use when commit messages or prose must stay tight: cut filler, padding,
+  preamble, AI fluff, and stories of attempts; lead with current results.
 allowed-tools: ["Read", "Grep", "Glob"]
 metadata:
   source: "plugins/lean/skills/lean-writing/SKILL.md"

@@ -1,14 +1,8 @@
 ---
 name: git-branch-soft-reset-and-recommit
 description: >-
-  Use when a commit history needs rebuilding rather than the code it
-  contains — `wip` commits to squash, one commit doing five unrelated
-  things, or a history no reviewer can follow. Collapses everything with a
-  soft reset and rebuilds it as atomic commits in the project's own message
-  format, preserving authorship, proving the resulting tree is
-  byte-identical to what it replaced, and gating each commit through the
-  project's checks. Ships an editor-free interactive rebase toolkit for
-  reordering, squashing, and verifying from an agent shell with no TTY.
+  Use when commit history must be rebuilt into atomic reviewable commits
+  while preserving the branch's final tree and authorship.
 allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "AskUserQuestion", "WebFetch"]
 metadata:
   argument-hint: "[PR number, base ref, or a hint like 'split the auth work out']"

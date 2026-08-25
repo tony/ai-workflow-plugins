@@ -1,11 +1,6 @@
 ---
 name: brainstorm
-description: >-
-  Use when the user wants multiple independent ideas, alternatives, or
-  approaches from adversarial participants for a creative prompt, design
-  question, or open-ended problem. Triggers on phrases like "brainstorm",
-  "give me ideas", "multiple approaches", "what are my options", or
-  "explore alternatives"
+description: "Use when a creative prompt, design question, or open-ended problem needs multiple independent adversarial ideas."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<prompt> [--variants=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--preamble=...] [--workers=subagents|model-clis]"
 user-invocable: true

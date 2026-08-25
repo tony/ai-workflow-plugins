@@ -1,9 +1,8 @@
 ---
 name: package-updater-update-package
 description: >-
-  Take one named package to a target version everywhere it is pinned —
-  research the span, land one commit per repo with a why/what body and
-  verified links, then its follow-up
+  Use when updating one named dependency to a target version everywhere it
+  is pinned across one repository or a fleet.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 metadata:

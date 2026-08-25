@@ -1,6 +1,6 @@
 ---
 name: update-toolchain
-description: Move runtime and toolchain pins — .tool-versions, .nvmrc, .python-version, packageManager, engines — one tool per commit, each release in the span linked
+description: "Use when updating one runtime or toolchain pin across version files, package metadata, CI, and other repositories."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 argument-hint: "[tool] [version] [--root <dir>] [--repo <path|slug>...] [--owner <name>...] [--audit-only] [--branch <name>] [--pr] [--no-push]"
 user-invocable: true

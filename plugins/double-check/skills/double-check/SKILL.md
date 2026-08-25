@@ -1,17 +1,6 @@
 ---
 name: double-check
-description: >-
-  Use whenever the user asks to double-check, cross-check, verify,
-  recheck, sanity-check, or confirm prior analysis or results —
-  including "are you sure", "are you confident", "is this true",
-  "still true?", "prove it", "triple check", "check against" some
-  artifact, "look again", "repeat the analysis", or "repeat your
-  findings in full". Re-derives the answer from source artifacts and
-  returns it standalone in the original request's structure — never
-  a revision log of the prior turn. Also invoke before re-running
-  any analysis whose output the user has already seen once. To
-  repair a chat where a diff-shaped answer already happened, use
-  /double-check:align.
+description: "Use when asked “are you sure/certain” or “I don't trust that”; recheck code/files from source and repeat prior analysis in full, not just changes."
 user-invocable: true
 ---
 
