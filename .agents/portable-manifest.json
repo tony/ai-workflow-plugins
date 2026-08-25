@@ -723,7 +723,7 @@
         "references/citation.md": "plugins/scholar/references/citation.md",
         "references/stage-gates.md": "plugins/scholar/references/stage-gates.md"
       },
-      "bytes": 8254
+      "bytes": 8403
     },
     {
       "name": "scholar-gather",

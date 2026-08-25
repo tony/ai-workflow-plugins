@@ -62,7 +62,7 @@ A study is a directory, not a document:
 ```
 notes/ontology/<subject>/
 ├── brief.md              the only file meant to be read start to finish
-├── terms.jsonl           interchange: {term, definition, parent, kind, cites, tier}
+├── terms.jsonl           interchange: {schema, term, definition, parent, kind, cites, tier}
 ├── sources.jsonl         {source, ref, scope, read, why}
 └── evidence/
     ├── hierarchy.md      the type hierarchy, one citation per is-a claim

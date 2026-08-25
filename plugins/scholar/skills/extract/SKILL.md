@@ -57,10 +57,13 @@ candidate, the corpus's own definition confirms it.
 One row per term as the corpus spells it:
 
 ```
-{"term": "adapter", "definition": "wraps a third-party client behind the port interface", "parent": "", "kind": "role", "tier": "structural", "cites": [{"url": "https://github.com/OWNER/REPO/blob/v2.40.0/src/ports.py#L12-L18", "locator": "src/ports.py:12-18", "quote": "every third-party client enters through a port"}]}
+{"schema": 1, "term": "adapter", "definition": "wraps a third-party client behind the port interface", "parent": "", "kind": "role", "tier": "structural", "cites": [{"url": "https://github.com/OWNER/REPO/blob/v2.40.0/src/ports.py#L12-L18", "locator": "src/ports.py:12-18", "quote": "every third-party client enters through a port"}]}
 ```
 
 `parent` stays empty here. `distill` assigns it.
+
+`schema` is the row format's version. It costs one integer now and cannot be
+added later without guessing what unversioned rows meant.
 
 `definition` is drawn from the corpus, not composed. Where the corpus never
 defines the term, record the definition its usage implies and say so in the
