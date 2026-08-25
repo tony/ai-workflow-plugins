@@ -1,0 +1,16 @@
+{
+  "skill_name": "ontology",
+  "trigger": {
+    "positive": [
+      { "prompt": "distil an ontology from this codebase", "top_k": 1 },
+      { "prompt": "what vocabulary does this project actually use", "top_k": 2 },
+      { "prompt": "build a glossary of the terms across these repos", "top_k": 2 },
+      { "prompt": "what does this project call the thing other projects call a job", "top_k": 2 }
+    ],
+    "negative": [
+      { "prompt": "study this dependency's source", "owner": "study-deps" },
+      { "prompt": "bring me up to speed on this branch", "owner": "situational-awareness" },
+      { "prompt": "the ontology of medieval scholastic metaphysics" }
+    ]
+  }
+}

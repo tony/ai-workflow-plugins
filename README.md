@@ -45,6 +45,7 @@ readable by agents scanning `.agents/skills/`.
 | [ticket](plugins/ticket/) | Development | Manage work across trackers (Linear, Jira, GitHub, etc.) respecting each platform's native object graph. Drafts durable tickets focused on invariants. |
 | [agent-messaging](plugins/agent-messaging/) | Development | Message another running agent session — Claude Code or Codex — and verify who actually sent an incoming message. |
 | [skill-style](plugins/skill-style/) | Development | Hold SKILL.md files to a deletion test — a line stays only when its removal would change what the agent does — while frontmatter, code blocks, and sections survive verbatim. |
+| [scholar](plugins/scholar/) | Development | Distil a checkable ontology from a codebase, a repository set, or a written corpus. Types, controlled vocabulary, cited and measured evidence. |
 
 ## Installation
 

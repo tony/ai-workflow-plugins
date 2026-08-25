@@ -664,6 +664,119 @@
       "bytes": 32238
     },
     {
+      "name": "scholar-annotate",
+      "sources": [
+        "plugins/scholar/skills/annotate/SKILL.md"
+      ],
+      "bundled": {
+        "references/citation.md": "plugins/scholar/references/citation.md"
+      },
+      "bytes": 6495
+    },
+    {
+      "name": "scholar-ask",
+      "sources": [
+        "plugins/scholar/skills/ask/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 3638
+    },
+    {
+      "name": "scholar-compare",
+      "sources": [
+        "plugins/scholar/skills/compare/SKILL.md"
+      ],
+      "bundled": {
+        "references/term-metrics.py": "plugins/scholar/references/term-metrics.py"
+      },
+      "bytes": 13218
+    },
+    {
+      "name": "scholar-contest",
+      "sources": [
+        "plugins/scholar/skills/contest/SKILL.md"
+      ],
+      "bundled": {
+        "references/evidence-tiers.md": "plugins/scholar/references/evidence-tiers.md",
+        "references/term-metrics.py": "plugins/scholar/references/term-metrics.py"
+      },
+      "bytes": 15829
+    },
+    {
+      "name": "scholar-distill",
+      "sources": [
+        "plugins/scholar/skills/distill/SKILL.md"
+      ],
+      "bundled": {
+        "references/evidence-tiers.md": "plugins/scholar/references/evidence-tiers.md",
+        "references/stage-gates.md": "plugins/scholar/references/stage-gates.md",
+        "references/term-metrics.py": "plugins/scholar/references/term-metrics.py"
+      },
+      "bytes": 16875
+    },
+    {
+      "name": "scholar-extract",
+      "sources": [
+        "plugins/scholar/skills/extract/SKILL.md"
+      ],
+      "bundled": {
+        "references/citation.md": "plugins/scholar/references/citation.md",
+        "references/stage-gates.md": "plugins/scholar/references/stage-gates.md"
+      },
+      "bytes": 8403
+    },
+    {
+      "name": "scholar-gather",
+      "sources": [
+        "plugins/scholar/skills/gather/SKILL.md"
+      ],
+      "bundled": {
+        "references/citation.md": "plugins/scholar/references/citation.md",
+        "references/stage-gates.md": "plugins/scholar/references/stage-gates.md"
+      },
+      "bytes": 8790
+    },
+    {
+      "name": "scholar-ontology",
+      "sources": [
+        "plugins/scholar/skills/ontology/SKILL.md"
+      ],
+      "bundled": {
+        "references/citation.md": "plugins/scholar/references/citation.md",
+        "references/evidence-tiers.md": "plugins/scholar/references/evidence-tiers.md",
+        "references/stage-gates.md": "plugins/scholar/references/stage-gates.md"
+      },
+      "bytes": 10978
+    },
+    {
+      "name": "scholar-render",
+      "sources": [
+        "plugins/scholar/skills/render/SKILL.md"
+      ],
+      "bundled": {
+        "references/term-metrics.py": "plugins/scholar/references/term-metrics.py"
+      },
+      "bytes": 13153
+    },
+    {
+      "name": "scholar-revise",
+      "sources": [
+        "plugins/scholar/skills/revise/SKILL.md"
+      ],
+      "bundled": {},
+      "bytes": 3512
+    },
+    {
+      "name": "scholar-verify",
+      "sources": [
+        "plugins/scholar/skills/verify/SKILL.md"
+      ],
+      "bundled": {
+        "references/citation.md": "plugins/scholar/references/citation.md"
+      },
+      "bytes": 6202
+    },
+    {
       "name": "self-improvement-apply",
       "sources": [
         "plugins/self-improvement/skills/apply/SKILL.md"
@@ -726,7 +839,7 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 15829
+      "bytes": 15833
     },
     {
       "name": "situate-what",
@@ -1087,10 +1200,13 @@
     "plugins/weave/references/deslop-pass.md": 6,
     "plugins/business/references/audiences.md": 5,
     "plugins/pytest-optimizer/references/output-contract.md": 5,
+    "plugins/scholar/references/citation.md": 5,
     "plugins/package-updater/references/commit-conventions.md": 4,
     "plugins/package-updater/references/ecosystems.md": 4,
     "plugins/package-updater/references/repo-scope.md": 4,
     "plugins/package-updater/references/upstream-links.md": 4,
+    "plugins/scholar/references/stage-gates.md": 4,
+    "plugins/scholar/references/term-metrics.py": 4,
     "plugins/terraform/references/layout-discovery.md": 4,
     "plugins/terraform/references/lock-and-init.md": 4,
     "plugins/ticket/references/contract.md": 4,
@@ -1105,6 +1221,7 @@
     "plugins/github-actions/references/dependabot-closeout.md": 3,
     "plugins/package-updater/references/follow-ups.md": 3,
     "plugins/pytest-optimizer/references/heuristic-catalog.md": 3,
+    "plugins/scholar/references/evidence-tiers.md": 3,
     "plugins/situate/references/situation-sweep.md": 3,
     "plugins/spike/references/verification-gates.md": 3,
     "plugins/terraform/references/pin-sites.md": 3,
