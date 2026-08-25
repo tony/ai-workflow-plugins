@@ -1,14 +1,16 @@
 ---
-name: compare
-description: "Set two term tables against each other — same concept different term, same term different concept, and what each covers that the other lacks"
-allowed-tools: ["Bash", "Read", "Glob", "Write"]
-argument-hint: "<study-dir> <study-dir> [--out=<file>]"
-user-invocable: true
+name: scholar-compare
+description: >-
+  Set two term tables against each other — same concept different term, same
+  term different concept, and what each covers that the other lacks
 disable-model-invocation: true
+allowed-tools: ["Bash", "Read", "Glob", "Write"]
+metadata:
+  argument-hint: "<study-dir> <study-dir> [--out=<file>]"
+  source: "plugins/scholar/skills/compare/SKILL.md"
 ---
 
-
-# /scholar:compare
+# this skill
 
 Two studies, one question: where do these vocabularies agree, where do they
 collide, and what does each one know that the other does not.
@@ -53,7 +55,7 @@ it is and why.
 ### 3. Record the numbers
 
 Every score is a distributional claim, so it carries the command that produced
-it. Run the analyzer at `../../references/term-metrics.py` against each table
+it. Run the analyzer at `references/term-metrics.py` against each table
 rather than eyeballing the definitions:
 
 ```console
@@ -81,6 +83,13 @@ Open with a one-line hero (`✓ <n> mappings, <n> collisions, <n> uncovered` or
 3. `## Coverage` — what each side has that the other lacks, and whether that
    is a difference or a gap.
 
-End with an `AskUserQuestion` panel offering next steps (for example: study
+End with an `ask-user-choice` panel offering next steps (for example: study
 the uncovered area, publish the mapping, stop here) — skip the panel only in
 plan mode.
+
+
+## Portability notes
+
+- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
+- Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.

@@ -1,21 +1,23 @@
 ---
-name: distill
-description: "Build the three ontology layers from a term table — types, members with discriminators, and the controlled vocabulary"
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write"]
-argument-hint: "[--out=<dir>]"
-user-invocable: true
+name: scholar-distill
+description: >-
+  Build the three ontology layers from a term table — types, members with
+  discriminators, and the controlled vocabulary
 disable-model-invocation: true
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write"]
+metadata:
+  argument-hint: "[--out=<dir>]"
+  source: "plugins/scholar/skills/distill/SKILL.md"
 ---
 
-
-# /scholar:distill
+# this skill
 
 Stage 3. Turn a flat term table into an ontology. Three layers, in order. Any
 one of them alone is not an ontology.
 
-Read `../../references/evidence-tiers.md` for what each claim must carry and
-`../../references/stage-gates.md` for this stage's exit condition. The orphan
-gate below runs `../../references/term-metrics.py`.
+Read `references/evidence-tiers.md` for what each claim must carry and
+`references/stage-gates.md` for this stage's exit condition. The orphan
+gate below runs `references/term-metrics.py`.
 
 User arguments: $ARGUMENTS
 
@@ -78,7 +80,7 @@ hierarchy has not named, or the term does not belong in the table.
 ## Rules
 
 - Every type has a discriminator before this stage hands off.
-- `../../references/term-metrics.py` reports no orphans before this stage
+- `references/term-metrics.py` reports no orphans before this stage
   hands off.
 - A term keeps the spelling `extract` recorded. The vocabulary names a
   preferred term; it does not rewrite the rows.
@@ -95,5 +97,12 @@ Open with a one-line hero (`✓ <n> types, <n> terms, <n> preferred terms` or
 3. `## Unresolved` — terms that resisted placement, and what that suggests
    about the corpus rather than about the table.
 
-End with an `AskUserQuestion` panel offering next steps (for example: run
+End with an `ask-user-choice` panel offering next steps (for example: run
 contest, revisit a type, stop here) — skip the panel only in plan mode.
+
+
+## Portability notes
+
+- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
+- Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.

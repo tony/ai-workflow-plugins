@@ -1,19 +1,21 @@
 ---
-name: render
-description: "Write a study's brief and evidence documents, then enforce the brief's citation prohibition with the analyzer"
-allowed-tools: ["Bash", "Read", "Glob", "Edit", "Write"]
-argument-hint: "[--out=<dir>]"
-user-invocable: true
+name: scholar-render
+description: >-
+  Write a study's brief and evidence documents, then enforce the brief's
+  citation prohibition with the analyzer
 disable-model-invocation: true
+allowed-tools: ["Bash", "Read", "Glob", "Edit", "Write"]
+metadata:
+  argument-hint: "[--out=<dir>]"
+  source: "plugins/scholar/skills/render/SKILL.md"
 ---
 
-
-# /scholar:render
+# this skill
 
 Stage 5. Write the two layers a reader actually meets: a brief they read start
 to finish, and the evidence they check it against.
 
-The analyzer ships at `../../references/term-metrics.py`; `<analyzer>` below
+The analyzer ships at `references/term-metrics.py`; `<analyzer>` below
 is that path.
 
 User arguments: $ARGUMENTS
@@ -65,7 +67,7 @@ produced it and the output it produced.
 
 `evidence/contested.md` — what `contest` judged, including the kills.
 
-`evidence/corrections.md` — created empty, written by `/scholar:revise`.
+`evidence/corrections.md` — created empty, written by the `scholar-revise` skill.
 
 ## Rules
 
@@ -86,6 +88,13 @@ or `⚠ Brief gate failed: <n> findings`), then exactly these sections:
 2. `## Evidence` — each document written and what it holds.
 3. `## Gate` — the brief check's output, verbatim.
 
-End with an `AskUserQuestion` panel offering next steps (for example: publish
+End with an `ask-user-choice` panel offering next steps (for example: publish
 via gh, compare against another study, stop here) — skip the panel only in
 plan mode.
+
+
+## Portability notes
+
+- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
+- Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.

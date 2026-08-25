@@ -1,20 +1,22 @@
 ---
-name: contest
-description: "Adversarially judge a distilled ontology one candidate at a time — synonymy, polysemy, orphans, circular evidence, and coverage"
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
-argument-hint: "[--out=<dir>] [--rounds=<n>] [--panel]"
-user-invocable: true
+name: scholar-contest
+description: >-
+  Adversarially judge a distilled ontology one candidate at a time —
+  synonymy, polysemy, orphans, circular evidence, and coverage
 disable-model-invocation: true
+allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "Task", "AskUserQuestion"]
+metadata:
+  argument-hint: "[--out=<dir>] [--rounds=<n>] [--panel]"
+  source: "plugins/scholar/skills/contest/SKILL.md"
 ---
 
-
-# /scholar:contest
+# this skill
 
 Stage 4. Attack the ontology. Four passes, serial by default: one judge, one
 candidate at a time, every verdict traceable to the evidence that settled it.
 
-Read `../../references/evidence-tiers.md` before recording any number. The
-analyzer ships beside it at `../../references/term-metrics.py`; `<analyzer>`
+Read `references/evidence-tiers.md` before recording any number. The
+analyzer ships beside it at `references/term-metrics.py`; `<analyzer>`
 below is that path.
 
 User arguments: $ARGUMENTS
@@ -73,7 +75,7 @@ Read `sources.jsonl` and ask what the study does not know:
 ## Pass 4 — stop condition
 
 Stop when a round surfaces no new contested claim, or at `--rounds`
-(default 3). The convergence rule is `/spike:ratchet`'s: stop when the design
+(default 3). The convergence rule is the `spike-ratchet` skill's: stop when the design
 stops fighting back, not when a counter runs out.
 
 ## The circularity check
@@ -89,7 +91,7 @@ the self-reference was noticed.
 ## Panels
 
 `--panel` hands one contested claim to independent adversarial participants
-via `/weave:ask`, recording their verdicts in `evidence/contested.md` beside
+via the `weave-ask` skill, recording their verdicts in `evidence/contested.md` beside
 the serial one. Where `weave` is not installed, say so and continue serially —
 the panel is an amplifier, not a dependency.
 
@@ -113,6 +115,13 @@ Open with a one-line hero (`✓ <n> candidates judged, <n> killed, <n> open` or
 3. `## Kills` — what was killed and what the kill revealed.
 4. `## Coverage` — what the study does not know, from pass 3.
 
-End with an `AskUserQuestion` panel offering next steps (for example: another
+End with an `ask-user-choice` panel offering next steps (for example: another
 round, run render, widen the corpus, stop here) — skip the panel only in plan
 mode.
+
+
+## Portability notes
+
+- `ask-user-choice` — present the listed options and wait for the user to pick one. Hosts with a structured multiple-choice tool (Claude Code's `AskUserQuestion`) should use it; otherwise print a numbered list and wait for a numbered reply. Never proceed on an assumed answer.
+- `$ARGUMENTS` — the text the user passed when invoking this skill. If your host does not substitute it, read it as the user's request in the current turn, and ask when there is none.
+- Bundled files — every relative path in this skill points at a file shipped inside this skill directory. Read them from here, not from the host's plugin tree.
