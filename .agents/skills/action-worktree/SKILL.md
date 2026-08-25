@@ -1,15 +1,8 @@
 ---
 name: action-worktree
 description: >-
-  Use when the user wants to take a ticket — or several tickets that share
-  one change — into its own branch and git worktree and drive it to gated
-  commits. Triggers on phrases like "work TEA-123 in a worktree", "spin up a
-  worktree for issue #45", "start on this ticket", "branch for the Linear
-  ticket", "put these two tickets on one branch", or "prep a worktree, I'll
-  take it from there". Resolves the ticket strictly read-only (never
-  assigns, comments, or transitions), names the branch by the team's own
-  conventions, implements through the project's discovered quality gates,
-  and never pushes or opens a PR unless the flags say so.
+  Use when taking one ticket or a related ticket group into its own branch
+  and git worktree for implementation.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 metadata:

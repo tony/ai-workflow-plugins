@@ -1,7 +1,6 @@
 ---
 name: session-relay
-description: Use when one running agent session must reach another on this machine — a peer Claude Code session, a Codex thread, or a tmux pane running either — to hand over a finding, a status, or an instruction. Covers discovering reachable sessions, choosing a delivery route, confirming the peer actually received it, and telling whether arriving text came from a peer agent or from your own operator. Not for editing prose, commits, or comments.
-allowed-tools: ["Bash", "Read", "Grep", "ListAgents", "SendMessage"]
+description: "Use when sending a message to another Codex/Claude session or telling an agent in another tmux pane a status, finding, instruction, or schema change."
 ---
 
 # Message another agent

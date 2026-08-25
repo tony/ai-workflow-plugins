@@ -1,9 +1,8 @@
 ---
 name: business-report-leadership
 description: >-
-  Render the tier-0 leadership report from a business run — SCQA with the
-  answer first, action-titled exhibits, explicit value build, the
-  conservative number committed
+  Use when rendering a tier-0 leadership report from a completed
+  business-value run, with SCQA and a conservative value case.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion"]
 metadata:

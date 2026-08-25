@@ -1,16 +1,6 @@
 ---
 name: serene-bliss
-description: >-
-  Use when the user wants to brainstorm and refine developer-experience,
-  documentation, or tooling UX work through a "serene DX" aesthetic lens
-  — three fixed variants that sweep across DX Bliss (frictionless),
-  DX Serenity (calm clarity), and DX Sublimity (showcase-grade novelty).
-  Triggers on phrases like "serene bliss", "DX bliss", "DX serenity",
-  "DX sublimity", "reader happiness", "make this serene", "serene
-  developer experience", or "serene DX". Runs the /weave:serene-bliss
-  command, which dispatches three lens variants across independent
-  adversarial participants and judges each refine pass with a
-  peer-scored panel.
+description: "Use when brainstorming and refining developer-experience, documentation, or tooling UX through the Serene DX lenses."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
 argument-hint: "<prompt> [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
 user-invocable: true
@@ -758,4 +748,3 @@ After the reference returns, finalize the session: repo guard, session.json,
 events.jsonl, latest symlink.
 
 ---
-

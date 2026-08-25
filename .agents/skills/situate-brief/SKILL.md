@@ -1,12 +1,8 @@
 ---
 name: situate-brief
 description: >-
-  Use when the user signals confusion without naming a subject — "huh",
-  "huh?", "wait, what?", "sorry, you lost me", "no idea", "slow down",
-  "explain simply", "keep it short". Answers in five lines or less, followed
-  by numbered single-line options. Not for a question that names its own
-  subject.
-allowed-tools: ["Bash", "Read", "Grep", "Glob"]
+  Use when confusion is only “huh,” “wait, what,” “sorry, you lost me,” or
+  “slow down; explain simply and keep it short.”
 metadata:
   source: "plugins/situate/skills/brief/SKILL.md"
 ---

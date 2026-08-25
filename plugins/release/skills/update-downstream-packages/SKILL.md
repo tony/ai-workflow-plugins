@@ -1,6 +1,6 @@
 ---
 name: update-downstream-packages
-description: Roll a newly published package release out to every consumer repo you maintain — discover consumers under your workspace roots, bump pins, re-lock, commit, push, and verify CI with gh.
+description: "Use when rolling a newly published package release through every maintained consumer repository and verifying CI."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion", "Task"]
 argument-hint: "<package> [<version>] [--roots <glob>...] [--no-push]"
 user-invocable: true

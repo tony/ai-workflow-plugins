@@ -1,6 +1,6 @@
 ---
 name: refresh-lock
-description: Refresh every root module's .terraform.lock.hcl within the constraints already written — no credentials needed, platform coverage preserved, and the versions that actually moved reported per module
+description: "Use when refreshing Terraform or OpenTofu root lockfiles within existing constraints while preserving platform coverage."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
 argument-hint: "[--root-module <dir>...] [--audit-only] [--no-commit]"
 user-invocable: true

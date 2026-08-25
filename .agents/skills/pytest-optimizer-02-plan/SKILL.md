@@ -1,14 +1,8 @@
 ---
 name: pytest-optimizer-02-plan
 description: >-
-  Phase 3 of the pytest-optimizer pipeline. Rank the validated speedups from
-  01-benchmark into an ordered commit plan. Scores each candidate with the
-  weighted rubric (safety, impact, effort, confidence, reversibility), drops
-  anything below the hard safety gate, orders the survivors (safety-gate
-  fixes and typings first; scope and consolidation before parallelism), and
-  drafts one why/what commit per speedup with its verify command. Runs
-  inside plan mode and presents the plan for approval. Writes plan.json. Use
-  after 01-benchmark to decide what to apply and in what order.
+  Use when ranking validated pytest speedups from 01-benchmark into an
+  approved, ordered, commit-by-commit plan.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "AskUserQuestion"]
 metadata:

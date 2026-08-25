@@ -1,12 +1,8 @@
 ---
 name: package-updater-updating-packages
 description: >-
-  Use when dependencies or toolchain pins are out of date across one repo or
-  a whole fleet — bump dev packages, refresh a lockfile (uv.lock,
-  pnpm-lock.yaml, package-lock.json, Cargo.lock, go.sum), find outdated
-  packages with ncu, uv, pnpm or cargo, hold a package back in .ncurc, or
-  move a .tool-versions, .nvmrc, packageManager or engines pin. Lands each
-  bump as its own commit, with the upstream release notes cited.
+  Use when packages are out of date across repos; bump dependencies, refresh
+  uv.lock, update .tool-versions/packageManager pins, and commit each.
 metadata:
   source: "plugins/package-updater/skills/updating-packages/SKILL.md"
 ---

@@ -1,16 +1,6 @@
 ---
 name: goal
-description: >-
-  Use when the review loop should run itself to completion instead of
-  one round at a time — screen the feedback, land what survives, push,
-  watch CI, wait for the repository's automated review agents to weigh
-  in on the new head, and go again until nothing new is actionable.
-  Triggers on phrases like "run the review loop", "keep going until the
-  review is clean", "watch CI and address whatever comes back", "loop
-  until the bots are quiet", "set a goal to finish the review". Detects
-  which review agents the repository actually has rather than assuming
-  any, bounds both the wait and the number of rounds, and halts on a
-  failure it cannot fix rather than grinding.
+description: "Use when the review-and-CI loop should continue through bounded rounds until no new actionable feedback remains."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[--pr=<num>] [--max-rounds=<n>] [--wait=<minutes>] [--no-push] [--reply]"
 user-invocable: true

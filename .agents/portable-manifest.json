@@ -10,7 +10,7 @@
         "references/ticket-detection.md": "plugins/action/references/ticket-detection.md",
         "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 27526
+      "bytes": 26986
     },
     {
       "name": "action-worktrees",
@@ -20,7 +20,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/action/references/verification-gates.md"
       },
-      "bytes": 15975
+      "bytes": 15451
     },
     {
       "name": "agent-messaging-session-relay",
@@ -32,7 +32,7 @@
         "references/claude-code.md": "plugins/agent-messaging/references/agents/claude-code.md",
         "references/codex.md": "plugins/agent-messaging/references/agents/codex.md"
       },
-      "bytes": 38726
+      "bytes": 38357
     },
     {
       "name": "business-case-study-internal",
@@ -83,7 +83,7 @@
         "references/measurement.md": "plugins/business/references/measurement.md",
         "references/provenance.md": "plugins/business/references/provenance.md"
       },
-      "bytes": 22085
+      "bytes": 22039
     },
     {
       "name": "business-report-org-wide",
@@ -109,7 +109,7 @@
         "references/measurement.md": "plugins/business/references/measurement.md",
         "references/provenance.md": "plugins/business/references/provenance.md"
       },
-      "bytes": 21186
+      "bytes": 21137
     },
     {
       "name": "changelog",
@@ -156,7 +156,7 @@
         "references/study-repos.md": "plugins/disk/references/study-repos.md",
         "references/virtual-disks.md": "plugins/disk/references/virtual-disks.md"
       },
-      "bytes": 30354
+      "bytes": 29373
     },
     {
       "name": "disk-reclaim",
@@ -196,7 +196,7 @@
       "bundled": {
         "references/verification-contract.md": "plugins/double-check/references/verification-contract.md"
       },
-      "bytes": 8300
+      "bytes": 7767
     },
     {
       "name": "double-check-align",
@@ -206,7 +206,7 @@
       "bundled": {
         "references/verification-contract.md": "plugins/double-check/references/verification-contract.md"
       },
-      "bytes": 7615
+      "bytes": 7198
     },
     {
       "name": "gh-create-issue",
@@ -218,7 +218,7 @@
         "references/rendered-markdown.md": "plugins/gh/references/rendered-markdown.md",
         "references/source-links.md": "plugins/gh/references/source-links.md"
       },
-      "bytes": 32662
+      "bytes": 32271
     },
     {
       "name": "gh-rendered-markdown",
@@ -229,7 +229,7 @@
         "references/rendered-markdown.md": "plugins/gh/references/rendered-markdown.md",
         "references/source-links.md": "plugins/gh/references/source-links.md"
       },
-      "bytes": 20932
+      "bytes": 20427
     },
     {
       "name": "git-branch-redo-from-scratch",
@@ -243,7 +243,7 @@
         "references/rebase-toolkit.md": "plugins/git-branch/references/rebase-toolkit.md",
         "references/rebuild-contract.md": "plugins/git-branch/references/rebuild-contract.md"
       },
-      "bytes": 38561
+      "bytes": 37939
     },
     {
       "name": "git-branch-soft-reset-and-recommit",
@@ -257,7 +257,7 @@
         "references/rebase-toolkit.md": "plugins/git-branch/references/rebase-toolkit.md",
         "references/split-mechanics.md": "plugins/git-branch/references/split-mechanics.md"
       },
-      "bytes": 40267
+      "bytes": 39827
     },
     {
       "name": "github-actions-bumping-github-actions",
@@ -268,7 +268,7 @@
         "references/action-pinning.md": "plugins/github-actions/references/action-pinning.md",
         "references/dependabot-closeout.md": "plugins/github-actions/references/dependabot-closeout.md"
       },
-      "bytes": 13917
+      "bytes": 13840
     },
     {
       "name": "github-actions-update-action",
@@ -290,7 +290,7 @@
         "references/action-pinning.md": "plugins/github-actions/references/action-pinning.md",
         "references/dependabot-closeout.md": "plugins/github-actions/references/dependabot-closeout.md"
       },
-      "bytes": 13414
+      "bytes": 13354
     },
     {
       "name": "lean-tighten",
@@ -300,7 +300,7 @@
       "bundled": {
         "references/lean-rubric.md": "plugins/lean/references/lean-rubric.md"
       },
-      "bytes": 6876
+      "bytes": 6554
     },
     {
       "name": "lean-trim-comments",
@@ -310,7 +310,7 @@
       "bundled": {
         "references/comment-policy.md": "plugins/lean/references/comment-policy.md"
       },
-      "bytes": 10666
+      "bytes": 10211
     },
     {
       "name": "lean-writing",
@@ -321,7 +321,7 @@
         "references/comment-policy.md": "plugins/lean/references/comment-policy.md",
         "references/lean-rubric.md": "plugins/lean/references/lean-rubric.md"
       },
-      "bytes": 11141
+      "bytes": 10720
     },
     {
       "name": "merge-pr-multiple",
@@ -349,7 +349,7 @@
         "plugins/model-cli/skills/agy/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 6331
+      "bytes": 5972
     },
     {
       "name": "model-cli-codex",
@@ -357,7 +357,7 @@
         "plugins/model-cli/skills/codex/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 5102
+      "bytes": 4760
     },
     {
       "name": "model-cli-cursor",
@@ -365,7 +365,7 @@
         "plugins/model-cli/skills/cursor/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 3510
+      "bytes": 3227
     },
     {
       "name": "model-cli-gemini",
@@ -373,7 +373,7 @@
         "plugins/model-cli/skills/gemini/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 1479
+      "bytes": 1245
     },
     {
       "name": "model-cli-gpt",
@@ -381,7 +381,7 @@
         "plugins/model-cli/skills/gpt/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 1083
+      "bytes": 926
     },
     {
       "name": "package-updater-update",
@@ -395,7 +395,7 @@
         "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 38150
+      "bytes": 38069
     },
     {
       "name": "package-updater-update-package",
@@ -409,7 +409,7 @@
         "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 36477
+      "bytes": 36417
     },
     {
       "name": "package-updater-update-toolchain",
@@ -422,7 +422,7 @@
         "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 33928
+      "bytes": 33883
     },
     {
       "name": "package-updater-updating-packages",
@@ -437,7 +437,7 @@
         "references/repo-scope.md": "plugins/package-updater/references/repo-scope.md",
         "references/upstream-links.md": "plugins/package-updater/references/upstream-links.md"
       },
-      "bytes": 47517
+      "bytes": 47234
     },
     {
       "name": "pr",
@@ -462,7 +462,7 @@
         "references/signatures.yml": "plugins/pr/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/pr/references/slop-taxonomy.md"
       },
-      "bytes": 72823
+      "bytes": 72161
     },
     {
       "name": "pr-merge-commit",
@@ -517,7 +517,7 @@
         "templates/pytest_optimizer_plugin.py": "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py",
         "templates/state.schema.json": "plugins/pytest-optimizer/templates/state.schema.json"
       },
-      "bytes": 76526
+      "bytes": 75926
     },
     {
       "name": "pytest-optimizer-00-scan",
@@ -535,7 +535,7 @@
         "templates/pytest_optimizer_plugin.py": "plugins/pytest-optimizer/templates/pytest_optimizer_plugin.py",
         "templates/state.schema.json": "plugins/pytest-optimizer/templates/state.schema.json"
       },
-      "bytes": 58944
+      "bytes": 58427
     },
     {
       "name": "pytest-optimizer-01-benchmark",
@@ -547,7 +547,7 @@
         "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
         "references/safety-gates.md": "plugins/pytest-optimizer/references/safety-gates.md"
       },
-      "bytes": 26280
+      "bytes": 25853
     },
     {
       "name": "pytest-optimizer-02-plan",
@@ -559,7 +559,7 @@
         "references/scoring-rubric.md": "plugins/pytest-optimizer/references/scoring-rubric.md",
         "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
       },
-      "bytes": 11795
+      "bytes": 11320
     },
     {
       "name": "pytest-optimizer-03-execute",
@@ -570,7 +570,7 @@
         "references/output-contract.md": "plugins/pytest-optimizer/references/output-contract.md",
         "templates/commit-message.tmpl": "plugins/pytest-optimizer/templates/commit-message.tmpl"
       },
-      "bytes": 7843
+      "bytes": 7363
     },
     {
       "name": "rebase",
@@ -588,7 +588,7 @@
       "bundled": {
         "references/release-conventions.md": "plugins/release/references/release-conventions.md"
       },
-      "bytes": 12262
+      "bytes": 12144
     },
     {
       "name": "release-cut",
@@ -598,7 +598,7 @@
       "bundled": {
         "references/release-conventions.md": "plugins/release/references/release-conventions.md"
       },
-      "bytes": 14262
+      "bytes": 14209
     },
     {
       "name": "release-update-downstream-packages",
@@ -606,7 +606,7 @@
         "plugins/release/skills/update-downstream-packages/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 8245
+      "bytes": 8170
     },
     {
       "name": "research-study-deps",
@@ -614,7 +614,7 @@
         "plugins/research/skills/deps/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 8474
+      "bytes": 7982
     },
     {
       "name": "respond-action",
@@ -626,7 +626,7 @@
         "references/screening-rubric.md": "plugins/respond/references/screening-rubric.md",
         "references/verification-gates.md": "plugins/respond/references/verification-gates.md"
       },
-      "bytes": 28165
+      "bytes": 27546
     },
     {
       "name": "respond-check",
@@ -637,7 +637,7 @@
         "references/feedback-sources.md": "plugins/respond/references/feedback-sources.md",
         "references/screening-rubric.md": "plugins/respond/references/screening-rubric.md"
       },
-      "bytes": 21052
+      "bytes": 20243
     },
     {
       "name": "respond-goal",
@@ -649,7 +649,7 @@
         "references/review-agents.md": "plugins/respond/references/review-agents.md",
         "references/verification-gates.md": "plugins/respond/references/verification-gates.md"
       },
-      "bytes": 20455
+      "bytes": 19892
     },
     {
       "name": "ruff-bump",
@@ -661,7 +661,7 @@
         "references/pin-sites-and-gating.md": "plugins/ruff/references/pin-sites-and-gating.md",
         "references/release-triage.md": "plugins/ruff/references/release-triage.md"
       },
-      "bytes": 32323
+      "bytes": 32238
     },
     {
       "name": "self-improvement-apply",
@@ -669,7 +669,7 @@
         "plugins/self-improvement/skills/apply/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 6796
+      "bytes": 6412
     },
     {
       "name": "self-improvement-sweep",
@@ -683,7 +683,7 @@
         "references/detecting-invocations.md": "plugins/self-improvement/references/detecting-invocations.md",
         "references/worked-example-spike.md": "plugins/self-improvement/references/worked-example-spike.md"
       },
-      "bytes": 48741
+      "bytes": 48405
     },
     {
       "name": "situate",
@@ -704,7 +704,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 9445
+      "bytes": 9231
     },
     {
       "name": "situate-refocus",
@@ -715,7 +715,7 @@
         "references/goal-derivation.md": "plugins/situate/references/goal-derivation.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 18655
+      "bytes": 18565
     },
     {
       "name": "situate-situational-awareness",
@@ -726,7 +726,7 @@
         "references/prior-conversations.md": "plugins/situate/references/prior-conversations.md",
         "references/situation-sweep.md": "plugins/situate/references/situation-sweep.md"
       },
-      "bytes": 16024
+      "bytes": 15762
     },
     {
       "name": "situate-what",
@@ -736,7 +736,7 @@
       "bundled": {
         "references/brief.md": "plugins/situate/references/brief.md"
       },
-      "bytes": 10114
+      "bytes": 10056
     },
     {
       "name": "skill-style",
@@ -748,7 +748,7 @@
         "references/example-ideal.md": "plugins/skill-style/references/example-ideal.md",
         "references/skill-rubric.md": "plugins/skill-style/references/skill-rubric.md"
       },
-      "bytes": 29479
+      "bytes": 28865
     },
     {
       "name": "slop-scan",
@@ -761,7 +761,7 @@
         "references/signatures.yml": "plugins/slop/references/signatures.yml",
         "references/slop-taxonomy.md": "plugins/slop/references/slop-taxonomy.md"
       },
-      "bytes": 63701
+      "bytes": 63169
     },
     {
       "name": "spike-bakeoff",
@@ -771,7 +771,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 18811
+      "bytes": 18058
     },
     {
       "name": "spike-probe",
@@ -781,7 +781,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 17420
+      "bytes": 16720
     },
     {
       "name": "spike-ratchet",
@@ -791,7 +791,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 15322
+      "bytes": 14567
     },
     {
       "name": "tailwind-spacing-audit",
@@ -802,7 +802,7 @@
         "references/heuristics.md": "plugins/tailwind/skills/spacing-audit/references/heuristics.md",
         "references/patterns.md": "plugins/tailwind/skills/spacing-audit/references/patterns.md"
       },
-      "bytes": 28530
+      "bytes": 28001
     },
     {
       "name": "tdd-fix",
@@ -818,7 +818,7 @@
         "plugins/tdd/skills/xfail/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 12917
+      "bytes": 12584
     },
     {
       "name": "terraform-bump-provider",
@@ -830,7 +830,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 28160
+      "bytes": 28107
     },
     {
       "name": "terraform-bump-terraform",
@@ -842,7 +842,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 28444
+      "bytes": 28350
     },
     {
       "name": "terraform-bumping-terraform",
@@ -854,7 +854,7 @@
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md",
         "references/pin-sites.md": "plugins/terraform/references/pin-sites.md"
       },
-      "bytes": 28761
+      "bytes": 28624
     },
     {
       "name": "terraform-refresh-lock",
@@ -865,7 +865,7 @@
         "references/layout-discovery.md": "plugins/terraform/references/layout-discovery.md",
         "references/lock-and-init.md": "plugins/terraform/references/lock-and-init.md"
       },
-      "bytes": 18656
+      "bytes": 18575
     },
     {
       "name": "ticket-draft",
@@ -889,7 +889,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/trello.md": "plugins/ticket/references/providers/trello.md"
       },
-      "bytes": 144364
+      "bytes": 143729
     },
     {
       "name": "ticket-rebuild",
@@ -913,7 +913,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/trello.md": "plugins/ticket/references/providers/trello.md"
       },
-      "bytes": 144055
+      "bytes": 143447
     },
     {
       "name": "weave-architecture",
@@ -955,7 +955,7 @@
         "references/present-results.md": "plugins/weave/references/present-results.md",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 73231
+      "bytes": 73037
     },
     {
       "name": "weave-brainstorm-and-refine",
@@ -971,7 +971,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 127811
+      "bytes": 127315
     },
     {
       "name": "weave-execute",
@@ -1040,7 +1040,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 126563
+      "bytes": 126109
     },
     {
       "name": "weave-review",
@@ -1072,7 +1072,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 111900
+      "bytes": 111398
     }
   ],
   "duplication": {

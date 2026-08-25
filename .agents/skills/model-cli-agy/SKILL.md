@@ -1,15 +1,9 @@
 ---
 name: model-cli-agy
 description: >-
-  Delegate a task to Google's Gemini via the Antigravity (agy) CLI. Use this
-  skill when the user explicitly asks to use Antigravity, agy, Gemini, or
-  Google's model for a task, or when you determine that Gemini would provide
-  better results for a specific task. Detects the agy binary, falls back to
-  the gemini CLI, then to agent --model gemini-3.1-pro if neither is
-  available.
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
+  Use when delegating to Google Gemini or Antigravity for a second opinion
+  from Google's model; falls back through Gemini and agent CLIs.
 metadata:
-  argument-hint: "<prompt> [timeout:<seconds>]"
   source: "plugins/model-cli/skills/agy/SKILL.md"
 ---
 

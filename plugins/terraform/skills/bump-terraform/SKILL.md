@@ -1,6 +1,6 @@
 ---
 name: bump-terraform
-description: Move the Terraform or OpenTofu CLI version across every module and every pin site outside the configuration — version manager files, CI workflows, container images — and report the sites that disagreed
+description: "Use when updating the Terraform or OpenTofu CLI across module constraints, version-manager files, CI, and images."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "WebSearch", "WebFetch", "AskUserQuestion"]
 argument-hint: "[version] [--root-module <dir>...] [--audit-only] [--no-lock] [--no-commit]"
 user-invocable: true

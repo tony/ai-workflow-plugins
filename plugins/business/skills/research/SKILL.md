@@ -1,6 +1,6 @@
 ---
 name: research
-description: Collect business-value data for an AI skill or workflow into a provenance-tagged run package — instrument discovery, pinned-window collection, immutable raw snapshots
+description: "Use when collecting evidence for the business value of an AI skill or workflow into a provenance-tagged research package."
 allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion", "EnterPlanMode"]
 argument-hint: "[skill or workflow to measure] [date range, e.g. 2026-04-01..2026-06-30]"
 user-invocable: true

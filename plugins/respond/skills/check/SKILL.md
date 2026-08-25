@@ -1,21 +1,6 @@
 ---
 name: check
-description: >-
-  Use when review feedback needs screening before anything gets fixed —
-  comments from a human reviewer, an automated review agent (Bugbot,
-  CodeRabbit, Copilot, Greptile, Codex), or the findings a review skill
-  produced earlier in the session. Triggers on phrases like "screen the
-  review comments", "which of these findings are worth doing", "is the
-  bot right", "triage the PR feedback", "should we actually fix this".
-  Collects the feedback from the session, a pull request, or pasted
-  text, then tests every claim for truth, provenance against the
-  merge-base, alignment with decisions the project already made, the
-  odds the scenario ever fires, and what the fix would cost — emitting
-  a ledger of fix / defer / decline verdicts with the evidence and
-  drafted replies. Changes no files.
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion", "Task"]
-argument-hint: "[findings text] [--pr=<num>] [--base=<ref>] [--include-resolved]"
-user-invocable: true
+description: "Use when screening or replying to pull-request review comments and bot findings; decide if each comment is real, worth fixing, deferred, or declined."
 ---
 
 

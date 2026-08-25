@@ -1,16 +1,9 @@
 ---
 name: research-study-deps
 description: >-
-  Clone and study your project's dependencies at the exact versions you use.
-  Scans manifest files (package.json, pyproject.toml, Cargo.toml, go.mod,
-  etc.), resolves each package's official upstream repo, clones them to
-  ~/study/<language>/, and creates version-pinned git worktrees. Use when
-  the user wants to pull down and read a dependency's upstream source,
-  understand how a package works, or study a library at the exact version
-  their project depends on.
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "WebSearch", "AskUserQuestion"]
+  Use when pulling upstream source or cloning a dependency at its installed
+  version to study internals, read code, or create pinned worktrees.
 metadata:
-  argument-hint: "<package-name|\"all\"|category> [--lang <language>] [--no-worktree]"
   source: "plugins/research/skills/deps/SKILL.md"
 ---
 

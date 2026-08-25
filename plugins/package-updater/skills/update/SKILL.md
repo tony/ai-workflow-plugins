@@ -1,6 +1,6 @@
 ---
 name: update
-description: Find every outdated dependency and toolchain pin across one repo or a fleet and bring them current — toolchain, named bumps, bulk refresh and fallout as separate researched commits
+description: "Use when bringing every outdated dependency and toolchain pin current across one repository or a fleet."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 argument-hint: "[--root <dir>] [--repo <path|slug>...] [--owner <name>...] [--audit-only] [--branch <name>] [--pr] [--issue github|linear] [--no-push]"
 user-invocable: true

@@ -1,12 +1,8 @@
 ---
 name: situate-situational-awareness
 description: >-
-  Use when a session starts on unfamiliar or resumed work — when asked to
-  catch up, come up to speed, get oriented, or figure out where things left
-  off and what you were in the middle of, what a branch is doing, what a
-  pull request or its review threads are asking for, or what state this repo
-  is in before you change anything in it.
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
+  Use when you came back to branch/PR: bring me up to speed on repo state
+  before work, where work left off, and what reviewers ask or PR waits on.
 metadata:
   source: "plugins/situate/skills/situational-awareness/SKILL.md"
 ---

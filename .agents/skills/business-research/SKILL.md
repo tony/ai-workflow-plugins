@@ -1,9 +1,8 @@
 ---
 name: business-research
 description: >-
-  Collect business-value data for an AI skill or workflow into a
-  provenance-tagged run package — instrument discovery, pinned-window
-  collection, immutable raw snapshots
+  Use when collecting evidence for the business value of an AI skill or
+  workflow into a provenance-tagged research package.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Write", "Grep", "AskUserQuestion", "EnterPlanMode"]
 metadata:

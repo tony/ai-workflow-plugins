@@ -1,18 +1,6 @@
 ---
 name: deslop
-description: >-
-  Use when the user wants to clean AI slop, verbosity, fragile
-  hard-coded references (line numbers, test counts, file counts), or
-  low-value contributions out of a branch's commits before review.
-  Triggers on phrases like "deslop", "remove AI slop", "clean up
-  commits", "tighten the commits", "fix verbose commit messages",
-  "drop the fluff", "remove brittle counts", "kill the line-number
-  references", "audit the branch for slop", "scrub Claude signatures",
-  or "fixup the slop on this branch". Operates per-commit since trunk:
-  detects issues, proposes targeted patches and fixup commits (and
-  `--fixup=reword:` for commit-message slop), then optionally runs
-  `git rebase -i --autosquash`, running the project's formatter,
-  linter, and type-checker on every conflict pause.
+description: "Use when cleaning AI slop, verbose commit messages, brittle references, or low-value changes from a branch before review."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<commit-range>] [--apply-patches] [--apply-rebase] [--budget=strict|default|lax] [--targets=diff,messages,both] [--message-only | --diff-only] [--since=<ref>] [--force-rewrite-pushed] [--run-tests] [--no-semantic] [--taxonomy=<path>]"
 user-invocable: true

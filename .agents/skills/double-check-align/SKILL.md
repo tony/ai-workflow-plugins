@@ -1,14 +1,8 @@
 ---
 name: double-check-align
 description: >-
-  Use when a verification pass already came back as a diff against the
-  agent's prior turn — verdict lists like "overstated" / "still holds",
-  "what I changed" sections — and you want the analysis restated whole.
-  Triggers on "align", "restate cleanly", "say how it is", "stop correcting
-  yourself", "I never read the first version", or "give me the final
-  version". Rebuilds the answer from source as a standalone artifact; with
-  an argument, re-anchors on a narrower question and drops the old
-  scaffolding entirely.
+  Use when prior verification was framed as a revision log and the user
+  wants a clean, standalone restatement.
 disable-model-invocation: true
 allowed-tools: ["Read", "Grep", "Glob", "Bash"]
 metadata:

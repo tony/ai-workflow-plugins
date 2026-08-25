@@ -1,9 +1,8 @@
 ---
 name: package-updater-update
 description: >-
-  Find every outdated dependency and toolchain pin across one repo or a
-  fleet and bring them current — toolchain, named bumps, bulk refresh and
-  fallout as separate researched commits
+  Use when bringing every outdated dependency and toolchain pin current
+  across one repository or a fleet.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 metadata:

@@ -1,16 +1,8 @@
 ---
 name: ticket-draft
 description: >-
-  Use when filing into Linear, Jira, GitLab, Shortcut, Azure DevOps, Trello,
-  or Asana — an issue, story, epic, project, initiative, or document — or
-  into GitHub above single-issue altitude. Resolves which provider and which
-  semantic role the object actually is before drafting, since a Linear
-  Project is not an Epic and a merge request is not a pull request. Carries
-  only provenance that cannot be re-derived from the repository, keeps
-  references from rotting or minting unwanted backlinks, and names the few
-  invariants that would make the work pointless rather than a checklist that
-  decides the implementation. Files through a real backend where one exists.
-allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
+  Use when asked to file a Linear issue or regression, draft a Jira epic,
+  open a GitLab issue, or create a Shortcut story or tracker document.
 metadata:
   source: "plugins/ticket/skills/draft/SKILL.md"
 ---

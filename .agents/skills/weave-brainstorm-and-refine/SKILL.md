@@ -1,14 +1,9 @@
 ---
 name: weave-brainstorm-and-refine
 description: >-
-  Use when the user wants to generate multiple original ideas from
-  independent adversarial participants, then iteratively judge, weave, and
-  refine them across multiple passes. Triggers on phrases like "brainstorm
-  and refine", "generate ideas then improve", "explore options then
-  synthesize", or "brainstorm then polish"
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Task", "AskUserQuestion"]
+  Use when asked to brainstorm then refine, generate ideas then improve, or
+  explore alternatives and synthesize the best one across passes.
 metadata:
-  argument-hint: "<prompt> [--variants=N] [--passes=N] [--timeout=N|none] [--mode=fast|balanced|deep] [--judge=host|round-robin] [--preamble=...] [--no-deslop|--quiet-deslop|--verbose-deslop] [--workers=subagents|model-clis]"
   source: "plugins/weave/skills/brainstorm-and-refine/SKILL.md"
 ---
 

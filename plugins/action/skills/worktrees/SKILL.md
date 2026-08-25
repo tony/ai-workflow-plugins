@@ -1,16 +1,6 @@
 ---
 name: worktrees
-description: >-
-  Use when the user wants to fan several tickets out into parallel
-  branches and git worktrees — one worktree per ticket by default,
-  tickets grouped onto a shared branch when they clearly overlap.
-  Triggers on phrases like "set up worktrees for these tickets", "fan
-  out my Linear queue", "work these three issues in parallel", "a
-  worktree per ticket", or "batch these bugs into branches". Discovers
-  and groups tickets strictly read-only, confirms the grouping at a
-  plan gate, then drives each unit through /action:worktree's
-  procedure — one subagent per worktree where the host supports it,
-  sequential otherwise.
+description: "Use when fanning several tickets into parallel branches and git worktrees, with related tickets grouped together."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[<ticket>...] [--groups=\"a b; c\"] [--sequential] [--local|--temp] [--push|--pr|--setup-only]"
 user-invocable: true

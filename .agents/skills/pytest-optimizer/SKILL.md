@@ -1,16 +1,8 @@
 ---
 name: pytest-optimizer
 description: >-
-  Use when the user wants to make a pytest suite faster, profile slow tests
-  or fixtures, find unused or mis-scoped fixtures, consolidate duplicate
-  test tracks, migrate to typed parametrize, or apply safe test speedups.
-  Triggers on phrases like "speed up my tests", "why are my tests slow",
-  "profile pytest", "optimize the test suite", "find slow fixtures", "my
-  fixtures are slow", "which fixtures are unused", "the test suite takes too
-  long", or "parallelize my tests". Runs a resumable four-phase pipeline
-  (scan, benchmark, plan, execute) that measures before it mutates and
-  applies each speedup as its own verified commit. Does not edit the suite
-  until a speedup clears the noise band and a safety gate.
+  Use when a pytest suite or its fixtures are slow and need measured,
+  safety-gated optimization across the full pipeline.
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 metadata:
   argument-hint: "[test-path-or-marker] [--phase=scan|benchmark|plan|execute] [--force] [--memory-dir=<path>]"

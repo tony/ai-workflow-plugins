@@ -1,16 +1,6 @@
 ---
 name: scan
-description: >-
-  Use when the user wants to scan the current repo for AI slop,
-  verbosity, fragile hard-coded references (line numbers, test
-  counts, file counts), or low-value contributions in tracked files,
-  with each finding landing as its own atomic forward-going commit.
-  Triggers on phrases like "scan for slop", "audit repo for slop",
-  "deslop the repo", "remove slop from this codebase", "scrub the
-  repo", "scan the codebase for AI signatures", or "clean up slop
-  without rewriting history". Does NOT rewrite history; every
-  finding lands as a forward-going commit, with the project's
-  formatter, linter, and type-checker running before each commit.
+description: "Use when scanning tracked repository files for AI slop, verbosity, brittle references, or low-value contributions."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 argument-hint: "[--paths=<glob>] [--apply] [--budget=strict|default|lax] [--with-history=<N>] [--allow-dirty] [--run-tests] [--no-semantic] [--taxonomy=<path>] [--on-fail=skip|stop|ask]"
 user-invocable: true

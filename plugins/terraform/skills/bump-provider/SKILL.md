@@ -1,6 +1,6 @@
 ---
 name: bump-provider
-description: Move a Terraform or OpenTofu provider to a new version across every module that declares it, then refresh each root module's lock file without narrowing its platform coverage
+description: "Use when updating one Terraform or OpenTofu provider across modules and refreshing root lockfiles without losing platforms."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "WebSearch", "WebFetch", "AskUserQuestion"]
 argument-hint: "<provider> [version] [--root-module <dir>...] [--audit-only] [--no-lock] [--no-commit]"
 user-invocable: true

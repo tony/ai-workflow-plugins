@@ -1,18 +1,8 @@
 ---
 name: spike-probe
 description: >-
-  Use when the user wants to prove out a feature or fix fast before
-  committing to an implementation — a spike, probe, blitz, sprint, bolt,
-  speedrun, MVP pass, or proof-of-concept that mutates the working tree but
-  must not land as commits. Triggers on phrases like "probe it", "quick
-  probe", "spike into", "do a spike", "blitz it", "bolt through it",
-  "speedrun the fix", "do a sprint to handle this without committing", "take
-  a stab at it", "prove it works, then plan", "MVP this then clean it up",
-  "probe those review items", or "get it working before my meeting". The
-  goal may be typed or inferred from conversation context (review findings,
-  a failing test under discussion). Ends with the working tree stashed and a
-  commit-by-commit plan to land the work through the project's quality
-  gates.
+  Use when spiking a feature or fix in the working tree to prove it quickly
+  before committing to an implementation.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "AskUserQuestion", "Task"]
 metadata:

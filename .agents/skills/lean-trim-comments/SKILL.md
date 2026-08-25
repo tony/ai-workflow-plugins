@@ -1,16 +1,9 @@
 ---
 name: lean-trim-comments
 description: >-
-  Use when comments or docstrings already in the source are too fat,
-  bloated, dense, or slop-heavy and should be trimmed, leaned, cut down, or
-  debloated — "these comments are too fat", "trim the comments", "comment
-  bloat", "that comment is pure slop", "keep comments light", "avoid dense
-  docstrings", "would we still be grateful for this in 3 years". Judges what
-  is already written and deletes what does not earn its keep; it never adds
-  any.
-allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
+  Use when existing source comments or docstrings are bloated, dense,
+  repetitive, AI slop, or should be trimmed, debloated, and kept light.
 metadata:
-  argument-hint: "[paths/globs] [--staged] [--all] [--diff-only]"
   source: "plugins/lean/skills/trim-comments/SKILL.md"
 ---
 

@@ -1,9 +1,8 @@
 ---
 name: situate-refocus
 description: >-
-  Re-derive what this work is for from its ticket and pull request, sort
-  every commit into on-goal, load-bearing, and drift, name what the goal
-  asked for that is still missing, and propose the correction
+  Use when a branch may have drifted from its ticket or pull-request goal
+  and needs its work and gaps reclassified.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
 metadata:

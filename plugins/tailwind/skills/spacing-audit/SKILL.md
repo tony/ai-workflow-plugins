@@ -1,15 +1,6 @@
 ---
 name: tailwind-spacing-audit
-description: >-
-  This skill should be used when the user mentions uneven spacing, alignment
-  issues, inconsistent gaps between elements, mixed margin/gap strategies,
-  navbar or toolbar spacing problems, or asks to "clean up", "normalize", or
-  "audit" spacing in a Tailwind component. This skill also applies when reviewing UI code
-  where flex/grid containers use a mix of gap-*, margin (m*, me-*, ms-*),
-  padding, and fixed widths to space sibling elements — even if the user
-  doesn't explicitly say "spacing." If someone pastes a nav bar, toolbar,
-  header, or action bar and says "something looks off," this skill is almost
-  certainly what they need.
+description: "Use when Tailwind UI spacing, alignment, gaps, margins, padding, or toolbar and navbar rhythm looks inconsistent."
 user-invocable: true
 argument-hint: <file-or-directory-to-audit>
 ---

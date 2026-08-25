@@ -1,10 +1,8 @@
 ---
 name: release-bump
 description: >-
-  Discover what version comes next — enumerate candidates from the project's
-  own scheme (a1→a2, 0.1.9→0.1.10, 0.2.0, 0.2.0a0), confirm with the user,
-  then cut the release with the same safe defaults as the `release-cut`
-  skill.
+  Use when discovering and confirming the next version from a project's own
+  release scheme before cutting the release.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 metadata:

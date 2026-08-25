@@ -1,15 +1,8 @@
 ---
 name: pytest-optimizer-00-scan
 description: >-
-  Phase 1 of the pytest-optimizer pipeline. Profile the suite and emit
-  hypotheses without editing any test. Detects pytest + plugin versions and
-  gates capabilities, establishes a reproducible timing baseline with a
-  measured noise band, ranks the slowest test bodies and the slowest fixture
-  setup/teardown separately, and runs the static detectors
-  (unused/mis-scoped/ duplicate fixtures, mark-on-fixture, typing and
-  parametrize gaps). Writes baseline.json, capabilities.json, and
-  hypotheses.json to the memory directory. Read-only on the test suite. Use
-  when starting a pytest optimization pass or re-baselining after changes.
+  Use when starting or re-baselining a pytest optimization pass by profiling
+  tests and fixtures without editing the suite.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "AskUserQuestion"]
 metadata:

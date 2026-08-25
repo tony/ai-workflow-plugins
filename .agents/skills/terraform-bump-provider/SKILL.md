@@ -1,9 +1,8 @@
 ---
 name: terraform-bump-provider
 description: >-
-  Move a Terraform or OpenTofu provider to a new version across every module
-  that declares it, then refresh each root module's lock file without
-  narrowing its platform coverage
+  Use when updating one Terraform or OpenTofu provider across modules and
+  refreshing root lockfiles without losing platforms.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "WebSearch", "WebFetch", "AskUserQuestion"]
 metadata:

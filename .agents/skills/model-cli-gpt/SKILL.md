@@ -1,10 +1,8 @@
 ---
 name: model-cli-gpt
 description: >-
-  Use when running a prompt through OpenAI GPT directly. An alternative
-  invocation point for the `model-cli-codex` skill — both use the same
-  backend (codex binary or agent --model gpt-5.4-high fallback). Use this or
-  the `model-cli-codex` skill interchangeably.
+  Use when invoking OpenAI GPT directly through the same Codex CLI or agent
+  fallback used by the codex skill.
 disable-model-invocation: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Write", "Edit"]
 metadata:

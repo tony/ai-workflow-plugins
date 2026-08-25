@@ -1,17 +1,6 @@
 ---
 name: skill-style
-description: >-
-  Use when writing, auditing, or trimming a SKILL.md — a new skill, a
-  bloated skill nobody reads through, a skill description that never
-  triggers, or a sweep over every skill in a plugin. Holds each line to
-  a deletion test: it stays only when you can name what the agent would
-  do differently without it. Preserves YAML frontmatter, fenced code
-  blocks, literal commands, and section headings verbatim. Applies the
-  Anthropic and OpenAI skill-authoring rules — a third-person
-  description carrying its own trigger words, one job per skill,
-  progressive disclosure into reference files. Triggers on "review my
-  skill", "this SKILL.md is bloated", "why does my skill never fire",
-  "tighten these skills", or "write a SKILL.md".
+description: "Use when writing, auditing, or trimming a SKILL.md, especially for bloated bodies, weak descriptions, or plugin-wide sweeps."
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "AskUserQuestion"]
 argument-hint: "[skill paths/globs] [--audit] [--diff-only]"
@@ -116,7 +105,7 @@ it, in the literal words a user would type.
 - `name` — lowercase letters, numbers, hyphens; 64 characters or
   fewer. Gerunds and noun phrases both read well; `helper`, `utils`,
   and `tools` name nothing.
-- `description` — 1024 characters or fewer. Front-load the trigger.
+- `description` — 150 characters or fewer. Front-load the trigger.
   Never `I can help you…` or `You can use this to…`.
 - Set `disable-model-invocation: true` when the skill only makes sense
   asked for by name, so it stays out of the routing corpus.

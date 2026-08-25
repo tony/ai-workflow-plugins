@@ -1,6 +1,6 @@
 ---
 name: bump
-description: Move one repo or a whole fleet onto a new ruff release — predict which rules can fire against each repo's own select list, gate on the resolver seeing the version, then land one reviewed commit per rule
+description: "Use when upgrading Ruff in one repository or a fleet and evaluating newly applicable rules before committing each change."
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write", "WebSearch", "WebFetch", "Task", "AskUserQuestion"]
 argument-hint: "[version] [--root <dir>] [--repo <path|slug>...] [--owner <name>...] [--branch <name>] [--adopt-defaults] [--audit-only] [--no-pr] [--no-changelog]"
 user-invocable: true

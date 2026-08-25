@@ -1,14 +1,6 @@
 ---
 name: create-issue
-description: >-
-  Use when filing a GitHub issue — reporting a bug, proposing a
-  feature or a piece of work, or turning an audit, review finding, or
-  investigation into something tracked. Reproduces and gathers
-  evidence before writing prose, checks the repository's own templates
-  and existing issues for a duplicate, pins every source link to a tag
-  or commit, strips local paths and PII, previews the body through
-  GitHub's renderer, and opens it with `gh` only after you approve the
-  full title and body.
+description: "Use when filing a GitHub issue for a bug, feature, audit, review finding, or investigated piece of work."
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob", "WebSearch", "WebFetch", "AskUserQuestion"]
 ---
