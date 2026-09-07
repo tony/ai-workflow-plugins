@@ -114,6 +114,42 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 See [uv installation docs](https://docs.astral.sh/uv/getting-started/installation/) for
 other methods.
 
+### Install the working tree into your agent CLIs
+
+Every host caches an unpacked plugin tree keyed by name and version, so
+installing over an unchanged version does nothing. `scripts/install.py`
+uninstalls the plugins, removes the marketplace, re-adds it and reinstalls, so
+edited skills take effect while the version stays put.
+
+Reinstall into every detected host:
+
+```console
+$ uv run ./scripts/install.py
+```
+
+Preview the commands without running them:
+
+```console
+$ uv run ./scripts/install.py --dry-run
+```
+
+Target one host:
+
+```console
+$ uv run ./scripts/install.py --host codex
+```
+
+Claude Code, Codex, Grok and Antigravity read the working tree directly and are
+installed by default. Cursor is opt-in with `--host cursor`: it indexes a
+marketplace on its own servers against the signed-in account, so it takes a git
+URL and cannot see local edits.
+
+Install the published marketplace instead of the working tree:
+
+```console
+$ uv run ./scripts/install.py --source tony/skills
+```
+
 ### Lint and validate
 
 ```bash
