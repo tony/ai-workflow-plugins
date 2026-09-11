@@ -202,6 +202,21 @@ No uncommitted changes should remain before moving to the next finding.
 
 ## Phase 4: Present results
 
+Resolve `AIP_ROOT`, `REPO_DIR`, and `SESSION_ID` by following Steps 1–3 of
+Session Directory Initialization in `../review/SKILL.md`, then create the
+session directory:
+
+```bash
+SESSION_DIR="$AIP_ROOT/repos/$REPO_DIR/sessions/fix-review/$SESSION_ID"
+```
+
+```bash
+mkdir -p -m 700 "$SESSION_DIR"
+```
+
+Write the session summary — each finding, its verdict, and the commit that
+addressed it — to `$SESSION_DIR/phase-4-summary.md`.
+
 Read `../../references/present-results.md` and apply it with:
 
 - `RESULT_KIND` = `fix-review`
