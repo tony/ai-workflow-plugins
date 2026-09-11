@@ -299,7 +299,7 @@ git stash --include-untracked -m "weave-execute: user-changes stash"
 #### Step 4c: Repo Guard — Capture Fingerprint
 
 Capture the clean repository state after stashing. See
-`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+`../../docs/repo-guard-protocol.md` Layer 2 for the full protocol.
 
 ```bash
 REPO_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
@@ -893,7 +893,7 @@ All project quality gates passed.
 ## Rules
 
 - Always create isolated worktrees — never let models interfere with each other
-- **Repo Guard**: External model CLIs run in isolated worktrees via `(cd "$WORKTREE_PATH" && ...)`. Post-analysis verification ensures the main tree is unchanged during diff capture. Session-end verification confirms only synthesized changes are present before stash restore. See `docs/repo-guard-protocol.md`.
+- **Repo Guard**: External model CLIs run in isolated worktrees via `(cd "$WORKTREE_PATH" && ...)`. Post-analysis verification ensures the main tree is unchanged during diff capture. Session-end verification confirms only synthesized changes are present before stash restore. See `../../docs/repo-guard-protocol.md`.
 - Always run quality gates on each implementation before comparing
 - Always present the synthesis plan to the user and wait for confirmation before applying
 - Always clean up worktrees and branches after synthesis

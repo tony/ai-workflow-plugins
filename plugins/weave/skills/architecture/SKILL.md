@@ -201,7 +201,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 2. Else next CLI in the fallback chain → use it (`agent` slots use the `--model` flag)
 3. Else → slot unavailable, note in report
 
-The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `docs/repo-guard-protocol.md`).
+The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `../../docs/repo-guard-protocol.md`).
 
 Report which models will participate and which backend each uses.
 
@@ -304,7 +304,7 @@ git stash --include-untracked -m "weave-architecture: user-changes stash"
 #### Step 4c: Repo Guard — Capture Fingerprint
 
 Capture the clean repository state after stashing. See
-`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+`../../docs/repo-guard-protocol.md` Layer 2 for the full protocol.
 
 ```bash
 REPO_HEAD="$(git -C "$REPO_TOPLEVEL" rev-parse HEAD)"
@@ -926,7 +926,7 @@ Present the final result:
 - Always present the synthesis plan to the user and wait for confirmation before applying
 - Always clean up worktrees and branches after synthesis
 - The synthesized architecture must have valid frontmatter and consistent cross-references before being considered complete
-- **Repo Guard**: External model CLIs run in isolated worktrees via `(cd "$WORKTREE_PATH" && ...)`. Post-analysis verification ensures the main tree is unchanged during diff capture. Session-end verification confirms only synthesized changes are present before stash restore. See `docs/repo-guard-protocol.md`.
+- **Repo Guard**: External model CLIs run in isolated worktrees via `(cd "$WORKTREE_PATH" && ...)`. Post-analysis verification ensures the main tree is unchanged during diff capture. Session-end verification confirms only synthesized changes are present before stash restore. See `../../docs/repo-guard-protocol.md`.
 - If only Claude is available, skip worktree creation and just generate artifacts directly
 - Use `<timeout_cmd> <timeout_seconds>` for external CLI commands, resolved from Phase 2 Step 4. If no timeout command is available, omit the prefix entirely. Adjust higher or lower based on observed completion times.
 - Capture stderr from external tools (via `$SESSION_DIR/pass-{N}/stderr/<model>.txt`) to report failures clearly

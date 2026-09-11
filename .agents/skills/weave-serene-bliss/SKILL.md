@@ -266,7 +266,8 @@ each model producing all three lens variants in parallel.
 ### Variant Preambles (locked)
 
 The variant preambles are FIXED for serene-bliss — the variant preamble
-table from brainstorm.md/brainstorm-and-refine.md does NOT apply.
+table from the `weave-brainstorm` skill and
+the `weave-brainstorm-and-refine` skill does NOT apply.
 Instead, every variant receives the **same** compound preamble (above),
 prefixed by weave's standard "Variant N of M:" marker. The compound
 preamble's slot directives route each variant to its lens by variant
@@ -685,7 +686,8 @@ and writes it to `$SESSION_DIR/refine/pass-0001/woven.md`.
 ### Step 6: Distribute (if pass_count > 1)
 
 Follow Phase 5 Step 4 (Distribute for Pass 2) of
-`brainstorm-and-refine.md` verbatim. Send the woven version back to
+the `weave-brainstorm-and-refine` skill verbatim. Send the woven version
+back to
 all 3 models for the next
 pass's critique.
 

@@ -229,7 +229,7 @@ After interactive configuration, launch a single setup Task agent (`subagent_typ
 > | **Antigravity** | `agy` binary | `Gemini 3.1 Pro (High)` | `gemini -m gemini-3-pro-preview` → `agent --model gemini-3.1-pro` | `gemini-3.1-pro` |
 > | **GPT** | `codex` binary | (default) | `agent --model gpt-5.4-high` | `gpt-5.4-high` |
 >
-> The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `docs/repo-guard-protocol.md`).
+> The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `../../docs/repo-guard-protocol.md`).
 >
 > Resolution logic for each external slot:
 > 1. Native CLI found → use it
@@ -446,7 +446,7 @@ Launch a Task agent (`subagent_type: "general-purpose"`, `mode: "default"`) to e
 > Construct the planning prompt by prepending the role preamble to the task description and context packet, then appending:
 > "Additional instructions: Read AGENTS.md/CLAUDE.md for project conventions. Reference actual files, functions, and patterns from the codebase. Do NOT modify any files — plan only. Include: files to modify, implementation steps in order (each step = one atomic commit with quality gate verification before committing), architecture decisions, test strategy, and risks."
 >
-> The agent must run the appropriate command based on the backend. **Repo Guard**: `agy` has no native read-only mode (its print mode reads *and* writes), so isolate it in a disposable git worktree checked out at `HEAD` — agy reads the snapshot while any stray write lands in the throwaway worktree, never the main repo (see `docs/repo-guard-protocol.md` Layer 1). The `gemini` and `agent` fallbacks keep their own native read-only modes.
+> The agent must run the appropriate command based on the backend. **Repo Guard**: `agy` has no native read-only mode (its print mode reads *and* writes), so isolate it in a disposable git worktree checked out at `HEAD` — agy reads the snapshot while any stray write lands in the throwaway worktree, never the main repo (see `../../docs/repo-guard-protocol.md` Layer 1). The `gemini` and `agent` fallbacks keep their own native read-only modes.
 >
 > **Primary (`agy` CLI, disposable worktree)**:
 > ```bash
@@ -747,7 +747,7 @@ For each pass from 2 to `pass_count`:
 
 ## Rules
 
-- Never modify project files — this is project-read-only planning. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
+- Never modify project files — this is project-read-only planning. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`../../docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - Do not exit plan mode — the plan file is the final output.
 - All Bash, Write (non-plan-file), and Edit operations must go through sub-agents spawned with `mode: "default"`.
 - Session-end: persist synthesis and update session metadata via sub-agent; write the plan to the plan file directly.

@@ -222,7 +222,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 2. Else next CLI in the fallback chain → use it (`agent` slots use the `--model` flag)
 3. Else → slot unavailable, note in report
 
-The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `docs/repo-guard-protocol.md`).
+The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `../../docs/repo-guard-protocol.md`).
 
 Report which models will participate and which backend each uses.
 
@@ -400,7 +400,7 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 #### Step 8b: Repo Guard — Capture Fingerprint
 
 Capture the repository state before any model runs. See
-`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+`../../docs/repo-guard-protocol.md` Layer 2 for the full protocol.
 
 ```bash
 REPO_TOPLEVEL="$(git rev-parse --show-toplevel)"
@@ -489,7 +489,7 @@ CRITICAL: Do NOT write, edit, create, or delete any files. Do NOT use any file-w
 The agent must:
 
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
-2. Run the resolved Antigravity command with output redirection. **Repo Guard**: `agy` has no native read-only mode (its print mode reads *and* writes), so isolate it in a disposable git worktree checked out at `HEAD` — agy reads the snapshot while any stray write lands in the throwaway worktree, never the main repo (see `docs/repo-guard-protocol.md` Layer 1). The `gemini` and `agent` fallbacks keep their own native read-only modes.
+2. Run the resolved Antigravity command with output redirection. **Repo Guard**: `agy` has no native read-only mode (its print mode reads *and* writes), so isolate it in a disposable git worktree checked out at `HEAD` — agy reads the snapshot while any stray write lands in the throwaway worktree, never the main repo (see `../../docs/repo-guard-protocol.md` Layer 1). The `gemini` and `agent` fallbacks keep their own native read-only modes.
 
    **Primary (`agy` CLI, disposable worktree)**:
    ```bash
@@ -506,7 +506,7 @@ The agent must:
    (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gemini-3.1-pro "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/agy.md" 2>>"$SESSION_DIR/pass-0001/stderr/agy.txt")
    ```
 
-3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
+3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `../../docs/repo-guard-protocol.md` Layer 3):
 
    ```bash
    CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
@@ -536,7 +536,7 @@ The agent must:
 1. Read the prompt from `$SESSION_DIR/pass-0001/prompt.md`
 2. Run the resolved GPT command with output redirection:
 
-   **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1)
+   **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `../../docs/repo-guard-protocol.md` Layer 1)
 
    **Native (`codex` CLI)**:
    ```bash
@@ -550,7 +550,7 @@ The agent must:
    (cd "$SESSION_DIR" && <timeout_cmd> <timeout_seconds> agent -p --mode plan --trust --workspace "$REPO_TOPLEVEL" --model gpt-5.4-high "$(cat "$SESSION_DIR/pass-0001/prompt.md")" >"$SESSION_DIR/pass-0001/outputs/gpt.md" 2>>"$SESSION_DIR/pass-0001/stderr/gpt.txt")
    ```
 
-3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `docs/repo-guard-protocol.md` Layer 3):
+3. **Repo Guard**: After the CLI returns, verify the repository is unchanged (see `../../docs/repo-guard-protocol.md` Layer 3):
 
    ```bash
    CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"
@@ -717,7 +717,7 @@ The judge prompt structure:
 
 **Step B: Write and dispatch judge prompt.** Write the prompt to `$SESSION_DIR/pass-NNNN/judge-prompt.md`. Dispatch to the judge model using the same CLI mechanism as participation:
 
-**Antigravity as judge** — primary (`agy` CLI, disposable worktree). `agy` has no native read-only mode, so isolate it in a disposable git worktree checked out at `HEAD`, in a SEPARATE worktree from any model-pass run so the two never collide (see `docs/repo-guard-protocol.md` Layer 1):
+**Antigravity as judge** — primary (`agy` CLI, disposable worktree). `agy` has no native read-only mode, so isolate it in a disposable git worktree checked out at `HEAD`, in a SEPARATE worktree from any model-pass run so the two never collide (see `../../docs/repo-guard-protocol.md` Layer 1):
 ```bash
 (AGY_RO_WT="${REPO_TOPLEVEL}-weave-agy-ro-judge"; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; git -C "$REPO_TOPLEVEL" worktree add -q --detach "$AGY_RO_WT" HEAD && (cd "$AGY_RO_WT" && <timeout_cmd> <timeout_seconds> agy --model "Gemini 3.1 Pro (High)" --add-dir "$AGY_RO_WT" --dangerously-skip-permissions -p "$(cat "$SESSION_DIR/pass-NNNN/judge-prompt.md")" </dev/null >"$SESSION_DIR/pass-NNNN/judge-raw.md" 2>"$SESSION_DIR/pass-NNNN/stderr/judge-agy.txt"); rc=$?; git -C "$REPO_TOPLEVEL" worktree remove --force "$AGY_RO_WT" 2>/dev/null; exit "$rc")
 ```
@@ -739,7 +739,7 @@ The judge prompt structure:
 
 Use the same fallback and retry protocol as participation dispatch (see Phase 3). If the native CLI fails, fall back to `agent --model <model>`.
 
-**Repo Guard**: After each external judge CLI returns, verify the repository is unchanged using the same post-CLI verification as Phase 3 (see `docs/repo-guard-protocol.md` Layer 3). Log any violation with the judge model name.
+**Repo Guard**: After each external judge CLI returns, verify the repository is unchanged using the same post-CLI verification as Phase 3 (see `../../docs/repo-guard-protocol.md` Layer 3). Log any violation with the judge model name.
 
 **Step C: Parse external judge output.** Read `$SESSION_DIR/pass-NNNN/judge-raw.md` and extract:
 
@@ -916,7 +916,7 @@ After the reference returns, finalize the session:
 
 ## Rules
 
-- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`../../docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - The woven version MUST go back to ALL models for each subsequent pass — do not let the judge refine alone. The judge picks the winner and weaves, but all models must critique and improve the woven result in the next pass.
 - Each model's output MUST clearly separate Critique, Improved Version, and Rationale sections. If a model's output does not follow this structure, parse it best-effort and note the formatting issue in the judge's assessment.
 - `--judge=round-robin` rotates judging across available models. The rotation order is Claude → Antigravity → GPT (skipping unavailable models). External model judges produce scores and pick winners via the External Judge Protocol; the host agent always weaves. If an external judge's output cannot be parsed, the host judges that pass as fallback. Record the actual judge and any fallback in `judge.md` and `events.jsonl`.
