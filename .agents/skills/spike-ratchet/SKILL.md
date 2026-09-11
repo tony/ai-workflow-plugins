@@ -17,10 +17,6 @@ is the right design?" — that only emerges from hitting real code
 several times and watching which parts keep fighting back. The ratchet
 runs both in rounds until the design stops resisting.
 
-This skill is invoked by name, never routed to on the model's
-initiative: it runs multiple mutating rounds and (in `--replay`)
-creates commits, so it must be user-explicit, not router-inferred.
-
 ## Core thesis
 
 Across rounds the code is disposable and **the ledger is the

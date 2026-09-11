@@ -904,7 +904,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 14713
+      "bytes": 14518
     },
     {
       "name": "tailwind-spacing-audit",
