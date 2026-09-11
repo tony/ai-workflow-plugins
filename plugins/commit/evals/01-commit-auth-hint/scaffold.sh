@@ -35,14 +35,19 @@ MD
 # The harness drops its own dotfiles into the run's working directory. Ignore
 # them so the skill sees a working tree holding only the change under test.
 cat >.gitignore <<'MD'
-.claude
-.mcp.json
-.eval-artifacts
-.zshrc
+.bash_profile
 .bashrc
-.profile
+.claude
+.eval-artifacts
+.gitconfig
+.gitmodules
 .idea
+.mcp.json
+.profile
+.ripgreprc
 .vscode
+.zprofile
+.zshrc
 MD
 
 mkdir -p src tests
