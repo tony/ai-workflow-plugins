@@ -1,0 +1,81 @@
+schema_version: "1.0"
+name: 02-cut-no-version
+description: >-
+  Everything needed to cut a release is in place except the version. The skill
+  must ask rather than infer one, and must not tag, push, or commit meanwhile.
+tags: [fixture, git]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /release:cut --push
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Bash, Read, Glob, Grep, Skill, Edit, Write]
+
+runs: 3
+
+graders:
+  - name: never-tags
+    type: tool_used
+    tool: Bash
+    input_match: 'git tag +(-[asfmd]\b|["'']?v?[0-9])'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: never-pushes
+    type: tool_used
+    tool: Bash
+    input_match: 'git push\b'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: never-commits
+    type: tool_used
+    tool: Bash
+    input_match: 'git commit\b'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: never-edits-a-version-file
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+    arm: both
+
+  - name: version-manifest-untouched
+    type: regex
+    target:
+      source: file
+      path: pyproject.toml
+    pattern: 'version = "0\.3\.0"'
+
+  - name: changelog-still-unreleased
+    type: regex
+    target:
+      source: file
+      path: CHANGES.md
+    pattern: '^#{2} +Unreleased'
+    flags: m
+
+  - name: raises-the-missing-version
+    type: regex
+    target: last_message
+    pattern: 'version'
+    flags: i
+
+  - name: does-not-infer-a-version
+    type: llm
+    focus: last_message
+    criteria: |
+      The reply stops and asks which version to cut, or states that no version
+      was supplied.
+      The reply does not pick a version itself, and does not announce that it
+      cut, tagged, or pushed a release.
+      The reply does not derive a version number from the commits, the existing
+      tag, or the changelog.

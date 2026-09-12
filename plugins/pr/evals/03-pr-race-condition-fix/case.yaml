@@ -1,0 +1,65 @@
+schema_version: "1.0"
+name: 03-pr-race-condition-fix
+description: >-
+  With a branch that fixes a counter race across two commits, the skill drafts
+  a PR description in the project's section order and without brittle details.
+tags: [fixture, git]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /pr:pr fixes the race condition
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Bash, Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: has-summary-section
+    type: regex
+    target: last_message
+    pattern: '^#{2,3} +Summary'
+    flags: m
+
+  - name: has-test-plan-section
+    type: regex
+    target: last_message
+    pattern: '^#{2,3} +Test plan'
+    flags: m
+
+  - name: describes-the-race-it-was-told-about
+    type: regex
+    target: last_message
+    pattern: 'race|concurren|lock'
+    flags: i
+
+  - name: names-the-module-that-changed
+    type: regex
+    target: last_message
+    pattern: 'metrics'
+
+  - name: no-brittle-counts
+    type: regex
+    target: last_message
+    match: not_contains
+    pattern: '\b\d+ +(tests?|files? changed|insertions?|deletions?|lines? of)\b'
+    flags: i
+
+  - name: never-pushes-to-trunk
+    type: tool_used
+    tool: Bash
+    input_match: 'git push[^\n]*\b(main|master)\b'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: drafts-rather-than-claims-a-pr
+    type: llm
+    focus: last_message
+    criteria: |
+      The reply contains a proposed pull request description with a title and a
+      body, written for a reader who has not seen the branch.
+      The reply does not claim that a pull request was actually opened on
+      GitHub, and does not invent a pull request number or URL.

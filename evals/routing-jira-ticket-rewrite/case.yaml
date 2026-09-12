@@ -1,0 +1,61 @@
+schema_version: "1.0"
+name: routing-jira-ticket-rewrite
+description: >-
+  Rewriting an existing tracker ticket is not filing a GitHub issue. With both
+  plugins loaded, ticket must win and gh must stay quiet.
+tags: [routing]
+
+plugins: ["../../plugins/gh", "../../plugins/ticket"]
+
+execution:
+  prompt: |-
+    This jira ticket is full of insertion counts and line numbers, rewrite it. It's WIDGET-482 in the tracker (no API access here, so I'm pasting exactly what's on the ticket right now):
+
+    Title: Rework the retry queue
+
+    Body:
+    Changed retryQueue.js (+142/-38 lines) to add a circuit breaker. Added new file breaker.js (89 lines). The fix replaces the linear backoff (lines 12-40 in the old retryQueue.js) with exponential backoff capped at 30s.
+
+    We first tried a token-bucket limiter but abandoned it because it caused thundering-herd retries under load; exponential backoff with jitter avoided that.
+
+    Definition of done:
+    - Circuit breaker implemented using the half-open state pattern
+    - Backoff capped at exactly 30 seconds
+    - retryQueue.js test coverage above 90%
+  max_turns: 15
+  timeout_seconds: 360
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: ticket-rebuild-wins
+    type: tool_used
+    tool: Skill
+    input_match: '"skill":\s*"(ticket:)?rebuild"'
+    arm: both
+
+  - name: gh-stays-quiet
+    type: tool_used
+    tool: Skill
+    input_match: '"skill":\s*"(gh:)?create-issue"'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: presents-an-audit-of-what-changed
+    type: regex
+    target: last_message
+    pattern: '^#{2,4} +(Kept|Cut|Relocated|Demoted|Repaired|Missing)\b|^\*\*(Kept|Cut|Relocated|Demoted|Repaired|Missing)\b'
+    flags: mi
+
+  - name: accounts-for-the-insertion-counts
+    type: regex
+    target: last_message
+    pattern: '\+142/-38'
+
+  - name: keeps-the-abandoned-attempt
+    type: regex
+    target: last_message
+    pattern: 'token.bucket'
+    flags: i

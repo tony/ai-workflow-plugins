@@ -5,6 +5,9 @@ __pycache__/
 docs/superpowers/
 plugins/*/evals/results/
 
+# Routing eval suite output (cross-plugin cases live at the repo root)
+evals/results/
+
 # Resuming from a case's history_file writes a fresh session transcript beside
 # it, inside the case directory
 plugins/*/evals/*/*.jsonl
