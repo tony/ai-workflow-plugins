@@ -1,0 +1,60 @@
+schema_version: "1.0"
+name: 01-double-check-retry-cap
+description: >-
+  The prior turn really is in the conversation and really is wrong. Asked
+  neutrally, the answer must be re-derived and standalone, not a correction
+  notice about what was said before.
+tags: [history]
+
+context:
+  scaffold_script: scaffold.sh
+  history_file: history.jsonl
+
+execution:
+  prompt: Are you sure about that? Double-check the retry cap against the file.
+  max_turns: 15
+  timeout_seconds: 420
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill":\s*"(double-check:)?double-check"'
+
+  - name: reads-the-file-again
+    type: tool_used
+    tool: Read
+    input_match: 'client\.py'
+    arm: both
+
+  - name: cites-the-constant-from-source
+    type: regex
+    target: last_message
+    pattern: 'MAX_RETRIES\s*=\s*3'
+
+  - name: does-not-carry-the-earlier-five-forward
+    type: regex
+    target: last_message
+    match: not_contains
+    pattern: 'MAX_RETRIES\s*=\s*5|caps? (out )?at 5|5 attempts'
+    flags: i
+
+  - name: no-revision-verdict-language
+    type: regex
+    target: last_message
+    match: not_contains
+    pattern: 'overstated|as I (mentioned|said) (before|earlier)|still holds|verdict update|what changed'
+    flags: i
+
+  - name: delivers-a-standalone-finding
+    type: llm
+    focus: last_message
+    criteria: |
+      The reply works the retry behaviour out from the file's own code, citing
+      the `MAX_RETRIES = 3` line.
+      The reply reads as a fresh answer to the question, not as a correction
+      notice about a previous answer, and does not repeat the earlier claim of
+      five as if it still stood.
