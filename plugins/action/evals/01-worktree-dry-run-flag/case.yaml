@@ -1,0 +1,50 @@
+schema_version: "1.0"
+name: 01-worktree-dry-run-flag
+description: >-
+  With a real trunk to branch from, the skill derives a branch name from the
+  goal rather than inventing a ticket, and sets the work up in a worktree
+  outside the current checkout.
+tags: [fixture, git]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /action:worktree Add a --dry-run flag to the sync command that prints planned actions without executing them --setup-only
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Bash, Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: creates-the-worktree
+    type: tool_used
+    tool: Bash
+    input_match: 'git worktree add'
+
+  - name: branch-name-comes-from-the-goal
+    type: regex
+    target: last_message
+    pattern: 'dry-run'
+    flags: i
+
+  - name: invents-no-ticket-id
+    type: regex
+    target: last_message
+    match: not_contains
+    pattern: '\b[A-Z]{2,}-\d+\b'
+
+  - name: reports-where-the-work-will-happen
+    type: regex
+    target: last_message
+    pattern: 'worktree'
+    flags: i
+
+  - name: commits-nothing-under-setup-only
+    type: tool_used
+    tool: Bash
+    input_match: 'git commit'
+    min: 0
+    max: 0
+    arm: both
