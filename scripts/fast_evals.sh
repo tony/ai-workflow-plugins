@@ -25,6 +25,8 @@ THRESHOLD="${FAST_EVAL_THRESHOLD:-0.5}"
 MAX_COST="${FAST_EVAL_MAX_COST:-25}"
 # A haiku judge misreads a reply that opens by naming what it could not verify.
 JUDGE="${FAST_EVAL_JUDGE:-sonnet}"
+# Parallel runs share one rate limit and one machine; raise with care.
+JOBS="${FAST_EVAL_JOBS:-1}"
 
 specs=()
 for eval_dir in plugins/*/evals; do
@@ -74,30 +76,34 @@ verdict_for() {
 
 mkdir -p "$OUT"
 
-echo "Fast suite: ${#specs[@]} cases, one run each, no ablation."
+# Resolve what a previous pass already settled, so an interrupted run costs
+# only what it has left to do.
+pending=()
 failed=()
 for spec in "${specs[@]}"; do
   plugin="${spec%%|*}"
   case_name="${spec##*|}"
-  # Already scored in a previous pass: reuse the verdict, so an interrupted run
-  # resumes instead of paying for every case again. Delete the output
-  # directory to force a re-run.
   result="$OUT/$plugin--$case_name/aggregate-result.json"
   if [[ -s "$result" ]]; then
     verdict="$(verdict_for "$result")"
     case "$verdict" in
       pass)
-        echo "skip $plugin/$case_name (scored previously)"
+        echo "skip  $plugin/$case_name (scored previously)"
         continue ;;
       incomplete*)
         echo "redo  $plugin/$case_name (${verdict#incomplete: })"
         rm -rf "$OUT/$plugin--$case_name" ;;
       *)
         failed+=("$plugin/$case_name -- ${verdict#fail: }")
-        echo "FAIL $plugin/$case_name (${verdict#fail: })"
+        echo "FAIL  $plugin/$case_name (${verdict#fail: })"
         continue ;;
     esac
   fi
+  pending+=("$spec")
+done
+
+run_case() {
+  local plugin="${1%%|*}" case_name="${1##*|}"
   env -u ANTHROPIC_API_KEY claude plugin eval "plugins/$plugin" \
       --case "$case_name" \
       --ablation none \
@@ -109,14 +115,45 @@ for spec in "${specs[@]}"; do
       --no-publish \
       --output-dir "$OUT/$plugin--$case_name" \
       >"$OUT/$plugin--$case_name.log" 2>&1
-  verdict="$(verdict_for "$result")"
-  if [[ "$verdict" == pass ]]; then
-    echo "ok    $plugin/$case_name"
-  else
-    failed+=("$plugin/$case_name -- ${verdict#*: }")
-    echo "FAIL  $plugin/$case_name ($verdict)"
+}
+
+if (( ${#pending[@]} > 0 )); then
+  echo "Running ${#pending[@]} case(s), $JOBS at a time."
+  # Longest first, so the ten-minute ensemble case starts before the
+  # forty-second ones rather than straggling alone at the end.
+  if (( JOBS > 1 )); then
+    ordered=()
+    while IFS= read -r spec; do
+      [[ -n "$spec" ]] && ordered+=("$spec")
+    done < <(printf '%s\n' "${pending[@]}" | FAST_EVAL_OUT="$OUT" python3 "$SELF_DIR/fast_evals_order.py")
+    pending=("${ordered[@]}")
   fi
-done
+  # Batches rather than a `wait -n` pool: macOS ships bash 3.2, which has no
+  # `wait -n`, and a batch keeps the runner readable for the small win it gives
+  # up.
+  batch=()
+  for spec in "${pending[@]}"; do
+    run_case "$spec" &
+    batch+=($!)
+    if (( ${#batch[@]} >= JOBS )); then
+      wait "${batch[@]}" 2>/dev/null || true
+      batch=()
+    fi
+  done
+  (( ${#batch[@]} > 0 )) && { wait "${batch[@]}" 2>/dev/null || true; }
+
+  for spec in "${pending[@]}"; do
+    plugin="${spec%%|*}"
+    case_name="${spec##*|}"
+    verdict="$(verdict_for "$OUT/$plugin--$case_name/aggregate-result.json")"
+    if [[ "$verdict" == pass ]]; then
+      echo "ok    $plugin/$case_name"
+    else
+      failed+=("$plugin/$case_name -- ${verdict#*: }")
+      echo "FAIL  $plugin/$case_name ($verdict)"
+    fi
+  done
+fi
 
 if (( ${#failed[@]} > 0 )); then
   echo
