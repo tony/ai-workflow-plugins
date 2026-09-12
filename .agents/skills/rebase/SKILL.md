@@ -12,10 +12,14 @@ metadata:
 ## Context
 
 - Current branch: !`git branch --show-current`
-- Trunk branch: !`git symbolic-ref --short refs/remotes/origin/HEAD`
+- Working tree: !`git status --short`
 - Remote refs available: !`git remote -v`
-- Commits on current branch not on trunk: !`git log --oneline origin/HEAD..HEAD`
-- Diff from trunk (summary): !`git diff --stat origin/HEAD`
+
+These run before the first turn, so each is a single command that succeeds in
+any repository. Anything needing the trunk is derived in Phase 1 instead: a
+repository set up with `git init` and `git remote add` has no
+`refs/remotes/origin/HEAD`, and a context command that exits non-zero takes the
+whole invocation with it.
 
 ## Your Task
 
@@ -23,7 +27,7 @@ Rebase the current branch onto the remote trunk branch. Follow these steps caref
 
 ### Phase 1: Detect trunk branch
 
-Determine the trunk branch name from the context above (the "Trunk branch" value). Store it mentally as `TRUNK`. It will typically be `master` or `main`. If detection failed, try both `origin/master` and `origin/main` to see which exists.
+Determine the trunk branch name and store it as `TRUNK`. Run `git symbolic-ref --short refs/remotes/origin/HEAD`: it prints `origin/<branch>`, so `TRUNK` is the part **after** the slash — the bare name, because every use below prefixes it with `origin/` itself. That ref is unset in a repository built with `git init` plus `git remote add`, in which case the command exits non-zero; fall back to whichever of `origin/main` or `origin/master` `git rev-parse --verify` resolves.
 
 ### Phase 2: Fetch latest and analyze
 
