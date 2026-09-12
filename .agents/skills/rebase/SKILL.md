@@ -12,10 +12,10 @@ metadata:
 ## Context
 
 - Current branch: !`git branch --show-current`
-- Trunk branch: !`git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"`
-- Remote refs available: !`git remote -v 2>/dev/null | head -2`
-- Commits on current branch not on trunk: !`TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"); git log --oneline "origin/${TRUNK}..HEAD" 2>/dev/null || echo "(could not determine commits ahead)"`
-- Diff from trunk (summary): !`TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"); git diff --stat "origin/${TRUNK}" 2>/dev/null || echo "(could not diff against trunk)"`
+- Trunk branch: !`git symbolic-ref --short refs/remotes/origin/HEAD`
+- Remote refs available: !`git remote -v`
+- Commits on current branch not on trunk: !`git log --oneline origin/HEAD..HEAD`
+- Diff from trunk (summary): !`git diff --stat origin/HEAD`
 
 ## Your Task
 

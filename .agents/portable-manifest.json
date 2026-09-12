@@ -578,7 +578,7 @@
         "plugins/rebase/skills/rebase/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 4336
+      "bytes": 3942
     },
     {
       "name": "release-bump",
