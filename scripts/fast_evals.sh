@@ -53,6 +53,23 @@ failed=()
 for spec in "${specs[@]}"; do
   plugin="${spec%%|*}"
   case_name="${spec##*|}"
+  # Already scored in a previous pass: reuse the verdict, so an interrupted run
+  # resumes instead of paying for every case again. Delete the output
+  # directory to force a re-run.
+  result="$OUT/$plugin--$case_name/aggregate-result.json"
+  if [[ -s "$result" ]]; then
+    if python3 -c "
+import json, sys
+score = json.load(open('$result'))['aggregates']['overallScore']
+sys.exit(0 if score >= $THRESHOLD else 1)
+" 2>/dev/null; then
+      echo "skip $plugin/$case_name (scored previously)"
+    else
+      failed+=("$plugin/$case_name")
+      echo "FAIL $plugin/$case_name (scored previously)"
+    fi
+    continue
+  fi
   if ! env -u ANTHROPIC_API_KEY claude plugin eval "plugins/$plugin" \
       --case "$case_name" \
       --ablation none \
