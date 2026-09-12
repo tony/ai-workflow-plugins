@@ -22,6 +22,8 @@ LIST_ONLY=0
 OUT="${FAST_EVAL_OUT:-evals/results/fast}"
 THRESHOLD="${FAST_EVAL_THRESHOLD:-0.5}"
 MAX_COST="${FAST_EVAL_MAX_COST:-25}"
+# A haiku judge misreads a reply that opens by naming what it could not verify.
+JUDGE="${FAST_EVAL_JUDGE:-sonnet}"
 
 specs=()
 for eval_dir in plugins/*/evals; do
@@ -74,6 +76,7 @@ sys.exit(0 if score >= $THRESHOLD else 1)
       --case "$case_name" \
       --ablation none \
       --runs 1 \
+      --judge-model "$JUDGE" \
       --threshold "$THRESHOLD" \
       --max-cost-usd "$MAX_COST" \
       --trust-plugin \
