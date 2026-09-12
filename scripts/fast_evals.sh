@@ -12,9 +12,19 @@
 #
 # Requires a logged-in Claude Code on the runner. Budget roughly one minute
 # and a few cents of API-equivalent usage per case.
+# No -e on purpose: a failing case must be judged by its verdict and the pass
+# must continue, unlike the scaffolds, which abort on the first error.
 set -uo pipefail
 
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# The helpers carry a PEP 723 header, so honour it when uv is present rather
+# than silently running them on whatever python3 happens to be first on PATH.
+if command -v uv >/dev/null 2>&1; then
+  PY_RUN=(uv run --script)
+else
+  PY_RUN=(python3)
+fi
 cd "$SELF_DIR/.."
 
 LIST_ONLY=0
@@ -42,7 +52,9 @@ for eval_dir in plugins/*/evals; do
     [[ -f "$case_dir/case.yaml" || -f "$case_dir/prompt.md" ]] || continue
     # A scaffolded case needs tool grants the tripwire does not hand out.
     [[ -f "$case_dir/scaffold.sh" ]] && continue
-    if [[ "$name" == *neg* ]]; then
+    # Anchored: a case merely containing "neg" (03-negotiate-timeout) is not a
+    # should-not-fire case.
+    if [[ "$name" == *-neg-* ]]; then
       specs+=("$plugin|$name")
       continue
     fi
@@ -50,7 +62,8 @@ for eval_dir in plugins/*/evals; do
     # Prefer a case that asserts the skill fired. This is a routing tripwire,
     # and a case graded on the artifact instead fails for want of the write
     # tools it is never given, which says nothing about routing.
-    if [[ -z "$routing_trigger" ]] && grep -rqs 'tool: Skill' "$case_dir"; then
+    if [[ -z "$routing_trigger" ]] && grep -hEqs '^[[:space:]]*tool:[[:space:]]*["'"'"']?Skill["'"'"']?[[:space:]]*$' \
+      "$case_dir/case.yaml" "$case_dir"/graders/*.md 2>/dev/null; then
       routing_trigger="$name"
     fi
   done
@@ -71,7 +84,17 @@ fi
 # that alone: a routing case usually pairs one routing grader with one answer
 # grader, so at a 0.5 threshold the answer keeps a broken route green.
 verdict_for() {
-  FAST_EVAL_THRESHOLD="$THRESHOLD" python3 "$SELF_DIR/fast_evals_verdict.py" "$1"
+  FAST_EVAL_THRESHOLD="$THRESHOLD" "${PY_RUN[@]}" "$SELF_DIR/fast_evals_verdict.py" "$1"
+}
+
+# Durations outlive the results they came from: a completed case is skipped and
+# an incomplete one is deleted, so without this cache every pending case looks
+# equally cheap and longest-first ordering does nothing.
+TIMINGS="$OUT/.timings.json"
+
+record_timing() {
+  FAST_EVAL_TIMINGS="$TIMINGS" "${PY_RUN[@]}" "$SELF_DIR/fast_evals_order.py" \
+    --record "$1|$2" "$OUT/$1--$2/aggregate-result.json" 2>/dev/null || true
 }
 
 mkdir -p "$OUT"
@@ -80,6 +103,7 @@ mkdir -p "$OUT"
 # only what it has left to do.
 pending=()
 failed=()
+accounted=0
 for spec in "${specs[@]}"; do
   plugin="${spec%%|*}"
   case_name="${spec##*|}"
@@ -89,13 +113,16 @@ for spec in "${specs[@]}"; do
     case "$verdict" in
       pass)
         echo "skip  $plugin/$case_name (scored previously)"
+        accounted=$(( accounted + 1 ))
         continue ;;
       incomplete*)
         echo "redo  $plugin/$case_name (${verdict#incomplete: })"
+        record_timing "$plugin" "$case_name"
         rm -rf "$OUT/$plugin--$case_name" ;;
       *)
         failed+=("$plugin/$case_name -- ${verdict#fail: }")
         echo "FAIL  $plugin/$case_name (${verdict#fail: })"
+        accounted=$(( accounted + 1 ))
         continue ;;
     esac
   fi
@@ -122,11 +149,24 @@ if (( ${#pending[@]} > 0 )); then
   # Longest first, so the ten-minute ensemble case starts before the
   # forty-second ones rather than straggling alone at the end.
   if (( JOBS > 1 )); then
-    ordered=()
-    while IFS= read -r spec; do
-      [[ -n "$spec" ]] && ordered+=("$spec")
-    done < <(printf '%s\n' "${pending[@]}" | FAST_EVAL_OUT="$OUT" python3 "$SELF_DIR/fast_evals_order.py")
-    pending=("${ordered[@]}")
+    # Ordering is an optimisation, never a filter. Take the new order only when
+    # the helper succeeded and returned every case it was given; anything else
+    # keeps discovery order. Command substitution, not process substitution,
+    # because the latter hides the helper's exit status.
+    if ordered_out="$(printf '%s\n' "${pending[@]}" \
+        | FAST_EVAL_OUT="$OUT" "${PY_RUN[@]}" "$SELF_DIR/fast_evals_order.py")"; then
+      ordered=()
+      while IFS= read -r spec; do
+        [[ -n "$spec" ]] && ordered+=("$spec")
+      done <<<"$ordered_out"
+      if (( ${#ordered[@]} == ${#pending[@]} )); then
+        pending=("${ordered[@]}")
+      else
+        echo "warn: ordering returned ${#ordered[@]} of ${#pending[@]} cases; keeping discovery order"
+      fi
+    else
+      echo "warn: ordering helper failed; keeping discovery order"
+    fi
   fi
   # Batches rather than a `wait -n` pool: macOS ships bash 3.2, which has no
   # `wait -n`, and a batch keeps the runner readable for the small win it gives
@@ -145,7 +185,9 @@ if (( ${#pending[@]} > 0 )); then
   for spec in "${pending[@]}"; do
     plugin="${spec%%|*}"
     case_name="${spec##*|}"
+    record_timing "$plugin" "$case_name"
     verdict="$(verdict_for "$OUT/$plugin--$case_name/aggregate-result.json")"
+    accounted=$(( accounted + 1 ))
     if [[ "$verdict" == pass ]]; then
       echo "ok    $plugin/$case_name"
     else
@@ -153,6 +195,14 @@ if (( ${#pending[@]} > 0 )); then
       echo "FAIL  $plugin/$case_name ($verdict)"
     fi
   done
+fi
+
+# Guards the whole class of bug this runner has now hit twice: reporting success
+# for work it never did.
+if (( accounted != ${#specs[@]} )); then
+  echo
+  echo "internal error: accounted for $accounted of ${#specs[@]} cases; refusing to report a result"
+  exit 1
 fi
 
 if (( ${#failed[@]} > 0 )); then

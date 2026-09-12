@@ -132,6 +132,8 @@ def authenticate(token: str, expires_at: float) -> str | None:
 PY
 
 cat >tests/test_auth.py <<'PY'
+import time
+
 from src.auth import is_expired
 
 
@@ -139,8 +141,10 @@ def test_expired_token_is_rejected() -> None:
     assert is_expired(0.0)
 
 
-def test_token_expiring_now_is_rejected() -> None:
-    import time
-
-    assert is_expired(time.time())
+def test_token_expiring_now_is_rejected(monkeypatch) -> None:
+    # Freeze the clock: reading it twice lets drift satisfy `<` on its own,
+    # so the exact-equality boundary would pass with or without the fix.
+    now = 1_700_000_000.0
+    monkeypatch.setattr(time, "time", lambda: now)
+    assert is_expired(now)
 PY
