@@ -30,6 +30,7 @@ for eval_dir in plugins/*/evals; do
   [[ -d "$eval_dir" ]] || continue
   plugin="$(basename "$(dirname "$eval_dir")")"
   trigger=""
+  routing_trigger=""
   for case_dir in "$eval_dir"/*/; do
     [[ -d "$case_dir" ]] || continue
     name="$(basename "$case_dir")"
@@ -37,10 +38,17 @@ for eval_dir in plugins/*/evals; do
     [[ -f "$case_dir/scaffold.sh" ]] && continue
     if [[ "$name" == *neg* ]]; then
       specs+=("$plugin|$name")
-    elif [[ -z "$trigger" ]]; then
-      trigger="$name"
+      continue
+    fi
+    [[ -z "$trigger" ]] && trigger="$name"
+    # Prefer a case that asserts the skill fired. This is a routing tripwire,
+    # and a case graded on the artifact instead fails for want of the write
+    # tools it is never given, which says nothing about routing.
+    if [[ -z "$routing_trigger" ]] && grep -rqs 'tool: Skill' "$case_dir"; then
+      routing_trigger="$name"
     fi
   done
+  [[ -n "$routing_trigger" ]] && trigger="$routing_trigger"
   [[ -n "$trigger" ]] && specs+=("$plugin|$trigger")
 done
 
