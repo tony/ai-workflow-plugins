@@ -14,7 +14,8 @@
 # and a few cents of API-equivalent usage per case.
 set -uo pipefail
 
-cd "$(dirname "$0")/.."
+SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SELF_DIR/.."
 
 LIST_ONLY=0
 [[ "${1:-}" == "--list" ]] && LIST_ONLY=1
@@ -34,6 +35,9 @@ for eval_dir in plugins/*/evals; do
   for case_dir in "$eval_dir"/*/; do
     [[ -d "$case_dir" ]] || continue
     name="$(basename "$case_dir")"
+    # Only a directory that defines a case is one. Running an eval with its
+    # default output location creates evals/results/, which is not.
+    [[ -f "$case_dir/case.yaml" || -f "$case_dir/prompt.md" ]] || continue
     # A scaffolded case needs tool grants the tripwire does not hand out.
     [[ -f "$case_dir/scaffold.sh" ]] && continue
     if [[ "$name" == *neg* ]]; then
@@ -60,6 +64,14 @@ fi
 
 # Without this every per-case log redirect fails, and each case is recorded as
 # a failure without ever being run.
+# A result passes only when it is complete, free of run errors, and every
+# grader asserting a Skill invocation passed. An aggregate score cannot carry
+# that alone: a routing case usually pairs one routing grader with one answer
+# grader, so at a 0.5 threshold the answer keeps a broken route green.
+verdict_for() {
+  FAST_EVAL_THRESHOLD="$THRESHOLD" python3 "$SELF_DIR/fast_evals_verdict.py" "$1"
+}
+
 mkdir -p "$OUT"
 
 echo "Fast suite: ${#specs[@]} cases, one run each, no ablation."
@@ -72,19 +84,21 @@ for spec in "${specs[@]}"; do
   # directory to force a re-run.
   result="$OUT/$plugin--$case_name/aggregate-result.json"
   if [[ -s "$result" ]]; then
-    if python3 -c "
-import json, sys
-score = json.load(open('$result'))['aggregates']['overallScore']
-sys.exit(0 if score >= $THRESHOLD else 1)
-" 2>/dev/null; then
-      echo "skip $plugin/$case_name (scored previously)"
-    else
-      failed+=("$plugin/$case_name")
-      echo "FAIL $plugin/$case_name (scored previously)"
-    fi
-    continue
+    verdict="$(verdict_for "$result")"
+    case "$verdict" in
+      pass)
+        echo "skip $plugin/$case_name (scored previously)"
+        continue ;;
+      incomplete*)
+        echo "redo  $plugin/$case_name (${verdict#incomplete: })"
+        rm -rf "$OUT/$plugin--$case_name" ;;
+      *)
+        failed+=("$plugin/$case_name -- ${verdict#fail: }")
+        echo "FAIL $plugin/$case_name (${verdict#fail: })"
+        continue ;;
+    esac
   fi
-  if ! env -u ANTHROPIC_API_KEY claude plugin eval "plugins/$plugin" \
+  env -u ANTHROPIC_API_KEY claude plugin eval "plugins/$plugin" \
       --case "$case_name" \
       --ablation none \
       --runs 1 \
@@ -94,11 +108,13 @@ sys.exit(0 if score >= $THRESHOLD else 1)
       --trust-plugin \
       --no-publish \
       --output-dir "$OUT/$plugin--$case_name" \
-      >"$OUT/$plugin--$case_name.log" 2>&1; then
-    failed+=("$plugin/$case_name")
-    echo "FAIL $plugin/$case_name"
+      >"$OUT/$plugin--$case_name.log" 2>&1
+  verdict="$(verdict_for "$result")"
+  if [[ "$verdict" == pass ]]; then
+    echo "ok    $plugin/$case_name"
   else
-    echo "ok   $plugin/$case_name"
+    failed+=("$plugin/$case_name -- ${verdict#*: }")
+    echo "FAIL  $plugin/$case_name ($verdict)"
   fi
 done
 
