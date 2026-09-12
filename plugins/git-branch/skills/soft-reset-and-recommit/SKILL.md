@@ -23,7 +23,7 @@ Four references carry the parts that must not drift:
 - `../../references/commit-messages.md` — style
   discovery, intent recovery, and the privacy gate.
 - `../../references/rebase-toolkit.md` — interactive
-  rebase with no editor, plus `references/rebase-todo.sh`.
+  rebase with no editor, plus `../../references/rebase-todo.sh`.
 
 ## Core principle
 
@@ -125,7 +125,7 @@ Write each message from the intent gathered in Phase 1, in the format
 discovered in Phase 3, preserving the original author identity and
 date. Carry `Co-authored-by` and ticket trailers forward.
 
-`<toolkit>` is the absolute path to `references/rebase-todo.sh`, which ships
+`<toolkit>` is the absolute path to `../../references/rebase-todo.sh`, which ships
 with this skill. A shell runs with your project as its working directory, not
 this skill's, so substitute the full path before invoking it.
 

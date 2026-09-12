@@ -226,7 +226,7 @@ command -v agent >/dev/null 2>&1 && echo "agent:available" || echo "agent:missin
 2. Else next CLI in the fallback chain → use it (`agent` slots use the `--model` flag)
 3. Else → slot unavailable, note in report
 
-The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `docs/repo-guard-protocol.md`). Because brainstorm runs multiple variants per model that may execute in parallel, each variant isolates `agy` in its own uniquely-named worktree.
+The **Antigravity** slot is Google's lane: `agy` (Antigravity) supersedes the standalone `gemini` CLI, which Google retires on 2026-06-18. `agy` has no native read-only mode, so read-only commands isolate it in a disposable git worktree (Repo Guard Layer 1; see `../../docs/repo-guard-protocol.md`). Because brainstorm runs multiple variants per model that may execute in parallel, each variant isolates `agy` in its own uniquely-named worktree.
 
 Report which models will participate and which backend each uses.
 
@@ -397,7 +397,7 @@ Store `$SESSION_DIR` for use in all subsequent phases.
 #### Step 8b: Repo Guard — Capture Fingerprint
 
 Capture the repository state before any model runs. See
-`docs/repo-guard-protocol.md` Layer 2 for the full protocol.
+`../../docs/repo-guard-protocol.md` Layer 2 for the full protocol.
 
 ```bash
 REPO_TOPLEVEL="$(git rev-parse --show-toplevel)"
@@ -487,7 +487,7 @@ For each Antigravity variant (1 through `variant_count`), launch a separate Task
 The agent must:
 
 1. Read the variant prompt from `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
-2. Run the resolved Antigravity command with output redirection. **Repo Guard**: `agy` has no native read-only mode (its print mode reads *and* writes), so isolate it in a disposable git worktree checked out at `HEAD` — agy reads the snapshot while any stray write lands in the throwaway worktree, never the main repo (see `docs/repo-guard-protocol.md` Layer 1). Because multiple variants can run concurrently, each variant's worktree path carries its variant number (`-v<N>`) so parallel runs never share a worktree. The `gemini` and `agent` fallbacks keep their own native read-only modes.
+2. Run the resolved Antigravity command with output redirection. **Repo Guard**: `agy` has no native read-only mode (its print mode reads *and* writes), so isolate it in a disposable git worktree checked out at `HEAD` — agy reads the snapshot while any stray write lands in the throwaway worktree, never the main repo (see `../../docs/repo-guard-protocol.md` Layer 1). Because multiple variants can run concurrently, each variant's worktree path carries its variant number (`-v<N>`) so parallel runs never share a worktree. The `gemini` and `agent` fallbacks keep their own native read-only modes.
 
    **Primary (`agy` CLI, disposable worktree)**:
    ```bash
@@ -544,7 +544,7 @@ For each GPT variant (1 through `variant_count`), launch a separate Task agent (
 The agent must:
 
 1. Read the variant prompt from `$SESSION_DIR/brainstorm/prompts/variant-<N>.md`
-2. Run the resolved GPT command with output redirection. **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `docs/repo-guard-protocol.md` Layer 1):
+2. Run the resolved GPT command with output redirection. **Repo Guard**: invoke the CLI in its native read-only sandbox — it reads the repo but cannot write it (see `../../docs/repo-guard-protocol.md` Layer 1):
 
    **Native (`codex` CLI)**:
    ```bash
@@ -898,7 +898,7 @@ Produce a woven version starting from the winner, incorporating runner-up streng
 
 ### Step 4: Distribute (skip for final pass)
 
-If this is NOT the final pass, distribute the woven version back to ALL models. Create the next pass directory and construct the distribution prompt using the standard refinement wording from `refine.md` (not the brainstorm-origin wording from Phase 5 Step 4 — by pass 2+, models are iterating on a refined artifact, not brainstorm originals). Dispatch all models in parallel.
+If this is NOT the final pass, distribute the woven version back to ALL models. Create the next pass directory and construct the distribution prompt using the standard refinement wording from `../refine/SKILL.md` (not the brainstorm-origin wording from Phase 5 Step 4 — by pass 2+, models are iterating on a refined artifact, not brainstorm originals). Dispatch all models in parallel.
 
 Write prompt to `$SESSION_DIR/refine/pass-NEXT/prompt.md`. Write outputs to `$SESSION_DIR/refine/pass-NEXT/outputs/<model>.md`.
 
@@ -972,7 +972,7 @@ After the reference returns, finalize the session:
 
 ## Rules
 
-- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
+- Never modify project files — this is project-read-only research. Session artifacts are written to `$AI_AIP_ROOT`, which is outside the repository. The Repo Guard Protocol (`../../docs/repo-guard-protocol.md`) enforces this: external CLIs run in their native read-only sandbox (Layer 1) — they can read the repo but not write it — post-CLI verification reverts any write that bypasses the sandbox, and session-end verification catches anything else.
 - Each brainstorm variant MUST receive a separate, independent prompt invocation to prevent anchoring. Never combine multiple variants in a single model call.
 - When `--variants=1`, omit the variant label from brainstorm output headers (just "Claude", not "Claude — Variant 1").
 - The woven version MUST go back to ALL models for each subsequent refinement pass — do not let the judge refine alone.

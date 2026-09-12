@@ -1,0 +1,50 @@
+schema_version: "1.0"
+name: 02-refresh-retry-wording
+description: >-
+  The branch added a vague changelog entry for a real code change. Refresh
+  must tighten that entry, leave the base branch's entry alone, and commit
+  because --commit was passed.
+tags: [fixture, git]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /changelog:refresh --commit the retry backoff wording was tightened
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Bash, Read, Glob, Grep, Skill, Edit]
+
+runs: 3
+
+graders:
+  - name: quotes-the-vague-entry-it-found
+    type: regex
+    target: last_message
+    pattern: 'a bit better'
+
+  - name: proposes-the-jitter-it-read-from-the-diff
+    type: regex
+    target: last_message
+    pattern: 'jitter'
+    flags: i
+
+  - name: names-the-real-cap
+    type: regex
+    target: last_message
+    pattern: '\b30\b'
+
+  - name: base-branch-entry-untouched
+    type: regex
+    target:
+      source: file
+      path: CHANGES.md
+    pattern: 'config loader'
+
+  - name: never-rewrites-history
+    type: tool_used
+    tool: Bash
+    input_match: '--amend|git rebase|push --force'
+    min: 0
+    max: 0
+    arm: both

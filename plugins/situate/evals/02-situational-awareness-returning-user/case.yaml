@@ -1,0 +1,54 @@
+schema_version: "1.0"
+name: 02-situational-awareness-returning-user
+description: >-
+  The half-finished work really is in the history and really is in the repo.
+  Catching the user up means reading both, not asking them to re-explain.
+tags: [history]
+
+context:
+  scaffold_script: scaffold.sh
+  history_file: history.jsonl
+
+execution:
+  prompt: >-
+    I'm back after a two-week break. Bring me up to speed on everything — what
+    changed, what's still open, and what's blocking me.
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Bash, Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill":\s*"(situate:)?situational-awareness"'
+
+  - name: names-the-branch
+    type: regex
+    target: last_message
+    pattern: 'fix/exponential-backoff'
+
+  - name: surfaces-the-open-decision
+    type: regex
+    target: last_message
+    pattern: 'retry_budget|per[- ]call|budget'
+    flags: i
+
+  - name: does-not-ask-the-user-to-re-explain
+    type: regex
+    target: last_message
+    match: not_contains
+    pattern: 'remind me what|could you tell me what you were|what were you working on'
+    flags: i
+
+  - name: reports-state-from-both-sources
+    type: llm
+    focus: last_message
+    criteria: |
+      The reply says what is committed on the branch and what is still
+      uncommitted in the working tree.
+      The reply names the unresolved decision about the retry budget as the
+      thing that is blocking, drawing on the earlier conversation rather than
+      asking the user to recall it.

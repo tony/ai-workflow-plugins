@@ -1,0 +1,38 @@
+schema_version: "1.0"
+name: routing-codex-session-relay
+description: >-
+  "my other codex session" is a relay, not a delegation. With both plugins
+  loaded, agent-messaging must win and model-cli must stay quiet.
+tags: [routing]
+
+plugins: ["../../plugins/model-cli", "../../plugins/agent-messaging"]
+
+execution:
+  prompt: Send a message to my other codex session telling it the migration finished.
+  max_turns: 10
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: session-relay-wins
+    type: tool_used
+    tool: Skill
+    input_match: '"skill":\s*"(agent-messaging:)?session-relay"'
+    arm: both
+
+  - name: model-cli-stays-quiet
+    type: tool_used
+    tool: Skill
+    input_match: '"skill":\s*"(model-cli:)?(codex|gpt|gemini|agy|cursor)"'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: addresses-relaying-not-delegation
+    type: llm
+    focus: last_message
+    criteria: |
+      The reply is about delivering a message to another running session, not
+      about running a command-line tool to analyse code.

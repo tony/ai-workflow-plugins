@@ -1,0 +1,69 @@
+schema_version: "1.0"
+name: 01-commit-auth-hint
+description: >-
+  With an unstaged auth fix and a history that teaches the convention, the
+  skill stages the changed files and writes a conventional commit.
+tags: [fixture, git]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /commit:commit fix the auth bug
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Bash, Read, Glob, Grep, Skill]
+
+runs: 3
+
+graders:
+  - name: commit-created
+    type: tool_used
+    tool: Bash
+    input_match: 'git commit'
+
+  - name: subject-follows-project-convention
+    type: tool_used
+    tool: Bash
+    input_match: 'git commit[\s\S]*?[A-Za-z][\w-]*\((feat|fix|refactor|docs|chore|test|style)(\[[^\]]*\])?\)\s+\S'
+
+  - name: body-has-why-and-what
+    type: tool_used
+    tool: Bash
+    input_match: 'git commit[\s\S]*?why:[\s\S]*?what:'
+
+  - name: message-describes-the-auth-fix
+    type: tool_used
+    tool: Bash
+    input_match: 'git commit[\s\S]*?[Aa]uth(?!ored)'
+
+  - name: stages-named-files-not-everything
+    type: tool_used
+    tool: Bash
+    input_match: 'git add (-A\b|--all\b|\.(?![\w/]))'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: never-pushes-or-amends
+    type: tool_used
+    tool: Bash
+    input_match: 'git push|--amend|--no-verify'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: no-ai-signature-in-message
+    type: tool_used
+    tool: Bash
+    input_match: 'Co-Authored-By|Generated with|Co-authored-by'
+    min: 0
+    max: 0
+    arm: both
+
+  - name: reports-the-commit-it-made
+    type: llm
+    focus: last_message
+    criteria: |
+      The reply states that a commit was created, and identifies it by either
+      its hash or its subject line.

@@ -578,7 +578,7 @@
         "plugins/rebase/skills/rebase/SKILL.md"
       ],
       "bundled": {},
-      "bytes": 4336
+      "bytes": 4691
     },
     {
       "name": "release-bump",
@@ -904,7 +904,7 @@
       "bundled": {
         "references/verification-gates.md": "plugins/spike/references/verification-gates.md"
       },
-      "bytes": 14713
+      "bytes": 14518
     },
     {
       "name": "tailwind-spacing-audit",
@@ -1084,7 +1084,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 127625
+      "bytes": 127638
     },
     {
       "name": "weave-execute",
@@ -1108,7 +1108,7 @@
         "references/ensemble-techniques.md": "plugins/weave/references/ensemble-techniques.md",
         "references/present-results.md": "plugins/weave/references/present-results.md"
       },
-      "bytes": 30793
+      "bytes": 31230
     },
     {
       "name": "weave-plan",
@@ -1185,7 +1185,7 @@
         "references/slop-signatures.yml": "plugins/slop/references/signatures.yml",
         "references/worker-backends.md": "plugins/weave/references/worker-backends.md"
       },
-      "bytes": 111398
+      "bytes": 111445
     }
   ],
   "duplication": {

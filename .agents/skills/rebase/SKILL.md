@@ -12,10 +12,14 @@ metadata:
 ## Context
 
 - Current branch: !`git branch --show-current`
-- Trunk branch: !`git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"`
-- Remote refs available: !`git remote -v 2>/dev/null | head -2`
-- Commits on current branch not on trunk: !`TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"); git log --oneline "origin/${TRUNK}..HEAD" 2>/dev/null || echo "(could not determine commits ahead)"`
-- Diff from trunk (summary): !`TRUNK=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "master"); git diff --stat "origin/${TRUNK}" 2>/dev/null || echo "(could not diff against trunk)"`
+- Working tree: !`git status --short`
+- Remote refs available: !`git remote -v`
+
+These run before the first turn, so each is a single command that succeeds in
+any repository. Anything needing the trunk is derived in Phase 1 instead: a
+repository set up with `git init` and `git remote add` has no
+`refs/remotes/origin/HEAD`, and a context command that exits non-zero takes the
+whole invocation with it.
 
 ## Your Task
 
@@ -23,7 +27,17 @@ Rebase the current branch onto the remote trunk branch. Follow these steps caref
 
 ### Phase 1: Detect trunk branch
 
-Determine the trunk branch name from the context above (the "Trunk branch" value). Store it mentally as `TRUNK`. It will typically be `master` or `main`. If detection failed, try both `origin/master` and `origin/main` to see which exists.
+Determine the trunk branch name and store it as `TRUNK`, the **bare** name — every use below prefixes it with `origin/` itself, so storing `origin/main` here would ask git for `origin/origin/main`.
+
+Ask the remote first, because it answers before anything has been fetched:
+
+```
+git ls-remote --symref origin HEAD
+```
+
+The `ref:` line names the remote's default branch, so `TRUNK` is the part after `refs/heads/`. A repository built with `git init` plus `git remote add` has no remote-tracking refs at all until Phase 2 fetches, so local lookups cannot answer this yet.
+
+If the remote is unreachable, fall back to `git symbolic-ref --short refs/remotes/origin/HEAD` (which prints `origin/<branch>` — take the part after the slash), and failing that to whichever of `origin/main` or `origin/master` `git rev-parse --verify` resolves.
 
 ### Phase 2: Fetch latest and analyze
 

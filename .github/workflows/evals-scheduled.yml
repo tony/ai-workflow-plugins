@@ -1,0 +1,44 @@
+name: Evals (scheduled)
+
+# A routing tripwire, not a gate on changes. It calls a model for every case,
+# so it runs on a schedule rather than per pull request, and by hand when a
+# routing change needs checking.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: "Minimum per-case score"
+        required: false
+        default: "0.5"
+
+jobs:
+  fast:
+    runs-on: ubuntu-latest
+    # One run per case, around a minute each; see evals/README.md for the
+    # measured cost of a full pass.
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run the fast suite
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          FAST_EVAL_THRESHOLD: ${{ github.event.inputs.threshold || '0.5' }}
+        run: scripts/fast_evals.sh
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-eval-results
+          path: evals/results/fast/
+          retention-days: 14

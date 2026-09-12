@@ -264,7 +264,8 @@ each model producing all three lens variants in parallel.
 ### Variant Preambles (locked)
 
 The variant preambles are FIXED for serene-bliss — the variant preamble
-table from brainstorm.md/brainstorm-and-refine.md does NOT apply.
+table from `../brainstorm/SKILL.md` and
+`../brainstorm-and-refine/SKILL.md` does NOT apply.
 Instead, every variant receives the **same** compound preamble (above),
 prefixed by weave's standard "Variant N of M:" marker. The compound
 preamble's slot directives route each variant to its lens by variant
@@ -340,7 +341,7 @@ The agent must:
    reads *and* writes), so isolate it in a disposable git worktree
    checked out at `HEAD` — agy reads the snapshot while any stray write
    lands in the throwaway worktree, never the main repo (see
-   `docs/repo-guard-protocol.md` Layer 1). Because multiple variants
+   `../../docs/repo-guard-protocol.md` Layer 1). Because multiple variants
    can run concurrently, each variant's worktree path carries its
    variant number (`-v<N>`) so parallel runs never share a worktree.
    The `gemini` and `agent` fallbacks keep their own native read-only
@@ -407,7 +408,7 @@ replacements. Include `$REPO_TOPLEVEL` and `$REPO_FINGERPRINT` in the
 agent prompt for post-CLI verification.
 
 **Repo Guard**: invoke the CLI in its native read-only sandbox — it
-reads the repo but cannot write it (see `docs/repo-guard-protocol.md`
+reads the repo but cannot write it (see `../../docs/repo-guard-protocol.md`
 Layer 1).
 
 **Native (`codex` CLI)**:
@@ -521,7 +522,7 @@ Launch one judge per available model **in the same turn**:
   native read-only mode, so isolate it in a disposable git worktree
   named `${REPO_TOPLEVEL}-weave-agy-ro-judge` (a SEPARATE worktree from
   any model-pass run so the two never collide; see
-  `docs/repo-guard-protocol.md` Layer 1). Writes to
+  `../../docs/repo-guard-protocol.md` Layer 1). Writes to
   `$SESSION_DIR/refine/pass-0001/judges/agy.md`.
 
   **Primary (`agy` CLI, disposable worktree)**:
@@ -550,7 +551,7 @@ Launch one judge per available model **in the same turn**:
 **Repo Guard**: the GPT judge CLI must use the same native read-only
 sandbox invocation as Phase 3 variant dispatches, and the Antigravity
 judge must run inside its `-judge` disposable worktree as above
-(see `docs/repo-guard-protocol.md` Layer 1). After each judge CLI
+(see `../../docs/repo-guard-protocol.md` Layer 1). After each judge CLI
 returns, run the post-CLI repo state verification — capture
 `CURRENT_STATUS="$(git -C "$REPO_TOPLEVEL" status --porcelain)"`,
 and if `$CURRENT_STATUS` differs from `$REPO_FINGERPRINT`, revert
@@ -683,7 +684,8 @@ and writes it to `$SESSION_DIR/refine/pass-0001/woven.md`.
 ### Step 6: Distribute (if pass_count > 1)
 
 Follow Phase 5 Step 4 (Distribute for Pass 2) of
-`brainstorm-and-refine.md` verbatim. Send the woven version back to
+`../brainstorm-and-refine/SKILL.md` verbatim. Send the woven version
+back to
 all 3 models for the next
 pass's critique.
 
