@@ -50,6 +50,10 @@ if (( LIST_ONLY )); then
   exit 0
 fi
 
+# Without this every per-case log redirect fails, and each case is recorded as
+# a failure without ever being run.
+mkdir -p "$OUT"
+
 echo "Fast suite: ${#specs[@]} cases, one run each, no ablation."
 failed=()
 for spec in "${specs[@]}"; do
