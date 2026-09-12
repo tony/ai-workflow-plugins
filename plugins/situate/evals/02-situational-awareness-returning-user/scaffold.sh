@@ -3,6 +3,12 @@
 # is still unstaged, and trunk has moved underneath it.
 set -euo pipefail
 
+# The prompt and history.jsonl both say this work stopped two weeks ago. Date
+# the commits to match, so a skill reading `git log --format=%cr` is not told
+# one thing by the transcript and another by the repository.
+export GIT_AUTHOR_DATE="2026-08-28T09:00:00+00:00"
+export GIT_COMMITTER_DATE="2026-08-28T09:00:00+00:00"
+
 git init -b main >/dev/null
 
 cat >.gitignore <<'MD'
