@@ -25,7 +25,17 @@ Rebase the current branch onto the remote trunk branch. Follow these steps caref
 
 ### Phase 1: Detect trunk branch
 
-Determine the trunk branch name and store it as `TRUNK`. Run `git symbolic-ref --short refs/remotes/origin/HEAD`: it prints `origin/<branch>`, so `TRUNK` is the part **after** the slash — the bare name, because every use below prefixes it with `origin/` itself. That ref is unset in a repository built with `git init` plus `git remote add`, in which case the command exits non-zero; fall back to whichever of `origin/main` or `origin/master` `git rev-parse --verify` resolves.
+Determine the trunk branch name and store it as `TRUNK`, the **bare** name — every use below prefixes it with `origin/` itself, so storing `origin/main` here would ask git for `origin/origin/main`.
+
+Ask the remote first, because it answers before anything has been fetched:
+
+```
+git ls-remote --symref origin HEAD
+```
+
+The `ref:` line names the remote's default branch, so `TRUNK` is the part after `refs/heads/`. A repository built with `git init` plus `git remote add` has no remote-tracking refs at all until Phase 2 fetches, so local lookups cannot answer this yet.
+
+If the remote is unreachable, fall back to `git symbolic-ref --short refs/remotes/origin/HEAD` (which prints `origin/<branch>` — take the part after the slash), and failing that to whichever of `origin/main` or `origin/master` `git rev-parse --verify` resolves.
 
 ### Phase 2: Fetch latest and analyze
 
